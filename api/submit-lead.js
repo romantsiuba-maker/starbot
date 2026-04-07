@@ -2,7 +2,7 @@ import { createHash } from "crypto";
 
 const META_PIXEL_ID = "831360616646272";
 const EDGE_FUNCTION_URL =
-  "https://nduzzjtpvcgeelqwcfil.supabase.co/functions/v1/starbot-lead-notify";
+  "https://lxowggiqhuvwhzbktlsi.supabase.co/functions/v1/starbot-lead-notify";
 
 function sha256(value) {
   return createHash("sha256").update(value.trim().toLowerCase()).digest("hex");
