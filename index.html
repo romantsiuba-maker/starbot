@@ -20,23 +20,40 @@
     />
 
     <!-- Meta Pixel Code -->
-    <!--
     <script>
-    !function(f,b,e,v,n,t,s)
-    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-    n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];
-    s.parentNode.insertBefore(t,s)}(window, document,'script',
-    'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', 'YOUR_PIXEL_ID');
-    fbq('track', 'PageView');
-    fbq('track', 'ViewContent');
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return;
+        n = f.fbq = function () {
+          n.callMethod
+            ? n.callMethod.apply(n, arguments)
+            : n.queue.push(arguments);
+        };
+        if (!f._fbq) f._fbq = n;
+        n.push = n;
+        n.loaded = !0;
+        n.version = "2.0";
+        n.queue = [];
+        t = b.createElement(e);
+        t.async = !0;
+        t.src = v;
+        s = b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t, s);
+      })(
+        window,
+        document,
+        "script",
+        "https://connect.facebook.net/en_US/fbevents.js",
+      );
+      fbq("init", "831360616646272");
+      fbq("track", "PageView");
     </script>
-    <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=YOUR_PIXEL_ID&ev=PageView&noscript=1"/></noscript>
-    -->
+    <noscript
+      ><img
+        height="1"
+        width="1"
+        style="display: none"
+        src="https://www.facebook.com/tr?id=831360616646272&ev=PageView&noscript=1"
+    /></noscript>
     <!-- End Meta Pixel Code -->
 
     <style>
@@ -1007,15 +1024,27 @@
         <h2 class="form-title">Get a Free Consultation</h2>
         <p class="form-subtitle">See if your location qualifies</p>
         <form id="consultation-form">
-          <div class="form-group">
-            <label for="name">Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              placeholder="Your full name"
-              required
-            />
+          <div style="display: flex; gap: 12px">
+            <div class="form-group" style="flex: 1">
+              <label for="first_name">First Name</label>
+              <input
+                type="text"
+                id="first_name"
+                name="first_name"
+                placeholder="First name"
+                required
+              />
+            </div>
+            <div class="form-group" style="flex: 1">
+              <label for="last_name">Last Name</label>
+              <input
+                type="text"
+                id="last_name"
+                name="last_name"
+                placeholder="Last name"
+                required
+              />
+            </div>
           </div>
           <div class="form-group">
             <label for="company">Company / Building</label>
@@ -1050,6 +1079,15 @@
           <div class="form-group">
             <label for="phone">Phone (optional)</label>
             <input type="tel" id="phone" name="phone" placeholder="+44..." />
+          </div>
+          <div class="form-group">
+            <label for="message">Message (optional)</label>
+            <input
+              type="text"
+              id="message"
+              name="message"
+              placeholder="Tell us about your space or any questions"
+            />
           </div>
           <div style="position: absolute; left: -9999px; top: -9999px">
             <label for="website">Website</label>
@@ -1188,12 +1226,17 @@
       var utmSource = urlParams.get("utm_source") || null;
       var utmMedium = urlParams.get("utm_medium") || null;
       var utmCampaign = urlParams.get("utm_campaign") || null;
+      var utmContent = urlParams.get("utm_content") || null;
 
-      // Edge function endpoint
-      var EDGE_FUNCTION_URL =
-        "https://nduzzjtpvcgeelqwcfil.supabase.co/functions/v1/starbot-lead-notify";
+      // Cookie helpers
+      function getCookie(name) {
+        var match = document.cookie.match(
+          new RegExp("(^| )" + name + "=([^;]+)"),
+        );
+        return match ? decodeURIComponent(match[2]) : null;
+      }
 
-      // Form submission
+      // Form submission → Vercel serverless function → CAPI + edge function
       var form = document.getElementById("consultation-form");
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
@@ -1202,24 +1245,34 @@
         btn.textContent = "Sending...";
 
         try {
-          var res = await fetch(EDGE_FUNCTION_URL, {
+          var res = await fetch("/api/submit-lead", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              name: document.getElementById("name").value,
+              first_name: document.getElementById("first_name").value,
+              last_name: document.getElementById("last_name").value,
               company: document.getElementById("company").value,
               role: document.getElementById("role").value,
               email: document.getElementById("email").value,
               phone: document.getElementById("phone").value || null,
+              message: document.getElementById("message").value || null,
               website: document.getElementById("website").value,
               source: "landing_page",
+              source_url: window.location.href,
               utm_source: utmSource,
               utm_medium: utmMedium,
               utm_campaign: utmCampaign,
+              utm_content: utmContent,
+              fbp: getCookie("_fbp"),
+              fbc: getCookie("_fbc"),
             }),
           });
           if (res.ok) {
-            // fbq('track', 'Lead'); // Uncomment when pixel is live
+            var data = await res.json();
+            // Fire browser pixel Lead event with same event_id for dedup
+            if (window.fbq && data.event_id) {
+              fbq("track", "Lead", {}, { eventID: data.event_id });
+            }
             document.getElementById("form-container").innerHTML =
               '<div class="success-state">' +
               '<div class="success-icon">\u2713</div>' +
