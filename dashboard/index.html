@@ -592,109 +592,96 @@
         border-color: var(--accent);
       }
 
-      /* Conversation log */
+      /* Conversation log — S&S layout: date + sender + tag in one row, body indented */
       .convo-entries {
         display: flex;
         flex-direction: column;
         gap: 0;
         margin-bottom: 14px;
-        max-height: 280px;
+        max-height: 320px;
         overflow-y: auto;
+        padding-right: 4px;
       }
       .convo-entry {
+        padding-bottom: 16px;
+      }
+      .convo-entry + .convo-entry {
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+      }
+      .convo-meta-row {
         display: flex;
-        gap: 12px;
-        padding: 14px 0;
-        border-bottom: 1px solid var(--border);
-      }
-      .convo-entry:last-child {
-        border-bottom: none;
-      }
-      .convo-date-col {
-        flex-shrink: 0;
-        width: 90px;
-        text-align: right;
-        padding-top: 1px;
+        align-items: baseline;
+        gap: 10px;
       }
       .convo-date {
         font-family: var(--font-mono);
-        font-size: 11px;
+        font-size: 10px;
+        font-variant-numeric: tabular-nums;
         color: var(--text-tertiary);
         white-space: nowrap;
+        flex-shrink: 0;
+        width: 96px;
+        margin-top: 1px;
+      }
+      .convo-sender {
+        font-size: 13px;
+        font-weight: 600;
+        flex-shrink: 0;
+        width: 80px;
+      }
+      .convo-sender.lead {
+        color: var(--accent);
+      }
+      .convo-sender.roman {
+        color: #e8a87c;
+      }
+      .convo-sender.system {
+        color: var(--text-tertiary);
+      }
+      .convo-tag-flat {
+        font-family: var(--font-mono);
+        font-size: 10px;
+      }
+      .convo-tag-flat.tag-inquiry {
+        color: var(--success);
+      }
+      .convo-tag-flat.tag-reply {
+        color: var(--info);
+      }
+      .convo-tag-flat.tag-note {
+        color: var(--text-tertiary);
+      }
+      .convo-tag-flat.tag-default {
+        color: var(--text-tertiary);
       }
       .convo-body {
-        flex: 1;
-        min-width: 0;
-        border-left: 2px solid var(--border);
-        padding-left: 12px;
+        padding-left: 106px;
+      }
+      .convo-subject {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--text-tertiary);
+        margin-bottom: 2px;
       }
       .convo-text {
-        font-size: 13px;
-        color: var(--text-secondary);
-        line-height: 1.5;
+        font-size: 14px;
+        color: var(--text-primary);
+        line-height: 1.6;
         white-space: pre-wrap;
       }
-      .convo-tag {
-        display: inline-block;
-        font-family: var(--font-mono);
-        font-size: 9px;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+      .convo-text a {
         color: var(--accent);
-        background: rgba(45, 182, 183, 0.1);
-        border: 1px solid rgba(45, 182, 183, 0.2);
-        padding: 1px 6px;
-        border-radius: 4px;
-        margin-bottom: 4px;
+        text-decoration: none;
+      }
+      .convo-text a:hover {
+        text-decoration: underline;
       }
       .convo-empty {
         padding: 24px 0;
         text-align: center;
         color: var(--text-tertiary);
         font-size: 13px;
-      }
-      .convo-add {
-        display: flex;
-        gap: 8px;
-        background: var(--bg-elevated);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-        padding: 4px 4px 4px 12px;
-        align-items: center;
-        transition: border-color 0.15s;
-      }
-      .convo-add:focus-within {
-        border-color: var(--accent);
-      }
-      .convo-input {
-        flex: 1;
-        padding: 8px 0;
-        background: transparent;
-        border: none;
-        color: var(--text-primary);
-        font-family: var(--font-body);
-        font-size: 13px;
-        outline: none;
-      }
-      .convo-input::placeholder {
-        color: var(--text-tertiary);
-      }
-      .convo-add-btn {
-        padding: 7px 14px;
-        background: var(--accent);
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        font-family: var(--font-body);
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.15s;
-        white-space: nowrap;
-      }
-      .convo-add-btn:hover {
-        background: var(--accent-hover);
       }
 
       /* Unified compose area */
@@ -728,19 +715,21 @@
         gap: 8px;
       }
       .btn-note {
-        padding: 6px 8px;
-        background: none;
-        color: var(--text-tertiary);
-        border: none;
+        padding: 6px 14px;
+        background: transparent;
+        color: var(--text-secondary);
+        border: 0.5px solid var(--border);
+        border-radius: 8px;
         font-family: var(--font-mono);
-        font-size: 11px;
-        font-weight: 500;
+        font-size: 10px;
+        font-weight: 600;
         cursor: pointer;
-        transition: color 0.15s;
+        transition: all 0.15s;
         white-space: nowrap;
       }
       .btn-note:hover {
-        color: var(--text-secondary);
+        border-color: var(--border-hover);
+        color: var(--text-primary);
       }
       .btn-note:disabled,
       .btn-send:disabled {
@@ -750,31 +739,35 @@
       .btn-send {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        padding: 6px 8px;
-        background: none;
-        color: var(--accent);
-        border: none;
-        border-radius: 0;
+        gap: 6px;
+        padding: 6px 12px;
+        background: #052e16;
+        color: #4ade80;
+        border: 1px solid #14532d;
+        border-radius: 20px;
         font-family: var(--font-mono);
-        font-size: 11px;
-        font-weight: 500;
+        font-size: 10px;
+        font-weight: 600;
         cursor: pointer;
-        transition: color 0.15s;
+        transition: all 0.15s;
         white-space: nowrap;
       }
       .btn-send:hover {
-        color: var(--accent-hover);
+        background: #064e24;
+        color: #6ee7a0;
       }
       .btn-send.wa {
-        color: #25d366;
+        background: #052e16;
+        color: #4ade80;
+        border-color: #14532d;
       }
       .btn-send.wa:hover {
-        color: #2ee677;
+        background: #064e24;
+        color: #6ee7a0;
       }
       .btn-send svg {
-        width: 13px;
-        height: 13px;
+        width: 12px;
+        height: 12px;
       }
 
       /* Inline subject field for email compose */
@@ -944,34 +937,38 @@
         background: rgba(248, 113, 113, 0.1);
       }
       .action-email {
+        display: flex;
+        align-items: center;
+        gap: 6px;
         font-family: var(--font-body);
         font-size: 12px;
-        font-weight: 600;
-        color: #fff;
-        background: var(--accent);
-        border: none;
-        border-radius: 6px;
-        padding: 7px 14px;
-        cursor: pointer;
-        transition: background 0.15s;
-      }
-      .action-email:hover {
-        background: var(--accent-hover);
-      }
-      .action-next {
-        font-family: var(--font-mono);
-        font-size: 11px;
         color: var(--text-secondary);
         background: none;
-        border: 1px solid var(--border);
+        border: none;
         border-radius: 6px;
-        padding: 6px 12px;
+        padding: 6px 10px;
+        cursor: pointer;
+        transition: all 0.15s;
+        text-decoration: none;
+      }
+      .action-email:hover {
+        background: rgba(232, 168, 124, 0.1);
+        color: #e8a87c;
+      }
+      .action-next {
+        font-family: var(--font-body);
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--accent);
+        background: none;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 10px;
         cursor: pointer;
         transition: all 0.15s;
       }
       .action-next:hover {
-        border-color: var(--accent);
-        color: var(--accent);
+        background: rgba(45, 182, 183, 0.1);
       }
       .action-close-btn {
         font-family: var(--font-mono);
@@ -1433,7 +1430,21 @@
             id="modal-created"
           ></span>
           <button class="action-delete" id="action-delete">Delete</button>
-          <button class="action-email hidden" id="action-email">✉ Email</button>
+          <button class="action-email hidden" id="action-email">
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg
+            >Email
+          </button>
           <div class="action-spacer"></div>
           <button class="action-next" id="action-next"></button>
           <button class="action-close-btn" id="action-close-btn">Close</button>
@@ -2096,17 +2107,23 @@
                   ? "lead"
                   : "system";
             const tag = entry.tag || (entry.from ? "" : "Note");
+            const tagClass =
+              tag.toLowerCase() === "inquiry"
+                ? "tag-inquiry"
+                : tag.toLowerCase() === "reply"
+                  ? "tag-reply"
+                  : tag.toLowerCase() === "note"
+                    ? "tag-note"
+                    : "tag-default";
 
             return `<div class="convo-entry">
-              <div class="convo-date-col">
-                <div class="convo-date">${formatShort(entry.date)}</div>
+              <div class="convo-meta-row">
+                <span class="convo-date">${formatShort(entry.date)}</span>
+                <span class="convo-sender ${senderClass}">${esc(sender)}</span>
+                ${tag ? `<span class="convo-tag-flat ${tagClass}">&middot; ${esc(tag.toLowerCase())}</span>` : ""}
               </div>
               <div class="convo-body">
-                <div class="convo-header">
-                  <span class="convo-sender ${senderClass}">${esc(sender)}</span>
-                  ${tag ? `<span class="convo-tag">${esc(tag)}</span>` : ""}
-                </div>
-                ${entry.subject ? `<div class="convo-subject">${esc(entry.subject)}</div>` : ""}
+                ${entry.subject ? `<div class="convo-subject">Subject: ${esc(entry.subject)}</div>` : ""}
                 <div class="convo-text">${linkify(entry.text)}</div>
               </div>
             </div>`;
