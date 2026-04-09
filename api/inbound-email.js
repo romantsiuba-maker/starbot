@@ -49,14 +49,70 @@ export default async function handler(req, res) {
     const payload = req.body;
     const eventType = payload.type || "unknown";
 
-    // Only process inbound emails — ignore outbound events (sent, delivered, opened, etc.)
+    const data = payload.data || {};
+    const emailId = data.email_id;
+
+    // Delivery status updates (sent, delivered, bounced)
+    const STATUS_EVENTS = {
+      "email.sent": "sent",
+      "email.delivered": "delivered",
+      "email.bounced": "bounced",
+    };
+
+    if (STATUS_EVENTS[eventType]) {
+      if (!emailId) {
+        console.log(`[inbound-email] ${eventType} without email_id, skipping`);
+        return res.status(200).json({ ok: true });
+      }
+
+      const sb = createClient(supabaseUrl, supabaseServiceKey);
+      const { data: leads, error: lookupErr } = await sb
+        .from("starbot_leads")
+        .select("id, conversation_log")
+        .filter("conversation_log", "cs", JSON.stringify([{ resend_id: emailId }]));
+
+      if (lookupErr) {
+        console.error(`[inbound-email] ${eventType} lookup failed:`, lookupErr.message);
+        return res.status(200).json({ ok: true });
+      }
+
+      if (!leads || leads.length === 0) {
+        console.log(`[inbound-email] ${eventType} — no lead matched for resend_id ${emailId}`);
+        return res.status(200).json({ ok: true });
+      }
+
+      const lead = leads[0];
+      const log = Array.isArray(lead.conversation_log) ? lead.conversation_log : [];
+      let updated = false;
+      for (const entry of log) {
+        if (entry.resend_id === emailId) {
+          entry.status = STATUS_EVENTS[eventType];
+          updated = true;
+          break;
+        }
+      }
+
+      if (updated) {
+        const { error: updateErr } = await sb
+          .from("starbot_leads")
+          .update({ conversation_log: log, last_activity_at: new Date().toISOString() })
+          .eq("id", lead.id);
+
+        if (updateErr) {
+          console.error(`[inbound-email] ${eventType} update failed:`, updateErr.message);
+        } else {
+          console.log(`[inbound-email] ${eventType} → lead ${lead.id}, resend_id ${emailId}`);
+        }
+      }
+
+      return res.status(200).json({ ok: true });
+    }
+
+    // Inbound emails
     if (eventType !== "email.received") {
       console.log(`[inbound-email] Skipping event type: ${eventType}`);
       return res.status(200).json({ ok: true, skipped: true });
     }
-
-    const data = payload.data || {};
-    const emailId = data.email_id;
 
     // Extract sender and subject from webhook payload
     const fromRaw = data.from || "";

@@ -32,6 +32,7 @@ export default async function handler(req, res) {
         from: "Roman <hello@starbot.co.uk>",
         reply_to: "leads@reply.starbot.co.uk",
         to: [to],
+        bcc: ["anastasiia@starbot.co.uk"],
         subject: subject || "Re: Starbot Partnership",
         html: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; color: #1a2b4a; line-height: 1.6;">${body
           .trim()
@@ -47,6 +48,8 @@ export default async function handler(req, res) {
       console.error(`Resend send failed (${emailRes.status}):`, errText);
       return res.status(500).json({ error: "Failed to send email" });
     }
+
+    const { id: resendId } = await emailRes.json();
 
     // Append to conversation_log
     const sb = createClient(supabaseUrl, supabaseServiceKey);
@@ -70,7 +73,8 @@ export default async function handler(req, res) {
       from: "roman",
       subject: subject || null,
       text: body.trim(),
-      tag: "Reply",
+      tag: "Email",
+      resend_id: resendId || null,
     });
 
     const { error: updateErr } = await sb

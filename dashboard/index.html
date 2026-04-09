@@ -681,6 +681,20 @@
       .convo-tag-flat.tag-file {
         color: var(--accent);
       }
+      .convo-delivery-status {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        margin-top: 2px;
+      }
+      .convo-delivery-status.delivered {
+        color: var(--success);
+      }
+      .convo-delivery-status.sent {
+        color: var(--text-tertiary);
+      }
+      .convo-delivery-status.bounced {
+        color: var(--danger);
+      }
       .convo-body {
         padding-left: 106px;
       }
@@ -2085,6 +2099,7 @@
               <div class="convo-body">
                 ${entry.subject ? `<div class="convo-subject">Subject: ${esc(entry.subject)}</div>` : ""}
                 <div class="convo-text">${bodyHtml}</div>
+                ${entry.status === "delivered" ? '<div class="convo-delivery-status delivered">\u2713\u2713 Delivered</div>' : entry.status === "sent" ? '<div class="convo-delivery-status sent">\u2713 Sent</div>' : entry.status === "bounced" ? '<div class="convo-delivery-status bounced">\u2717 Bounced</div>' : ""}
               </div>
             </div>`;
           })
