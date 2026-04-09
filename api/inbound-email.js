@@ -1,5 +1,25 @@
 import { createClient } from "@supabase/supabase-js";
 
+// Strip quoted reply — everything after "On ... wrote:" or similar patterns
+function stripQuotedReply(text) {
+  if (!text) return "";
+  // Match: "On <date> <name> wrote:" in any language/format
+  const patterns = [
+    /\r?\n\s*On .+ wrote:\s*$/s,
+    /\r?\n\s*Le .+ a écrit\s*:\s*$/s,
+    /\r?\n\s*Am .+ schrieb .+:\s*$/s,
+    /\r?\n\s*El .+ escribió:\s*$/s,
+    /\r?\n\s*------+ ?Original Message ?------+\s*$/s,
+    /\r?\n\s*------+ ?Forwarded message ?------+\s*$/s,
+    /\r?\n\s*From:.*\nSent:.*\nTo:.*\n/s,
+  ];
+  let result = text;
+  for (const pat of patterns) {
+    result = result.replace(pat, "");
+  }
+  return result.trim();
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -7,8 +27,9 @@ export default async function handler(req, res) {
 
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+  const resendKey = process.env.RESEND_API_KEY;
 
-  if (!supabaseUrl || !supabaseServiceKey) {
+  if (!supabaseUrl || !supabaseServiceKey || !resendKey) {
     console.error("[inbound-email] Missing env vars");
     return res.status(503).json({ error: "Service not configured" });
   }
@@ -24,13 +45,12 @@ export default async function handler(req, res) {
     }
 
     const data = payload.data || {};
+    const emailId = data.email_id;
 
-    // Resend email.received payload includes the full email inline
+    // Extract sender and subject from webhook payload
     const fromRaw = data.from || "";
     const subject = data.subject || "";
-    const bodyText = data.text || data.html || "";
 
-    // Extract sender email address
     const senderEmail =
       fromRaw.match(/<([^>]+)>/)?.[1]?.toLowerCase() ||
       fromRaw.trim().toLowerCase();
@@ -40,8 +60,32 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true });
     }
 
+    // Fetch full email body from Resend API (webhook payload doesn't include body)
+    let bodyText = "";
+    if (emailId) {
+      try {
+        const emailRes = await fetch(
+          `https://api.resend.com/emails/${emailId}`,
+          { headers: { Authorization: `Bearer ${resendKey}` } },
+        );
+        if (emailRes.ok) {
+          const emailData = await emailRes.json();
+          bodyText = emailData.text || emailData.html || "";
+        } else {
+          console.error(
+            `[inbound-email] Failed to fetch email ${emailId} (${emailRes.status})`,
+          );
+        }
+      } catch (fetchErr) {
+        console.error("[inbound-email] Resend fetch error:", fetchErr.message);
+      }
+    }
+
+    // Strip quoted reply text
+    bodyText = stripQuotedReply(bodyText);
+
     console.log(
-      `[inbound-email] Inbound from ${senderEmail}, subject: "${subject}"`,
+      `[inbound-email] Inbound from ${senderEmail}, subject: "${subject}", body length: ${bodyText.length}`,
     );
 
     // Match sender to a lead by email
@@ -71,7 +115,7 @@ export default async function handler(req, res) {
       date: new Date().toISOString(),
       from: "lead",
       subject: subject || null,
-      text: bodyText.trim(),
+      text: bodyText,
       tag: "Reply",
     });
 
