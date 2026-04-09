@@ -1485,6 +1485,7 @@
       let currentLead = null;
       let filterStatus = "all";
       let searchQuery = "";
+      let pollInterval = null;
 
       // ── DOM refs ──
       const $ = (id) => document.getElementById(id);
@@ -1815,15 +1816,34 @@
         // Created date in footer
         $("modal-created").textContent = formatDate(lead.created_at);
 
-        // Show
+        // Show + start polling
         modalBackdrop.classList.add("open");
         document.body.style.overflow = "hidden";
+        if (pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(pollConversation, 30000);
       }
 
       function closeModal() {
+        if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
         modalBackdrop.classList.remove("open");
         document.body.style.overflow = "";
         currentLead = null;
+      }
+
+      async function pollConversation() {
+        if (!currentLead) return;
+        const { data } = await sb
+          .from("starbot_leads")
+          .select("conversation_log")
+          .eq("id", currentLead.id)
+          .maybeSingle();
+        if (!data) return;
+        const newLog = data.conversation_log || [];
+        const oldLog = currentLead.conversation_log || [];
+        if (newLog.length !== oldLog.length) {
+          currentLead.conversation_log = newLog;
+          renderConvoLog();
+        }
       }
 
       $("modal-close").addEventListener("click", closeModal);
