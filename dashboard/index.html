@@ -437,7 +437,7 @@
         border: 1px solid rgba(45, 182, 183, 0.15);
         border-radius: var(--radius);
         width: 100%;
-        max-width: 860px;
+        max-width: 1152px;
         min-height: 70vh;
         max-height: calc(100vh - 40px);
         display: flex;
@@ -644,13 +644,22 @@
         font-size: 10px;
       }
       .convo-tag-flat.tag-inquiry {
-        color: var(--success);
+        color: var(--accent);
       }
       .convo-tag-flat.tag-reply {
         color: var(--info);
       }
+      .convo-tag-flat.tag-call {
+        color: var(--warning);
+      }
+      .convo-tag-flat.tag-meeting {
+        color: #60a5fa;
+      }
       .convo-tag-flat.tag-note {
         color: var(--text-tertiary);
+      }
+      .convo-tag-flat.tag-email {
+        color: var(--accent);
       }
       .convo-tag-flat.tag-default {
         color: var(--text-tertiary);
@@ -709,13 +718,40 @@
       .convo-compose textarea:focus {
         border-color: var(--accent);
       }
-      .convo-compose-btns {
+      .compose-row {
         display: flex;
-        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
         gap: 8px;
       }
-      .btn-note {
-        padding: 6px 14px;
+      .compose-left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .log-type-select {
+        padding: 5px 28px 5px 10px;
+        background: var(--bg-elevated);
+        border: 0.5px solid var(--border);
+        border-radius: 8px;
+        color: var(--text-secondary);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 600;
+        outline: none;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: calc(100% - 8px) center;
+        transition: border-color 0.15s;
+      }
+      .log-type-select:focus {
+        border-color: var(--accent);
+      }
+      .btn-log {
+        padding: 5px 14px;
         background: transparent;
         color: var(--text-secondary);
         border: 0.5px solid var(--border);
@@ -727,11 +763,11 @@
         transition: all 0.15s;
         white-space: nowrap;
       }
-      .btn-note:hover {
+      .btn-log:hover {
         border-color: var(--border-hover);
         color: var(--text-primary);
       }
-      .btn-note:disabled,
+      .btn-log:disabled,
       .btn-send:disabled {
         opacity: 0.35;
         cursor: not-allowed;
@@ -753,15 +789,6 @@
         white-space: nowrap;
       }
       .btn-send:hover {
-        background: #064e24;
-        color: #6ee7a0;
-      }
-      .btn-send.wa {
-        background: #052e16;
-        color: #4ade80;
-        border-color: #14532d;
-      }
-      .btn-send.wa:hover {
         background: #064e24;
         color: #6ee7a0;
       }
@@ -811,18 +838,6 @@
         border-radius: 10px;
         margin-left: 6px;
         font-weight: 400;
-      }
-
-      /* WhatsApp contact icon */
-      .wa-link {
-        display: inline-flex;
-        align-items: center;
-        color: #25d366;
-        transition: opacity 0.15s;
-        opacity: 0.7;
-      }
-      .wa-link:hover {
-        opacity: 1;
       }
 
       /* Conversation sender-aware styles */
@@ -1322,7 +1337,7 @@
             </div>
             <div class="convo-entries" id="convo-entries"></div>
 
-            <!-- Unified compose: subject row (hidden until email) + textarea + 3 buttons -->
+            <!-- Compose: subject row (hidden until email) + textarea + log selector + send -->
             <div class="convo-compose">
               <div class="compose-subject-row hidden" id="compose-subject-row">
                 <label>Subject</label>
@@ -1337,12 +1352,19 @@
                 placeholder="Write or paste a message..."
                 rows="2"
               ></textarea>
-              <div class="convo-compose-btns">
-                <button class="btn-note" id="btn-add-note" disabled>
-                  Add to conversation
-                </button>
+              <div class="compose-row">
+                <div class="compose-left">
+                  <select class="log-type-select" id="log-type">
+                    <option value="note">Note</option>
+                    <option value="call">Call</option>
+                    <option value="meeting">Meeting</option>
+                  </select>
+                  <button class="btn-log" id="btn-log" disabled>Log</button>
+                </div>
                 <button class="btn-send hidden" id="btn-send-email" disabled>
                   <svg
+                    width="12"
+                    height="12"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -1354,21 +1376,6 @@
                     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                   </svg>
                   Send via Email
-                </button>
-                <button class="btn-send wa hidden" id="btn-send-wa" disabled>
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path
-                      d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"
-                    />
-                  </svg>
-                  Send via WhatsApp
                 </button>
               </div>
             </div>
@@ -1739,7 +1746,7 @@
         }
         $("modal-pills").innerHTML = pills.join("");
 
-        // Contact row: email · phone · WhatsApp · source
+        // Contact row: email · phone · source
         const contactParts = [];
         if (lead.email) {
           contactParts.push(
@@ -1753,13 +1760,6 @@
           contactParts.push(
             `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>` +
               `<a href="tel:${esc(lead.phone)}">${esc(lead.phone)}</a>`,
-          );
-          // WhatsApp quick-open icon
-          const digits = lead.phone.replace(/[^\d]/g, "");
-          contactParts.push(
-            `<a href="https://wa.me/${digits}" target="_blank" rel="noopener noreferrer" class="wa-link" title="Open WhatsApp">` +
-              `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.553 4.124 1.522 5.86L0 24l6.335-1.652A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.82a9.78 9.78 0 0 1-5.09-1.42l-.36-.22-3.76.98.99-3.65-.24-.38A9.78 9.78 0 0 1 2.18 12c0-5.42 4.4-9.82 9.82-9.82 5.42 0 9.82 4.4 9.82 9.82 0 5.42-4.4 9.82-9.82 9.82z"/></svg>` +
-              `</a>`,
           );
         }
         if (lead.source) {
@@ -1798,7 +1798,7 @@
         $("compose-subject").value = "Re: Starbot Partnership";
         $("compose-subject-row").classList.add("hidden");
         $("btn-send-email").classList.toggle("hidden", !lead.email);
-        $("btn-send-wa").classList.toggle("hidden", !lead.phone);
+        $("log-type").value = "note";
         $("action-email").classList.toggle("hidden", !lead.email);
         updateComposeButtons();
 
@@ -1914,27 +1914,28 @@
         setTimeout(() => compose.focus(), 300);
       });
 
-      // ── Unified compose ──
+      // ── Compose ──
       function updateComposeButtons() {
         const hasText = $("compose-text").value.trim().length > 0;
-        $("btn-add-note").disabled = !hasText;
+        $("btn-log").disabled = !hasText;
         $("btn-send-email").disabled = !hasText;
-        $("btn-send-wa").disabled = !hasText;
       }
 
       $("compose-text").addEventListener("input", updateComposeButtons);
 
-      // Add to conversation (note, no send)
-      $("btn-add-note").addEventListener("click", async () => {
+      // Log entry (note / call / meeting)
+      $("btn-log").addEventListener("click", async () => {
         if (!currentLead) return;
         const text = $("compose-text").value.trim();
         if (!text) return;
 
+        const logType = $("log-type").value;
+        const tagMap = { note: "Note", call: "Call", meeting: "Meeting" };
         const entry = {
           date: new Date().toISOString(),
-          from: "system",
+          from: "roman",
           text,
-          tag: "Note",
+          tag: tagMap[logType] || "Note",
         };
         const log = [...(currentLead.conversation_log || []), entry];
         currentLead.conversation_log = log;
@@ -1955,7 +1956,6 @@
       $("btn-send-email").addEventListener("click", async () => {
         if (!currentLead || !currentLead.email) return;
         const subjectRow = $("compose-subject-row");
-        // First click: reveal subject field and focus textarea
         if (subjectRow.classList.contains("hidden")) {
           subjectRow.classList.remove("hidden");
           $("compose-text").focus();
@@ -1988,7 +1988,7 @@
               from: "roman",
               subject,
               text,
-              tag: "Reply",
+              tag: "Email",
             };
             currentLead.conversation_log = [
               ...(currentLead.conversation_log || []),
@@ -2011,48 +2011,11 @@
         }
       });
 
-      // Send via WhatsApp
-      $("btn-send-wa").addEventListener("click", async () => {
-        if (!currentLead || !currentLead.phone) return;
-        const text = $("compose-text").value.trim();
-        if (!text) return;
-
-        // Save to conversation log
-        const entry = {
-          date: new Date().toISOString(),
-          from: "roman",
-          text,
-          tag: "Reply",
-        };
-        const log = [...(currentLead.conversation_log || []), entry];
-        currentLead.conversation_log = log;
-
-        // Open WhatsApp with pre-filled text
-        const digits = currentLead.phone.replace(/[^\d]/g, "");
-        window.open(
-          `https://wa.me/${digits}?text=${encodeURIComponent(text)}`,
-          "_blank",
-        );
-
-        $("compose-text").value = "";
-        $("compose-subject-row").classList.add("hidden");
-        updateComposeButtons();
-        renderConvoLog();
-
-        // Persist
-        const { error } = await sb
-          .from("starbot_leads")
-          .update({ conversation_log: log })
-          .eq("id", currentLead.id);
-
-        if (error) console.error("Failed to save conversation log:", error);
-      });
-
-      // Enter key in compose sends as note
+      // Enter key in compose logs as current type
       $("compose-text").addEventListener("keydown", (e) => {
         if (e.key === "Enter" && !e.shiftKey) {
           e.preventDefault();
-          $("btn-add-note").click();
+          $("btn-log").click();
         }
       });
 
@@ -2107,14 +2070,21 @@
                   ? "lead"
                   : "system";
             const tag = entry.tag || (entry.from ? "" : "Note");
+            const t = tag.toLowerCase();
             const tagClass =
-              tag.toLowerCase() === "inquiry"
+              t === "inquiry"
                 ? "tag-inquiry"
-                : tag.toLowerCase() === "reply"
+                : t === "reply"
                   ? "tag-reply"
-                  : tag.toLowerCase() === "note"
-                    ? "tag-note"
-                    : "tag-default";
+                  : t === "call"
+                    ? "tag-call"
+                    : t === "meeting"
+                      ? "tag-meeting"
+                      : t === "email"
+                        ? "tag-email"
+                        : t === "note"
+                          ? "tag-note"
+                          : "tag-default";
 
             return `<div class="convo-entry">
               <div class="convo-meta-row">
