@@ -7,57 +7,42 @@ export default async function handler(req, res) {
 
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-  const resendKey = process.env.RESEND_API_KEY;
 
-  if (!supabaseUrl || !supabaseServiceKey || !resendKey) {
-    console.error("Missing env vars for inbound-email");
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.error("[inbound-email] Missing env vars");
     return res.status(503).json({ error: "Service not configured" });
   }
 
   try {
     const payload = req.body;
+    const eventType = payload.type || "unknown";
 
-    // Log full payload for debugging
-    console.log(
-      "[inbound-email] Webhook payload:",
-      JSON.stringify(payload, null, 2),
-    );
-
-    // Extract email_id from Resend webhook event
-    const emailId = payload.data?.email_id || payload.email_id;
-    if (!emailId) {
-      console.warn("[inbound-email] No email_id in webhook payload");
-      return res.status(200).json({ ok: true });
+    // Only process inbound emails — ignore outbound events (sent, delivered, opened, etc.)
+    if (eventType !== "email.received") {
+      console.log(`[inbound-email] Skipping event type: ${eventType}`);
+      return res.status(200).json({ ok: true, skipped: true });
     }
 
-    // Fetch full email content from Resend API
-    const emailRes = await fetch(`https://api.resend.com/emails/${emailId}`, {
-      headers: { Authorization: `Bearer ${resendKey}` },
-    });
+    const data = payload.data || {};
 
-    if (!emailRes.ok) {
-      const errText = await emailRes.text().catch(() => "");
-      console.error(
-        `[inbound-email] Failed to fetch email ${emailId} (${emailRes.status}):`,
-        errText,
-      );
-      return res.status(200).json({ ok: true });
-    }
-
-    const email = await emailRes.json();
-    console.log("[inbound-email] Fetched email from:", email.from);
+    // Resend email.received payload includes the full email inline
+    const fromRaw = data.from || "";
+    const subject = data.subject || "";
+    const bodyText = data.text || data.html || "";
 
     // Extract sender email address
     const senderEmail =
-      email.from?.match(/<([^>]+)>/)?.[1] || email.from?.trim() || "";
+      fromRaw.match(/<([^>]+)>/)?.[1]?.toLowerCase() ||
+      fromRaw.trim().toLowerCase();
 
     if (!senderEmail) {
-      console.warn("[inbound-email] No sender address in fetched email");
+      console.warn("[inbound-email] No sender address in payload");
       return res.status(200).json({ ok: true });
     }
 
-    const bodyText = email.text || email.html || "";
-    const subject = email.subject || "";
+    console.log(
+      `[inbound-email] Inbound from ${senderEmail}, subject: "${subject}"`,
+    );
 
     // Match sender to a lead by email
     const sb = createClient(supabaseUrl, supabaseServiceKey);
@@ -65,8 +50,7 @@ export default async function handler(req, res) {
     const { data: lead, error: lookupErr } = await sb
       .from("starbot_leads")
       .select("id, conversation_log")
-      .eq("email", senderEmail.toLowerCase())
-      .limit(1)
+      .eq("email", senderEmail)
       .maybeSingle();
 
     if (lookupErr) {
