@@ -1,0 +1,2177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Starbot Leads</title>
+    <link
+      rel="icon"
+      href="https://cdn.prod.website-files.com/66e09bcd111e1de7c4153094/66e2ed435a1621ce1e7792db_favicon.png"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ── Reset ── */
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* ── Tokens ── */
+      :root {
+        --bg-page: #0a0e14;
+        --bg-surface: rgba(21, 21, 21, 0.75);
+        --bg-surface-solid: #151515;
+        --bg-elevated: #1a1a1a;
+        --border: #222222;
+        --border-hover: #333333;
+        --text-primary: #eeeeee;
+        --text-secondary: #888888;
+        --text-tertiary: #444444;
+        --accent: #2db6b7;
+        --accent-hover: #25a0a1;
+        --success: #22c55e;
+        --warning: #fbbf24;
+        --danger: #f87171;
+        --info: #818cf8;
+        --pill-bg: #1a1a1a;
+        --pill-border: #292929;
+        --radius: 12px;
+        --radius-sm: 8px;
+        --font-body: "DM Sans", -apple-system, sans-serif;
+        --font-mono: "DM Mono", ui-monospace, monospace;
+        --glass-bg: rgba(21, 21, 21, 0.6);
+        --glass-border: rgba(255, 255, 255, 0.06);
+        --glass-blur: 16px;
+      }
+
+      body {
+        font-family: var(--font-body);
+        background: var(--bg-page);
+        color: var(--text-primary);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── Scrollbar ── */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--border-hover);
+      }
+
+      /* ── Login ── */
+      .login-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+      .login-card {
+        background: var(--bg-surface);
+        backdrop-filter: blur(var(--glass-blur));
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius);
+        padding: 40px 36px;
+        width: 100%;
+        max-width: 380px;
+        text-align: center;
+      }
+      .login-card h1 {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        letter-spacing: -0.3px;
+      }
+      .login-card .subtitle {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-bottom: 28px;
+      }
+      .login-card input {
+        width: 100%;
+        padding: 10px 14px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.15s;
+        margin-bottom: 12px;
+      }
+      .login-card input::placeholder {
+        color: var(--text-tertiary);
+      }
+      .login-card input:focus {
+        border-color: var(--accent);
+      }
+      .login-btn {
+        width: 100%;
+        padding: 11px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius-sm);
+        font-family: var(--font-body);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+        margin-top: 4px;
+      }
+      .login-btn:hover {
+        background: var(--accent-hover);
+      }
+      .login-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .login-error {
+        color: var(--danger);
+        font-size: 12px;
+        margin-top: 12px;
+        min-height: 18px;
+      }
+
+      /* ── Top Bar ── */
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 24px;
+        background: rgba(10, 14, 20, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+      }
+      .topbar-title {
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: -0.3px;
+        white-space: nowrap;
+      }
+      .topbar-count {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--text-secondary);
+        background: var(--pill-bg);
+        border: 1px solid var(--pill-border);
+        padding: 3px 10px;
+        border-radius: 20px;
+        white-space: nowrap;
+      }
+      .topbar-spacer {
+        flex: 1;
+      }
+      .search-input {
+        padding: 7px 12px 7px 32px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 13px;
+        outline: none;
+        width: 220px;
+        transition: border-color 0.15s;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: 10px center;
+      }
+      .search-input::placeholder {
+        color: var(--text-tertiary);
+      }
+      .search-input:focus {
+        border-color: var(--accent);
+      }
+      .filter-select {
+        padding: 7px 12px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 13px;
+        outline: none;
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: calc(100% - 8px) center;
+        padding-right: 28px;
+      }
+      .logout-btn {
+        padding: 7px 14px;
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        font-family: var(--font-body);
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+      }
+      .logout-btn:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+      }
+
+      /* ── Board ── */
+      .board {
+        display: flex;
+        gap: 12px;
+        padding: 16px 24px 24px;
+        min-height: calc(100vh - 56px);
+        overflow-x: auto;
+      }
+      .column {
+        flex: 1;
+        min-width: 220px;
+        max-width: 320px;
+        display: flex;
+        flex-direction: column;
+      }
+      .column-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-secondary);
+      }
+      .column-count {
+        font-size: 10px;
+        background: var(--pill-bg);
+        border: 1px solid var(--pill-border);
+        padding: 1px 7px;
+        border-radius: 10px;
+        color: var(--text-tertiary);
+        font-weight: 400;
+      }
+      .column-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .column-cards {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-height: 60px;
+        padding: 4px;
+        border-radius: var(--radius-sm);
+        transition: background 0.15s;
+      }
+      .column-cards.sortable-ghost-class {
+        opacity: 0.4;
+      }
+
+      /* ── Cards ── */
+      .card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(var(--glass-blur));
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius);
+        padding: 14px 16px;
+        cursor: grab;
+        transition: all 0.2s;
+        position: relative;
+      }
+      .card:hover {
+        border-color: rgba(45, 182, 183, 0.3);
+        box-shadow:
+          0 0 24px rgba(45, 182, 183, 0.08),
+          0 4px 16px rgba(0, 0, 0, 0.3);
+        transform: translateY(-1px);
+      }
+      .card:active {
+        cursor: grabbing;
+      }
+      .card-company {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        line-height: 1.3;
+      }
+      .card-contact {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+        line-height: 1.3;
+      }
+      .card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .card-time {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--text-tertiary);
+      }
+      .status-pill {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-weight: 500;
+      }
+
+      /* Status colors */
+      .status-new {
+        background: rgba(45, 182, 183, 0.12);
+        color: var(--accent);
+        border: 1px solid rgba(45, 182, 183, 0.2);
+      }
+      .status-contacted {
+        background: rgba(129, 140, 248, 0.12);
+        color: var(--info);
+        border: 1px solid rgba(129, 140, 248, 0.2);
+      }
+      .status-interested {
+        background: rgba(251, 191, 36, 0.12);
+        color: var(--warning);
+        border: 1px solid rgba(251, 191, 36, 0.2);
+      }
+      .status-negotiating {
+        background: rgba(251, 191, 36, 0.12);
+        color: var(--warning);
+        border: 1px solid rgba(251, 191, 36, 0.2);
+      }
+      .status-won {
+        background: rgba(34, 197, 94, 0.12);
+        color: var(--success);
+        border: 1px solid rgba(34, 197, 94, 0.2);
+      }
+      .status-lost {
+        background: rgba(248, 113, 113, 0.12);
+        color: var(--danger);
+        border: 1px solid rgba(248, 113, 113, 0.2);
+      }
+
+      /* Column dot colors */
+      .dot-new {
+        background: var(--accent);
+      }
+      .dot-contacted {
+        background: var(--info);
+      }
+      .dot-interested {
+        background: var(--warning);
+      }
+      .dot-negotiating {
+        background: var(--warning);
+      }
+      .dot-won {
+        background: var(--success);
+      }
+      .dot-lost {
+        background: var(--danger);
+      }
+
+      /* SortableJS drag states */
+      .sortable-drag {
+        opacity: 0.9;
+        transform: rotate(1.5deg);
+      }
+      .sortable-ghost {
+        opacity: 0.3;
+      }
+      .column-cards-active {
+        background: rgba(45, 182, 183, 0.03);
+        border: 1px dashed rgba(45, 182, 183, 0.15);
+      }
+
+      /* ── Modal ── */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 0.2s;
+        pointer-events: none;
+      }
+      .modal-backdrop.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal {
+        background: rgba(21, 21, 21, 0.92);
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(45, 182, 183, 0.15);
+        border-radius: var(--radius);
+        width: 100%;
+        max-width: 860px;
+        min-height: 70vh;
+        max-height: calc(100vh - 40px);
+        display: flex;
+        flex-direction: column;
+        transform: translateY(12px) scale(0.97);
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow:
+          0 0 100px rgba(45, 182, 183, 0.08),
+          0 25px 60px rgba(0, 0, 0, 0.6);
+      }
+      .modal-backdrop.open .modal {
+        transform: translateY(0) scale(1);
+      }
+      .modal-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 24px 24px 0;
+      }
+      .modal-close {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.15s;
+        flex-shrink: 0;
+      }
+      .modal-close:hover {
+        border-color: var(--border-hover);
+        color: var(--text-primary);
+      }
+      .modal-body {
+        padding: 24px 28px 28px;
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+      }
+      .modal-company {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: -0.3px;
+        margin-bottom: 2px;
+      }
+      .modal-contact {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+      }
+
+      /* Modal sections */
+      .modal-section {
+        margin-bottom: 24px;
+      }
+      .modal-section-title {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-tertiary);
+        margin-bottom: 10px;
+        padding-left: 10px;
+        border-left: 3px solid var(--accent);
+      }
+      .modal-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .modal-field {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .modal-field.full {
+        grid-column: 1 / -1;
+      }
+      .modal-label {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .modal-value {
+        font-size: 13px;
+        color: var(--text-primary);
+        word-break: break-word;
+      }
+      .modal-value a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .modal-value a:hover {
+        text-decoration: underline;
+      }
+      .modal-value.empty {
+        color: var(--text-tertiary);
+        font-style: italic;
+      }
+
+      /* Status select */
+      .status-select {
+        padding: 8px 12px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 13px;
+        outline: none;
+        cursor: pointer;
+        width: 100%;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: calc(100% - 10px) center;
+        padding-right: 28px;
+        transition: border-color 0.15s;
+      }
+      .status-select:focus {
+        border-color: var(--accent);
+      }
+
+      /* Notes textarea */
+      .notes-textarea {
+        width: 100%;
+        min-height: 80px;
+        padding: 10px 12px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 13px;
+        outline: none;
+        resize: vertical;
+        transition: border-color 0.15s;
+      }
+      .notes-textarea::placeholder {
+        color: var(--text-tertiary);
+      }
+      .notes-textarea:focus {
+        border-color: var(--accent);
+      }
+
+      /* Conversation log */
+      .convo-entries {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        margin-bottom: 14px;
+        max-height: 280px;
+        overflow-y: auto;
+      }
+      .convo-entry {
+        display: flex;
+        gap: 12px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .convo-entry:last-child {
+        border-bottom: none;
+      }
+      .convo-date-col {
+        flex-shrink: 0;
+        width: 90px;
+        text-align: right;
+        padding-top: 1px;
+      }
+      .convo-date {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--text-tertiary);
+        white-space: nowrap;
+      }
+      .convo-body {
+        flex: 1;
+        min-width: 0;
+        border-left: 2px solid var(--border);
+        padding-left: 12px;
+      }
+      .convo-text {
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+      .convo-tag {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 9px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--accent);
+        background: rgba(45, 182, 183, 0.1);
+        border: 1px solid rgba(45, 182, 183, 0.2);
+        padding: 1px 6px;
+        border-radius: 4px;
+        margin-bottom: 4px;
+      }
+      .convo-empty {
+        padding: 24px 0;
+        text-align: center;
+        color: var(--text-tertiary);
+        font-size: 13px;
+      }
+      .convo-add {
+        display: flex;
+        gap: 8px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 4px 4px 4px 12px;
+        align-items: center;
+        transition: border-color 0.15s;
+      }
+      .convo-add:focus-within {
+        border-color: var(--accent);
+      }
+      .convo-input {
+        flex: 1;
+        padding: 8px 0;
+        background: transparent;
+        border: none;
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 13px;
+        outline: none;
+      }
+      .convo-input::placeholder {
+        color: var(--text-tertiary);
+      }
+      .convo-add-btn {
+        padding: 7px 14px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-family: var(--font-body);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+        white-space: nowrap;
+      }
+      .convo-add-btn:hover {
+        background: var(--accent-hover);
+      }
+
+      /* Unified compose area */
+      .convo-compose {
+        margin-top: 14px;
+      }
+      .convo-compose textarea {
+        width: 100%;
+        min-height: 48px;
+        padding: 10px 12px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 13px;
+        outline: none;
+        resize: vertical;
+        transition: border-color 0.15s;
+        margin-bottom: 8px;
+      }
+      .convo-compose textarea::placeholder {
+        color: var(--text-tertiary);
+      }
+      .convo-compose textarea:focus {
+        border-color: var(--accent);
+      }
+      .convo-compose-btns {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .btn-note {
+        padding: 6px 8px;
+        background: none;
+        color: var(--text-tertiary);
+        border: none;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: color 0.15s;
+        white-space: nowrap;
+      }
+      .btn-note:hover {
+        color: var(--text-secondary);
+      }
+      .btn-note:disabled,
+      .btn-send:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+      .btn-send {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 8px;
+        background: none;
+        color: var(--accent);
+        border: none;
+        border-radius: 0;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: color 0.15s;
+        white-space: nowrap;
+      }
+      .btn-send:hover {
+        color: var(--accent-hover);
+      }
+      .btn-send.wa {
+        color: #25d366;
+      }
+      .btn-send.wa:hover {
+        color: #2ee677;
+      }
+      .btn-send svg {
+        width: 13px;
+        height: 13px;
+      }
+
+      /* Inline subject field for email compose */
+      .compose-subject-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .compose-subject-row label {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        flex-shrink: 0;
+      }
+      .compose-subject-row input {
+        flex: 1;
+        padding: 6px 10px;
+        background: var(--bg-page);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      .compose-subject-row input:focus {
+        border-color: var(--accent);
+      }
+
+      /* Convo count badge */
+      .convo-count {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--text-tertiary);
+        background: var(--pill-bg);
+        border: 1px solid var(--pill-border);
+        padding: 1px 7px;
+        border-radius: 10px;
+        margin-left: 6px;
+        font-weight: 400;
+      }
+
+      /* WhatsApp contact icon */
+      .wa-link {
+        display: inline-flex;
+        align-items: center;
+        color: #25d366;
+        transition: opacity 0.15s;
+        opacity: 0.7;
+      }
+      .wa-link:hover {
+        opacity: 1;
+      }
+
+      /* Conversation sender-aware styles */
+      .convo-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 4px;
+        flex-wrap: wrap;
+      }
+      .convo-sender {
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .convo-sender.lead {
+        color: var(--accent);
+      }
+      .convo-sender.roman {
+        color: var(--text-primary);
+      }
+      .convo-sender.system {
+        color: var(--text-tertiary);
+      }
+      .convo-time {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--text-tertiary);
+      }
+      .convo-subject {
+        font-size: 12px;
+        color: var(--text-secondary);
+        font-style: italic;
+        margin-bottom: 2px;
+      }
+
+      /* Pills row */
+      .modal-pills {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        padding: 0 24px 16px;
+      }
+      .modal-pill {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 500;
+        padding: 2px 8px;
+        border-radius: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+      .modal-pill.channel {
+        background: var(--pill-bg);
+        color: var(--text-secondary);
+        border: 1px solid var(--pill-border);
+      }
+
+      /* Compact contact row */
+      .modal-contact-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 8px;
+        padding: 0 24px 16px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-contact-row a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.15s;
+      }
+      .modal-contact-row a:hover {
+        color: var(--accent);
+      }
+      .modal-contact-row .sep {
+        color: var(--text-tertiary);
+      }
+      .modal-contact-row svg {
+        display: inline-block;
+        vertical-align: -1px;
+        opacity: 0.5;
+      }
+
+      /* Action bar */
+      .modal-action-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 24px;
+        border-top: 1px solid var(--border);
+        background: var(--bg-surface-solid);
+        border-radius: 0 0 var(--radius) var(--radius);
+      }
+      .action-spacer {
+        flex: 1;
+      }
+      .action-delete {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--danger);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 6px 10px;
+        border-radius: 6px;
+        transition: background 0.15s;
+      }
+      .action-delete:hover {
+        background: rgba(248, 113, 113, 0.1);
+      }
+      .action-email {
+        font-family: var(--font-body);
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
+        background: var(--accent);
+        border: none;
+        border-radius: 6px;
+        padding: 7px 14px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .action-email:hover {
+        background: var(--accent-hover);
+      }
+      .action-next {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--text-secondary);
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 6px 12px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .action-next:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .action-close-btn {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--text-tertiary);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 6px 10px;
+        transition: color 0.15s;
+      }
+      .action-close-btn:hover {
+        color: var(--text-secondary);
+      }
+
+      /* Compose area */
+      .compose-area {
+        margin-top: 12px;
+        padding: 12px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+      }
+      .compose-field {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .compose-label {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        width: 50px;
+        flex-shrink: 0;
+      }
+      .compose-value {
+        font-size: 13px;
+        color: var(--text-secondary);
+      }
+      .compose-input {
+        flex: 1;
+        padding: 6px 10px;
+        background: var(--bg-page);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      .compose-input:focus {
+        border-color: var(--accent);
+      }
+      .compose-textarea {
+        width: 100%;
+        min-height: 80px;
+        padding: 10px;
+        background: var(--bg-page);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text-primary);
+        font-family: var(--font-body);
+        font-size: 13px;
+        outline: none;
+        resize: vertical;
+        margin-bottom: 8px;
+        transition: border-color 0.15s;
+      }
+      .compose-textarea::placeholder {
+        color: var(--text-tertiary);
+      }
+      .compose-textarea:focus {
+        border-color: var(--accent);
+      }
+      .compose-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+      .compose-send {
+        padding: 7px 14px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-family: var(--font-body);
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .compose-send:hover {
+        background: var(--accent-hover);
+      }
+      .compose-send:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .compose-cancel {
+        padding: 7px 14px;
+        background: none;
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-family: var(--font-body);
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .compose-cancel:hover {
+        border-color: var(--border-hover);
+        color: var(--text-primary);
+      }
+
+      /* UTM toggle */
+      .utm-toggle {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-tertiary);
+        background: none;
+        border: none;
+        padding: 0;
+        margin-bottom: 10px;
+        transition: color 0.15s;
+      }
+      .utm-toggle:hover {
+        color: var(--text-secondary);
+      }
+      .utm-chevron {
+        transition: transform 0.2s;
+        font-size: 12px;
+      }
+      .utm-chevron.open {
+        transform: rotate(90deg);
+      }
+      .utm-content {
+        display: none;
+      }
+      .utm-content.open {
+        display: block;
+      }
+
+      /* Modal timestamps */
+      .modal-timestamps {
+        display: flex;
+        gap: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--text-tertiary);
+      }
+
+      /* Save indicator */
+      .save-indicator {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--success);
+        opacity: 0;
+        transition: opacity 0.2s;
+        margin-left: 8px;
+      }
+      .save-indicator.show {
+        opacity: 1;
+      }
+
+      /* Message field */
+      .message-text {
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 10px 12px;
+        white-space: pre-wrap;
+      }
+
+      /* ── Empty state ── */
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        text-align: center;
+        color: var(--text-tertiary);
+        font-size: 13px;
+        min-height: 120px;
+      }
+
+      /* ── Loading ── */
+      .loading-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 60vh;
+      }
+      .spinner {
+        width: 28px;
+        height: 28px;
+        border: 2.5px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 768px) {
+        .topbar {
+          flex-wrap: wrap;
+          gap: 8px;
+          padding: 12px 16px;
+        }
+        .search-input {
+          width: 100%;
+          order: 10;
+        }
+        .filter-select {
+          order: 11;
+          flex: 1;
+        }
+        .board {
+          flex-direction: column;
+          padding: 12px 16px;
+          min-height: auto;
+          overflow-x: visible;
+        }
+        .column {
+          min-width: 100%;
+          max-width: 100%;
+        }
+        .column-cards {
+          min-height: 40px;
+        }
+        .modal {
+          max-width: 100%;
+          margin: 10px;
+        }
+        .modal-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ── Hidden utility ── */
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── Login Screen ── -->
+    <div id="login-screen" class="login-wrapper">
+      <div class="login-card">
+        <h1>Starbot Leads</h1>
+        <p class="subtitle">Sign in to manage your pipeline</p>
+        <form id="login-form">
+          <input
+            type="email"
+            id="login-email"
+            placeholder="Email"
+            required
+            autocomplete="email"
+          />
+          <input
+            type="password"
+            id="login-password"
+            placeholder="Password"
+            required
+            autocomplete="current-password"
+          />
+          <button type="submit" class="login-btn" id="login-btn">
+            Sign In
+          </button>
+        </form>
+        <div id="login-error" class="login-error"></div>
+      </div>
+    </div>
+
+    <!-- ── Dashboard (hidden until auth) ── -->
+    <div id="dashboard" class="hidden">
+      <!-- Top Bar -->
+      <div class="topbar">
+        <span class="topbar-title">Starbot Leads</span>
+        <span class="topbar-count" id="lead-count">0 leads</span>
+        <div class="topbar-spacer"></div>
+        <select class="filter-select" id="filter-status">
+          <option value="all">All statuses</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="interested">Interested</option>
+          <option value="negotiating">Negotiating</option>
+          <option value="won">Won</option>
+          <option value="lost">Lost</option>
+        </select>
+        <input
+          type="text"
+          class="search-input"
+          id="search-input"
+          placeholder="Search company..."
+        />
+        <button class="logout-btn" id="logout-btn">Sign out</button>
+      </div>
+
+      <!-- Loading -->
+      <div id="board-loading" class="loading-wrapper">
+        <div class="spinner"></div>
+      </div>
+
+      <!-- Kanban Board -->
+      <div id="board" class="board hidden"></div>
+    </div>
+
+    <!-- ── Lead Detail Modal ── -->
+    <div class="modal-backdrop" id="modal-backdrop">
+      <div class="modal" id="modal">
+        <div class="modal-header">
+          <div>
+            <div class="modal-company" id="modal-company"></div>
+            <div class="modal-contact" id="modal-contact"></div>
+          </div>
+          <button class="modal-close" id="modal-close">&times;</button>
+        </div>
+
+        <!-- Pills row: status + channel + campaign -->
+        <div class="modal-pills" id="modal-pills"></div>
+
+        <!-- Compact contact row -->
+        <div class="modal-contact-row" id="modal-contact-row"></div>
+
+        <div class="modal-body">
+          <!-- Conversation Thread -->
+          <div class="modal-section">
+            <div class="modal-section-title">
+              Conversation <span class="convo-count" id="convo-count">0</span>
+            </div>
+            <div class="convo-entries" id="convo-entries"></div>
+
+            <!-- Unified compose: subject row (hidden until email) + textarea + 3 buttons -->
+            <div class="convo-compose">
+              <div class="compose-subject-row hidden" id="compose-subject-row">
+                <label>Subject</label>
+                <input
+                  type="text"
+                  id="compose-subject"
+                  value="Re: Starbot Partnership"
+                />
+              </div>
+              <textarea
+                id="compose-text"
+                placeholder="Write or paste a message..."
+                rows="2"
+              ></textarea>
+              <div class="convo-compose-btns">
+                <button class="btn-note" id="btn-add-note" disabled>
+                  Add to conversation
+                </button>
+                <button class="btn-send hidden" id="btn-send-email" disabled>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                  </svg>
+                  Send via Email
+                </button>
+                <button class="btn-send wa hidden" id="btn-send-wa" disabled>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"
+                    />
+                  </svg>
+                  Send via WhatsApp
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="modal-section">
+            <div class="modal-section-title">
+              Notes
+              <span class="save-indicator" id="notes-saved">Saved</span>
+            </div>
+            <textarea
+              class="notes-textarea"
+              id="modal-notes"
+              placeholder="Call notes, impressions, reminders..."
+            ></textarea>
+          </div>
+
+          <!-- UTM (collapsible) -->
+          <div class="modal-section" id="modal-utm-section">
+            <button class="utm-toggle" id="utm-toggle">
+              <span class="utm-chevron" id="utm-chevron">&#9654;</span> UTM Data
+            </button>
+            <div class="utm-content" id="utm-content">
+              <div class="modal-grid">
+                <div class="modal-field">
+                  <span class="modal-label">Source</span
+                  ><span class="modal-value" id="modal-utm-source"></span>
+                </div>
+                <div class="modal-field">
+                  <span class="modal-label">Medium</span
+                  ><span class="modal-value" id="modal-utm-medium"></span>
+                </div>
+                <div class="modal-field">
+                  <span class="modal-label">Campaign</span
+                  ><span class="modal-value" id="modal-utm-campaign"></span>
+                </div>
+                <div class="modal-field">
+                  <span class="modal-label">Content</span
+                  ><span class="modal-value" id="modal-utm-content"></span>
+                </div>
+                <div class="modal-field">
+                  <span class="modal-label">Page Source</span
+                  ><span class="modal-value" id="modal-source"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action bar -->
+        <div class="modal-action-bar">
+          <span
+            style="
+              font-family: var(--font-mono);
+              font-size: 10px;
+              color: var(--text-tertiary);
+            "
+            id="modal-created"
+          ></span>
+          <button class="action-delete" id="action-delete">Delete</button>
+          <button class="action-email hidden" id="action-email">✉ Email</button>
+          <div class="action-spacer"></div>
+          <button class="action-next" id="action-next"></button>
+          <button class="action-close-btn" id="action-close-btn">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Scripts ── -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+
+    <script>
+      // ── Config ──
+      const SUPABASE_URL = "https://lxowggiqhuvwhzbktlsi.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4b3dnZ2lxaHV2d2h6Ymt0bHNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODY4MzcsImV4cCI6MjA5MTE2MjgzN30.1A5n9HEpqCZxyrivPE5THR82iN-eL9oU7ZE63h5TjIw";
+
+      const STAGES = [
+        { id: "new", label: "New", dot: "dot-new" },
+        { id: "contacted", label: "Contacted", dot: "dot-contacted" },
+        { id: "interested", label: "Interested", dot: "dot-interested" },
+        { id: "negotiating", label: "Negotiating", dot: "dot-negotiating" },
+        { id: "won", label: "Won", dot: "dot-won" },
+        { id: "lost", label: "Lost", dot: "dot-lost" },
+      ];
+
+      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      // ── State ──
+      let leads = [];
+      let currentLead = null;
+      let filterStatus = "all";
+      let searchQuery = "";
+
+      // ── DOM refs ──
+      const $ = (id) => document.getElementById(id);
+      const loginScreen = $("login-screen");
+      const dashboard = $("dashboard");
+      const boardEl = $("board");
+      const boardLoading = $("board-loading");
+      const modalBackdrop = $("modal-backdrop");
+
+      // ── Auth ──
+      async function init() {
+        const {
+          data: { session },
+        } = await sb.auth.getSession();
+        if (session) {
+          showDashboard();
+        } else {
+          loginScreen.classList.remove("hidden");
+        }
+      }
+
+      $("login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = $("login-btn");
+        const errEl = $("login-error");
+        btn.disabled = true;
+        errEl.textContent = "";
+
+        const email = $("login-email").value.trim();
+        const password = $("login-password").value;
+
+        const { error } = await sb.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) {
+          errEl.textContent = error.message;
+          btn.disabled = false;
+          return;
+        }
+        showDashboard();
+      });
+
+      $("logout-btn").addEventListener("click", async () => {
+        await sb.auth.signOut();
+        dashboard.classList.add("hidden");
+        loginScreen.classList.remove("hidden");
+        $("login-email").value = "";
+        $("login-password").value = "";
+        $("login-error").textContent = "";
+      });
+
+      async function showDashboard() {
+        loginScreen.classList.add("hidden");
+        dashboard.classList.remove("hidden");
+        boardLoading.classList.remove("hidden");
+        boardEl.classList.add("hidden");
+        await loadLeads();
+        buildBoard();
+        boardLoading.classList.add("hidden");
+        boardEl.classList.remove("hidden");
+      }
+
+      // ── Data ──
+      async function loadLeads() {
+        const { data, error } = await sb
+          .from("starbot_leads")
+          .select(
+            "id, name, first_name, last_name, company, role, email, phone, message, source, utm_source, utm_medium, utm_campaign, utm_content, status, notes, conversation_log, created_at, updated_at",
+          )
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Failed to load leads:", error);
+          return;
+        }
+        leads = data || [];
+        updateCount();
+      }
+
+      function updateCount() {
+        const filtered = getFilteredLeads();
+        $("lead-count").textContent =
+          `${filtered.length} lead${filtered.length !== 1 ? "s" : ""}`;
+      }
+
+      function getFilteredLeads() {
+        return leads.filter((l) => {
+          if (filterStatus !== "all" && l.status !== filterStatus) return false;
+          if (searchQuery) {
+            const q = searchQuery.toLowerCase();
+            const hay =
+              `${l.company || ""} ${l.name || ""} ${l.first_name || ""} ${l.last_name || ""} ${l.email || ""}`.toLowerCase();
+            if (!hay.includes(q)) return false;
+          }
+          return true;
+        });
+      }
+
+      // ── Board ──
+      function buildBoard() {
+        boardEl.innerHTML = "";
+        const filtered = getFilteredLeads();
+
+        STAGES.forEach((stage) => {
+          const col = document.createElement("div");
+          col.className = "column";
+
+          const stageLeads = filtered.filter(
+            (l) => (l.status || "new") === stage.id,
+          );
+
+          col.innerHTML = `
+          <div class="column-header">
+            <span class="column-dot ${stage.dot}"></span>
+            ${stage.label}
+            <span class="column-count">${stageLeads.length}</span>
+          </div>
+        `;
+
+          const cardsContainer = document.createElement("div");
+          cardsContainer.className = "column-cards";
+          cardsContainer.dataset.status = stage.id;
+
+          stageLeads.forEach((lead) => {
+            cardsContainer.appendChild(createCard(lead));
+          });
+
+          col.appendChild(cardsContainer);
+          boardEl.appendChild(col);
+
+          // SortableJS
+          new Sortable(cardsContainer, {
+            group: "kanban",
+            animation: 180,
+            ghostClass: "sortable-ghost",
+            dragClass: "sortable-drag",
+            easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+            onStart: () => {
+              document
+                .querySelectorAll(".column-cards")
+                .forEach((c) => c.classList.add("column-cards-active"));
+            },
+            onEnd: async (evt) => {
+              document
+                .querySelectorAll(".column-cards")
+                .forEach((c) => c.classList.remove("column-cards-active"));
+              const leadId = evt.item.dataset.id;
+              const newStatus = evt.to.dataset.status;
+              const lead = leads.find((l) => l.id === leadId);
+              if (!lead || lead.status === newStatus) return;
+
+              // Optimistic update
+              lead.status = newStatus;
+              updateCount();
+
+              // Persist
+              const { error } = await sb
+                .from("starbot_leads")
+                .update({ status: newStatus })
+                .eq("id", leadId);
+
+              if (error) {
+                console.error("Failed to update status:", error);
+                lead.status = evt.from.dataset.status;
+                buildBoard();
+              }
+            },
+          });
+        });
+      }
+
+      function createCard(lead) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.id = lead.id;
+
+        const displayName =
+          lead.name ||
+          [lead.first_name, lead.last_name].filter(Boolean).join(" ") ||
+          "Unknown";
+        const status = lead.status || "new";
+
+        card.innerHTML = `
+        <div class="card-company">${esc(lead.company || "No company")}</div>
+        <div class="card-contact">${esc(displayName)}${lead.role ? " &middot; " + esc(lead.role) : ""}</div>
+        <div class="card-footer">
+          <span class="card-time">${timeAgo(lead.created_at)}</span>
+          <span class="status-pill status-${status}">${status}</span>
+        </div>
+      `;
+
+        card.addEventListener("click", (e) => {
+          if (e.target.closest(".sortable-drag")) return;
+          openModal(lead);
+        });
+
+        return card;
+      }
+
+      // ── Filters ──
+      $("filter-status").addEventListener("change", (e) => {
+        filterStatus = e.target.value;
+        buildBoard();
+      });
+
+      $("search-input").addEventListener("input", (e) => {
+        searchQuery = e.target.value.trim();
+        buildBoard();
+      });
+
+      // ── Modal ──
+      // ── Pipeline stage order ──
+      const STAGE_ORDER = [
+        "new",
+        "contacted",
+        "interested",
+        "negotiating",
+        "won",
+      ];
+
+      function getNextStage(status) {
+        const idx = STAGE_ORDER.indexOf(status || "new");
+        if (idx < 0 || idx >= STAGE_ORDER.length - 1) return null;
+        return STAGE_ORDER[idx + 1];
+      }
+
+      function getLeadDisplayName(lead) {
+        return (
+          lead.name ||
+          [lead.first_name, lead.last_name].filter(Boolean).join(" ") ||
+          "Unknown"
+        );
+      }
+
+      function openModal(lead) {
+        currentLead = lead;
+        const displayName = getLeadDisplayName(lead);
+        const status = lead.status || "new";
+
+        $("modal-company").textContent = lead.company || "No company";
+        $("modal-contact").textContent =
+          `${displayName}${lead.role ? " \u00B7 " + lead.role : ""}`;
+
+        // Pills: status + channel + campaign
+        const pills = [];
+        pills.push(
+          `<span class="modal-pill status-pill status-${status}">${status}</span>`,
+        );
+        if (lead.utm_source) {
+          pills.push(
+            `<span class="modal-pill channel">${esc(lead.utm_source)}</span>`,
+          );
+        }
+        if (lead.utm_campaign) {
+          pills.push(
+            `<span class="modal-pill channel">${esc(lead.utm_campaign)}</span>`,
+          );
+        }
+        $("modal-pills").innerHTML = pills.join("");
+
+        // Contact row: email · phone · WhatsApp · source
+        const contactParts = [];
+        if (lead.email) {
+          contactParts.push(
+            `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>` +
+              `<a href="mailto:${esc(lead.email)}">${esc(lead.email)}</a>`,
+          );
+        }
+        if (lead.phone) {
+          if (lead.email)
+            contactParts.push('<span class="sep">&middot;</span>');
+          contactParts.push(
+            `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>` +
+              `<a href="tel:${esc(lead.phone)}">${esc(lead.phone)}</a>`,
+          );
+          // WhatsApp quick-open icon
+          const digits = lead.phone.replace(/[^\d]/g, "");
+          contactParts.push(
+            `<a href="https://wa.me/${digits}" target="_blank" rel="noopener noreferrer" class="wa-link" title="Open WhatsApp">` +
+              `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.126.553 4.124 1.522 5.86L0 24l6.335-1.652A11.94 11.94 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.82a9.78 9.78 0 0 1-5.09-1.42l-.36-.22-3.76.98.99-3.65-.24-.38A9.78 9.78 0 0 1 2.18 12c0-5.42 4.4-9.82 9.82-9.82 5.42 0 9.82 4.4 9.82 9.82 0 5.42-4.4 9.82-9.82 9.82z"/></svg>` +
+              `</a>`,
+          );
+        }
+        if (lead.source) {
+          if (lead.email || lead.phone)
+            contactParts.push('<span class="sep">&middot;</span>');
+          contactParts.push(
+            `<span style="color:var(--text-tertiary)">via ${esc(lead.source)}</span>`,
+          );
+        }
+        $("modal-contact-row").innerHTML = contactParts.join(" ");
+
+        // UTM
+        const hasUtm =
+          lead.utm_source ||
+          lead.utm_medium ||
+          lead.utm_campaign ||
+          lead.utm_content ||
+          lead.source;
+        $("modal-utm-section").classList.toggle("hidden", !hasUtm);
+        $("modal-utm-source").textContent = lead.utm_source || "\u2014";
+        $("modal-utm-medium").textContent = lead.utm_medium || "\u2014";
+        $("modal-utm-campaign").textContent = lead.utm_campaign || "\u2014";
+        $("modal-utm-content").textContent = lead.utm_content || "\u2014";
+        $("modal-source").textContent = lead.source || "\u2014";
+        $("utm-content").classList.remove("open");
+        $("utm-chevron").classList.remove("open");
+
+        // Notes
+        $("modal-notes").value = lead.notes || "";
+
+        // Conversation
+        renderConvoLog();
+
+        // Compose: reset and show/hide buttons based on contact info
+        $("compose-text").value = "";
+        $("compose-subject").value = "Re: Starbot Partnership";
+        $("compose-subject-row").classList.add("hidden");
+        $("btn-send-email").classList.toggle("hidden", !lead.email);
+        $("btn-send-wa").classList.toggle("hidden", !lead.phone);
+        $("action-email").classList.toggle("hidden", !lead.email);
+        updateComposeButtons();
+
+        // Next stage button
+        const next = getNextStage(status);
+        const nextBtn = $("action-next");
+        if (next && status !== "lost") {
+          nextBtn.textContent = `${next.charAt(0).toUpperCase() + next.slice(1)} \u2192`;
+          nextBtn.classList.remove("hidden");
+        } else {
+          nextBtn.classList.add("hidden");
+        }
+
+        // Created date in footer
+        $("modal-created").textContent = formatDate(lead.created_at);
+
+        // Show
+        modalBackdrop.classList.add("open");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeModal() {
+        modalBackdrop.classList.remove("open");
+        document.body.style.overflow = "";
+        currentLead = null;
+      }
+
+      $("modal-close").addEventListener("click", closeModal);
+      $("action-close-btn").addEventListener("click", closeModal);
+      modalBackdrop.addEventListener("click", (e) => {
+        if (e.target === modalBackdrop) closeModal();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+      });
+
+      // UTM toggle
+      $("utm-toggle").addEventListener("click", () => {
+        $("utm-content").classList.toggle("open");
+        $("utm-chevron").classList.toggle("open");
+      });
+
+      // Notes auto-save on blur
+      $("modal-notes").addEventListener("blur", async () => {
+        if (!currentLead) return;
+        const notes = $("modal-notes").value;
+        if (notes === (currentLead.notes || "")) return;
+
+        currentLead.notes = notes;
+        const { error } = await sb
+          .from("starbot_leads")
+          .update({ notes })
+          .eq("id", currentLead.id);
+
+        if (!error) flashSaved("notes-saved");
+        else console.error("Failed to save notes:", error);
+      });
+
+      // ── Next stage button ──
+      $("action-next").addEventListener("click", async () => {
+        if (!currentLead) return;
+        const next = getNextStage(currentLead.status);
+        if (!next) return;
+
+        currentLead.status = next;
+        const { error } = await sb
+          .from("starbot_leads")
+          .update({ status: next })
+          .eq("id", currentLead.id);
+
+        if (!error) {
+          buildBoard();
+          const nextBtn = $("action-next");
+          const newNext = getNextStage(next);
+          $("modal-pills").querySelector(".status-pill").className =
+            `modal-pill status-pill status-${next}`;
+          $("modal-pills").querySelector(".status-pill").textContent = next;
+          if (newNext && next !== "lost") {
+            nextBtn.textContent = `${newNext.charAt(0).toUpperCase() + newNext.slice(1)} \u2192`;
+          } else {
+            nextBtn.classList.add("hidden");
+          }
+        } else {
+          console.error("Failed to advance status:", error);
+        }
+      });
+
+      // ── Delete button ──
+      $("action-delete").addEventListener("click", async () => {
+        if (!currentLead) return;
+        if (!confirm("Delete this lead permanently? This cannot be undone."))
+          return;
+
+        const { error } = await sb
+          .from("starbot_leads")
+          .delete()
+          .eq("id", currentLead.id);
+
+        if (!error) {
+          leads = leads.filter((l) => l.id !== currentLead.id);
+          closeModal();
+          buildBoard();
+        } else {
+          console.error("Failed to delete lead:", error);
+        }
+      });
+
+      // ── Email shortcut in action bar ──
+      $("action-email").addEventListener("click", () => {
+        const compose = $("compose-text");
+        compose.scrollIntoView({ behavior: "smooth", block: "center" });
+        $("compose-subject-row").classList.remove("hidden");
+        setTimeout(() => compose.focus(), 300);
+      });
+
+      // ── Unified compose ──
+      function updateComposeButtons() {
+        const hasText = $("compose-text").value.trim().length > 0;
+        $("btn-add-note").disabled = !hasText;
+        $("btn-send-email").disabled = !hasText;
+        $("btn-send-wa").disabled = !hasText;
+      }
+
+      $("compose-text").addEventListener("input", updateComposeButtons);
+
+      // Add to conversation (note, no send)
+      $("btn-add-note").addEventListener("click", async () => {
+        if (!currentLead) return;
+        const text = $("compose-text").value.trim();
+        if (!text) return;
+
+        const entry = {
+          date: new Date().toISOString(),
+          from: "system",
+          text,
+          tag: "Note",
+        };
+        const log = [...(currentLead.conversation_log || []), entry];
+        currentLead.conversation_log = log;
+        $("compose-text").value = "";
+        $("compose-subject-row").classList.add("hidden");
+        updateComposeButtons();
+        renderConvoLog();
+
+        const { error } = await sb
+          .from("starbot_leads")
+          .update({ conversation_log: log })
+          .eq("id", currentLead.id);
+
+        if (error) console.error("Failed to save conversation log:", error);
+      });
+
+      // Send via Email — first click shows subject, second sends
+      $("btn-send-email").addEventListener("click", async () => {
+        if (!currentLead || !currentLead.email) return;
+        const subjectRow = $("compose-subject-row");
+        // First click: reveal subject field and focus textarea
+        if (subjectRow.classList.contains("hidden")) {
+          subjectRow.classList.remove("hidden");
+          $("compose-text").focus();
+          return;
+        }
+        const text = $("compose-text").value.trim();
+        const subject = $("compose-subject").value.trim();
+        if (!text) return;
+
+        const btn = $("btn-send-email");
+        btn.disabled = true;
+        const origLabel = btn.innerHTML;
+        btn.textContent = "Sending...";
+
+        try {
+          const res = await fetch("/api/send-reply", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              leadId: currentLead.id,
+              to: currentLead.email,
+              subject,
+              body: text,
+            }),
+          });
+
+          if (res.ok) {
+            const entry = {
+              date: new Date().toISOString(),
+              from: "roman",
+              subject,
+              text,
+              tag: "Reply",
+            };
+            currentLead.conversation_log = [
+              ...(currentLead.conversation_log || []),
+              entry,
+            ];
+            $("compose-text").value = "";
+            $("compose-subject-row").classList.add("hidden");
+            updateComposeButtons();
+            renderConvoLog();
+          } else {
+            const data = await res.json().catch(() => ({}));
+            alert(data.error || "Failed to send email");
+          }
+        } catch (err) {
+          console.error("Send email failed:", err);
+          alert("Failed to send email");
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = origLabel;
+        }
+      });
+
+      // Send via WhatsApp
+      $("btn-send-wa").addEventListener("click", async () => {
+        if (!currentLead || !currentLead.phone) return;
+        const text = $("compose-text").value.trim();
+        if (!text) return;
+
+        // Save to conversation log
+        const entry = {
+          date: new Date().toISOString(),
+          from: "roman",
+          text,
+          tag: "Reply",
+        };
+        const log = [...(currentLead.conversation_log || []), entry];
+        currentLead.conversation_log = log;
+
+        // Open WhatsApp with pre-filled text
+        const digits = currentLead.phone.replace(/[^\d]/g, "");
+        window.open(
+          `https://wa.me/${digits}?text=${encodeURIComponent(text)}`,
+          "_blank",
+        );
+
+        $("compose-text").value = "";
+        $("compose-subject-row").classList.add("hidden");
+        updateComposeButtons();
+        renderConvoLog();
+
+        // Persist
+        const { error } = await sb
+          .from("starbot_leads")
+          .update({ conversation_log: log })
+          .eq("id", currentLead.id);
+
+        if (error) console.error("Failed to save conversation log:", error);
+      });
+
+      // Enter key in compose sends as note
+      $("compose-text").addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          $("btn-add-note").click();
+        }
+      });
+
+      // ── Conversation log ──
+      function renderConvoLog() {
+        const container = $("convo-entries");
+        const log = currentLead?.conversation_log || [];
+        const displayName = currentLead
+          ? getLeadDisplayName(currentLead)
+          : "Lead";
+
+        // Build display entries — prepend form submission if applicable
+        const entries = [];
+        if (currentLead?.message) {
+          const alreadyHasFormEntry = log.some(
+            (e) =>
+              e.text === currentLead.message ||
+              e.tag === "Form submission" ||
+              e.tag === "Inquiry",
+          );
+          if (!alreadyHasFormEntry) {
+            entries.push({
+              date: currentLead.created_at,
+              from: "lead",
+              text: currentLead.message,
+              tag: "Inquiry",
+            });
+          }
+        }
+        entries.push(...log);
+
+        // Update count badge
+        $("convo-count").textContent = entries.length;
+
+        if (!entries.length) {
+          container.innerHTML = '<div class="convo-empty">No entries yet</div>';
+          return;
+        }
+
+        container.innerHTML = entries
+          .map((entry) => {
+            const sender =
+              entry.from === "roman"
+                ? "You"
+                : entry.from === "lead"
+                  ? displayName
+                  : "Note";
+            const senderClass =
+              entry.from === "roman"
+                ? "roman"
+                : entry.from === "lead"
+                  ? "lead"
+                  : "system";
+            const tag = entry.tag || (entry.from ? "" : "Note");
+
+            return `<div class="convo-entry">
+              <div class="convo-date-col">
+                <div class="convo-date">${formatShort(entry.date)}</div>
+              </div>
+              <div class="convo-body">
+                <div class="convo-header">
+                  <span class="convo-sender ${senderClass}">${esc(sender)}</span>
+                  ${tag ? `<span class="convo-tag">${esc(tag)}</span>` : ""}
+                </div>
+                ${entry.subject ? `<div class="convo-subject">${esc(entry.subject)}</div>` : ""}
+                <div class="convo-text">${linkify(entry.text)}</div>
+              </div>
+            </div>`;
+          })
+          .join("");
+        container.scrollTop = container.scrollHeight;
+      }
+
+      // ── Helpers ──
+      function linkify(text) {
+        return esc(text).replace(
+          /(https?:\/\/[^\s<]+)/g,
+          '<a href="$1" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">$1</a>',
+        );
+      }
+
+      function flashSaved(elId) {
+        const el = $(elId);
+        el.classList.add("show");
+        setTimeout(() => el.classList.remove("show"), 1500);
+      }
+
+      function esc(str) {
+        const d = document.createElement("div");
+        d.textContent = str || "";
+        return d.innerHTML;
+      }
+
+      function timeAgo(dateStr) {
+        if (!dateStr) return "";
+        const diff = Date.now() - new Date(dateStr).getTime();
+        const mins = Math.floor(diff / 60000);
+        if (mins < 1) return "just now";
+        if (mins < 60) return `${mins}m ago`;
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return `${hrs}h ago`;
+        const days = Math.floor(hrs / 24);
+        if (days < 30) return `${days}d ago`;
+        const months = Math.floor(days / 30);
+        return `${months}mo ago`;
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return "";
+        return new Date(dateStr).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      function formatShort(dateStr) {
+        if (!dateStr) return "";
+        const d = new Date(dateStr);
+        const day = d.getDate();
+        const mon = d.toLocaleString("en-GB", { month: "short" });
+        const h = String(d.getHours()).padStart(2, "0");
+        const m = String(d.getMinutes()).padStart(2, "0");
+        return `${day} ${mon} ${h}:${m}`;
+      }
+
+      // ── Boot ──
+      init();
+    </script>
+  </body>
+</html>
