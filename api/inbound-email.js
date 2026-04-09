@@ -65,15 +65,19 @@ export default async function handler(req, res) {
     if (emailId) {
       try {
         const emailRes = await fetch(
-          `https://api.resend.com/emails/${emailId}`,
+          `https://api.resend.com/emails/receiving/${emailId}`,
           { headers: { Authorization: `Bearer ${resendKey}` } },
         );
         if (emailRes.ok) {
           const emailData = await emailRes.json();
+          console.log(
+            `[inbound-email] Resend response keys: ${Object.keys(emailData).join(", ")}`,
+          );
           bodyText = emailData.text || emailData.html || "";
         } else {
+          const errText = await emailRes.text().catch(() => "");
           console.error(
-            `[inbound-email] Failed to fetch email ${emailId} (${emailRes.status})`,
+            `[inbound-email] Resend API ${emailRes.status}: ${errText}, emailId: ${emailId}`,
           );
         }
       } catch (fetchErr) {
