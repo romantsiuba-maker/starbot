@@ -75,7 +75,7 @@ export default async function handler(req, res) {
 
     const { error: updateErr } = await sb
       .from("starbot_leads")
-      .update({ conversation_log: log })
+      .update({ conversation_log: log, last_activity_at: new Date().toISOString() })
       .eq("id", leadId);
 
     if (updateErr) {

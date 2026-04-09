@@ -317,6 +317,21 @@
       .card:active {
         cursor: grabbing;
       }
+      .card-unread-dot {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .card-stale {
+        border-color: rgba(251, 191, 36, 0.5);
+      }
+      .card-stale:hover {
+        border-color: rgba(251, 191, 36, 0.7);
+      }
       .card-company {
         font-size: 14px;
         font-weight: 600;
@@ -607,7 +622,6 @@
       }
       .convo-entry + .convo-entry {
         padding-top: 12px;
-        border-top: 1px solid var(--border);
       }
       .convo-meta-row {
         display: flex;
@@ -664,6 +678,9 @@
       .convo-tag-flat.tag-default {
         color: var(--text-tertiary);
       }
+      .convo-tag-flat.tag-file {
+        color: var(--accent);
+      }
       .convo-body {
         padding-left: 106px;
       }
@@ -699,7 +716,7 @@
       }
       .convo-compose textarea {
         width: 100%;
-        min-height: 48px;
+        min-height: 80px;
         padding: 10px 12px;
         background: var(--bg-elevated);
         border: 1px solid var(--border);
@@ -753,8 +770,8 @@
       .btn-log {
         padding: 5px 14px;
         background: transparent;
-        color: var(--text-secondary);
-        border: 0.5px solid var(--border);
+        color: var(--accent);
+        border: 1px solid rgba(45, 182, 183, 0.3);
         border-radius: 8px;
         font-family: var(--font-mono);
         font-size: 10px;
@@ -764,8 +781,31 @@
         white-space: nowrap;
       }
       .btn-log:hover {
-        border-color: var(--border-hover);
-        color: var(--text-primary);
+        border-color: var(--accent);
+        background: rgba(45, 182, 183, 0.08);
+        color: var(--accent);
+      }
+      .btn-attach {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        background: transparent;
+        color: var(--text-tertiary);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.15s;
+        flex-shrink: 0;
+      }
+      .btn-attach:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .btn-attach svg {
+        width: 14px;
+        height: 14px;
       }
       .btn-log:disabled,
       .btn-send:disabled {
@@ -838,39 +878,6 @@
         border-radius: 10px;
         margin-left: 6px;
         font-weight: 400;
-      }
-
-      /* Conversation sender-aware styles */
-      .convo-header {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        margin-bottom: 4px;
-        flex-wrap: wrap;
-      }
-      .convo-sender {
-        font-size: 12px;
-        font-weight: 600;
-      }
-      .convo-sender.lead {
-        color: var(--accent);
-      }
-      .convo-sender.roman {
-        color: var(--text-primary);
-      }
-      .convo-sender.system {
-        color: var(--text-tertiary);
-      }
-      .convo-time {
-        font-family: var(--font-mono);
-        font-size: 10px;
-        color: var(--text-tertiary);
-      }
-      .convo-subject {
-        font-size: 12px;
-        color: var(--text-secondary);
-        font-style: italic;
-        margin-bottom: 2px;
       }
 
       /* Pills row */
@@ -999,110 +1006,8 @@
         color: var(--text-secondary);
       }
 
-      /* Compose area */
-      .compose-area {
-        margin-top: 12px;
-        padding: 12px;
-        background: var(--bg-elevated);
-        border: 1px solid var(--border);
-        border-radius: var(--radius-sm);
-      }
-      .compose-field {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 8px;
-      }
-      .compose-label {
-        font-family: var(--font-mono);
-        font-size: 10px;
-        color: var(--text-tertiary);
-        text-transform: uppercase;
-        width: 50px;
-        flex-shrink: 0;
-      }
-      .compose-value {
-        font-size: 13px;
-        color: var(--text-secondary);
-      }
-      .compose-input {
-        flex: 1;
-        padding: 6px 10px;
-        background: var(--bg-page);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        color: var(--text-primary);
-        font-family: var(--font-body);
-        font-size: 13px;
-        outline: none;
-        transition: border-color 0.15s;
-      }
-      .compose-input:focus {
-        border-color: var(--accent);
-      }
-      .compose-textarea {
-        width: 100%;
-        min-height: 80px;
-        padding: 10px;
-        background: var(--bg-page);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        color: var(--text-primary);
-        font-family: var(--font-body);
-        font-size: 13px;
-        outline: none;
-        resize: vertical;
-        margin-bottom: 8px;
-        transition: border-color 0.15s;
-      }
-      .compose-textarea::placeholder {
-        color: var(--text-tertiary);
-      }
-      .compose-textarea:focus {
-        border-color: var(--accent);
-      }
-      .compose-actions {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-      }
-      .compose-send {
-        padding: 7px 14px;
-        background: var(--accent);
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        font-family: var(--font-body);
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.15s;
-      }
-      .compose-send:hover {
-        background: var(--accent-hover);
-      }
-      .compose-send:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-      .compose-cancel {
-        padding: 7px 14px;
-        background: none;
-        color: var(--text-secondary);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        font-family: var(--font-body);
-        font-size: 12px;
-        cursor: pointer;
-        transition: all 0.15s;
-      }
-      .compose-cancel:hover {
-        border-color: var(--border-hover);
-        color: var(--text-primary);
-      }
-
-      /* UTM toggle */
-      .utm-toggle {
+      /* Notes collapsible */
+      .notes-toggle {
         display: flex;
         align-items: center;
         gap: 6px;
@@ -1118,21 +1023,22 @@
         padding: 0;
         margin-bottom: 10px;
         transition: color 0.15s;
+        width: 100%;
       }
-      .utm-toggle:hover {
+      .notes-toggle:hover {
         color: var(--text-secondary);
       }
-      .utm-chevron {
+      .notes-chevron {
         transition: transform 0.2s;
         font-size: 12px;
       }
-      .utm-chevron.open {
+      .notes-chevron.open {
         transform: rotate(90deg);
       }
-      .utm-content {
+      .notes-content {
         display: none;
       }
-      .utm-content.open {
+      .notes-content.open {
         display: block;
       }
 
@@ -1349,8 +1255,8 @@
               </div>
               <textarea
                 id="compose-text"
-                placeholder="Write or paste a message..."
-                rows="2"
+                placeholder="Type what happened..."
+                rows="4"
               ></textarea>
               <div class="compose-row">
                 <div class="compose-left">
@@ -1359,7 +1265,13 @@
                     <option value="call">Call</option>
                     <option value="meeting">Meeting</option>
                   </select>
-                  <button class="btn-log" id="btn-log" disabled>Log</button>
+                  <button class="btn-log" id="btn-log" disabled>Add to Timeline</button>
+                  <button class="btn-attach" id="btn-attach" title="Attach file">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                    </svg>
+                  </button>
+                  <input type="file" id="file-input" style="display:none">
                 </div>
                 <button class="btn-send hidden" id="btn-send-email" disabled>
                   <svg
@@ -1381,49 +1293,22 @@
             </div>
           </div>
 
-          <!-- Notes -->
+          <!-- Notes (collapsible) -->
           <div class="modal-section">
-            <div class="modal-section-title">
+            <button class="notes-toggle" id="notes-toggle">
+              <span class="notes-chevron" id="notes-chevron">&#9654;</span>
               Notes
               <span class="save-indicator" id="notes-saved">Saved</span>
+            </button>
+            <div class="notes-content" id="notes-content">
+              <textarea
+                class="notes-textarea"
+                id="modal-notes"
+                placeholder="Private notes, reminders..."
+              ></textarea>
             </div>
-            <textarea
-              class="notes-textarea"
-              id="modal-notes"
-              placeholder="Call notes, impressions, reminders..."
-            ></textarea>
           </div>
 
-          <!-- UTM (collapsible) -->
-          <div class="modal-section" id="modal-utm-section">
-            <button class="utm-toggle" id="utm-toggle">
-              <span class="utm-chevron" id="utm-chevron">&#9654;</span> UTM Data
-            </button>
-            <div class="utm-content" id="utm-content">
-              <div class="modal-grid">
-                <div class="modal-field">
-                  <span class="modal-label">Source</span
-                  ><span class="modal-value" id="modal-utm-source"></span>
-                </div>
-                <div class="modal-field">
-                  <span class="modal-label">Medium</span
-                  ><span class="modal-value" id="modal-utm-medium"></span>
-                </div>
-                <div class="modal-field">
-                  <span class="modal-label">Campaign</span
-                  ><span class="modal-value" id="modal-utm-campaign"></span>
-                </div>
-                <div class="modal-field">
-                  <span class="modal-label">Content</span
-                  ><span class="modal-value" id="modal-utm-content"></span>
-                </div>
-                <div class="modal-field">
-                  <span class="modal-label">Page Source</span
-                  ><span class="modal-value" id="modal-source"></span>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- Action bar -->
@@ -1485,7 +1370,7 @@
       let currentLead = null;
       let filterStatus = "all";
       let searchQuery = "";
-      let pollInterval = null;
+      let realtimeChannel = null;
 
       // ── DOM refs ──
       const $ = (id) => document.getElementById(id);
@@ -1547,6 +1432,26 @@
         buildBoard();
         boardLoading.classList.add("hidden");
         boardEl.classList.remove("hidden");
+
+        // Subscribe to Realtime changes — replaces polling
+        realtimeChannel = sb
+          .channel("starbot-leads")
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "starbot_leads" },
+            async () => {
+              await loadLeads();
+              buildBoard();
+              if (currentLead) {
+                const updated = leads.find((l) => l.id === currentLead.id);
+                if (updated) {
+                  currentLead = updated;
+                  renderConvoLog();
+                }
+              }
+            },
+          )
+          .subscribe();
       }
 
       // ── Data ──
@@ -1554,7 +1459,7 @@
         const { data, error } = await sb
           .from("starbot_leads")
           .select(
-            "id, name, first_name, last_name, company, role, email, phone, message, source, utm_source, utm_medium, utm_campaign, utm_content, status, notes, conversation_log, created_at, updated_at",
+            "id, name, first_name, last_name, company, role, email, phone, message, source, utm_source, utm_medium, utm_campaign, utm_content, status, notes, conversation_log, created_at, updated_at, last_activity_at, last_viewed_at",
           )
           .order("created_at", { ascending: false });
 
@@ -1669,7 +1574,23 @@
           "Unknown";
         const status = lead.status || "new";
 
+        // Attention indicators
+        const unread =
+          !lead.last_viewed_at ||
+          (lead.last_activity_at &&
+            new Date(lead.last_activity_at) > new Date(lead.last_viewed_at));
+
+        const ACTIVE_STAGES = ["new", "contacted", "interested", "negotiating"];
+        const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+        const stale =
+          ACTIVE_STAGES.includes(status) &&
+          lead.last_activity_at &&
+          Date.now() - new Date(lead.last_activity_at).getTime() > THREE_DAYS_MS;
+
+        if (stale) card.classList.add("card-stale");
+
         card.innerHTML = `
+        ${unread ? '<div class="card-unread-dot"></div>' : ""}
         <div class="card-company">${esc(lead.company || "No company")}</div>
         <div class="card-contact">${esc(displayName)}${lead.role ? " &middot; " + esc(lead.role) : ""}</div>
         <div class="card-footer">
@@ -1772,24 +1693,10 @@
         }
         $("modal-contact-row").innerHTML = contactParts.join(" ");
 
-        // UTM
-        const hasUtm =
-          lead.utm_source ||
-          lead.utm_medium ||
-          lead.utm_campaign ||
-          lead.utm_content ||
-          lead.source;
-        $("modal-utm-section").classList.toggle("hidden", !hasUtm);
-        $("modal-utm-source").textContent = lead.utm_source || "\u2014";
-        $("modal-utm-medium").textContent = lead.utm_medium || "\u2014";
-        $("modal-utm-campaign").textContent = lead.utm_campaign || "\u2014";
-        $("modal-utm-content").textContent = lead.utm_content || "\u2014";
-        $("modal-source").textContent = lead.source || "\u2014";
-        $("utm-content").classList.remove("open");
-        $("utm-chevron").classList.remove("open");
-
-        // Notes
+        // Notes (collapsed by default)
         $("modal-notes").value = lead.notes || "";
+        $("notes-content").classList.remove("open");
+        $("notes-chevron").classList.remove("open");
 
         // Conversation
         renderConvoLog();
@@ -1816,34 +1723,25 @@
         // Created date in footer
         $("modal-created").textContent = formatDate(lead.created_at);
 
-        // Show + start polling
+        // Mark as viewed (fire-and-forget)
+        const viewedAt = new Date().toISOString();
+        lead.last_viewed_at = viewedAt;
+        sb.from("starbot_leads")
+          .update({ last_viewed_at: viewedAt })
+          .eq("id", lead.id)
+          .then(({ error }) => {
+            if (error) console.error("Failed to update last_viewed_at:", error);
+          });
+
+        // Show modal
         modalBackdrop.classList.add("open");
         document.body.style.overflow = "hidden";
-        if (pollInterval) clearInterval(pollInterval);
-        pollInterval = setInterval(pollConversation, 30000);
       }
 
       function closeModal() {
-        if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
         modalBackdrop.classList.remove("open");
         document.body.style.overflow = "";
         currentLead = null;
-      }
-
-      async function pollConversation() {
-        if (!currentLead) return;
-        const { data } = await sb
-          .from("starbot_leads")
-          .select("conversation_log")
-          .eq("id", currentLead.id)
-          .maybeSingle();
-        if (!data) return;
-        const newLog = data.conversation_log || [];
-        const oldLog = currentLead.conversation_log || [];
-        if (newLog.length !== oldLog.length) {
-          currentLead.conversation_log = newLog;
-          renderConvoLog();
-        }
       }
 
       $("modal-close").addEventListener("click", closeModal);
@@ -1856,9 +1754,10 @@
       });
 
       // UTM toggle
-      $("utm-toggle").addEventListener("click", () => {
-        $("utm-content").classList.toggle("open");
-        $("utm-chevron").classList.toggle("open");
+      // Notes toggle
+      $("notes-toggle").addEventListener("click", () => {
+        $("notes-content").classList.toggle("open");
+        $("notes-chevron").classList.toggle("open");
       });
 
       // Notes auto-save on blur
@@ -2039,6 +1938,66 @@
         }
       });
 
+      // ── File upload ──
+      $("btn-attach").addEventListener("click", () => {
+        $("file-input").click();
+      });
+
+      $("file-input").addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file || !currentLead) return;
+
+        const btn = $("btn-attach");
+        btn.disabled = true;
+        btn.style.opacity = "0.4";
+
+        try {
+          const timestamp = Date.now();
+          const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+          const filePath = `${currentLead.id}/${timestamp}_${safeName}`;
+
+          const { error: uploadErr } = await sb.storage
+            .from("lead-attachments")
+            .upload(filePath, file);
+
+          if (uploadErr) {
+            console.error("File upload failed:", uploadErr.message);
+            alert("File upload failed: " + uploadErr.message);
+            return;
+          }
+
+          const { data: urlData } = sb.storage
+            .from("lead-attachments")
+            .getPublicUrl(filePath);
+
+          const entry = {
+            date: new Date().toISOString(),
+            from: "roman",
+            text: `Uploaded: ${file.name}`,
+            tag: "File",
+            file_url: urlData.publicUrl,
+          };
+
+          const log = [...(currentLead.conversation_log || []), entry];
+          currentLead.conversation_log = log;
+          renderConvoLog();
+
+          const { error: updateErr } = await sb
+            .from("starbot_leads")
+            .update({ conversation_log: log })
+            .eq("id", currentLead.id);
+
+          if (updateErr) console.error("Failed to save file entry:", updateErr);
+        } catch (err) {
+          console.error("File upload error:", err);
+          alert("File upload failed");
+        } finally {
+          btn.disabled = false;
+          btn.style.opacity = "";
+          $("file-input").value = "";
+        }
+      });
+
       // ── Conversation log ──
       function renderConvoLog() {
         const container = $("convo-entries");
@@ -2102,9 +2061,20 @@
                       ? "tag-meeting"
                       : t === "email"
                         ? "tag-email"
-                        : t === "note"
-                          ? "tag-note"
-                          : "tag-default";
+                        : t === "file"
+                          ? "tag-file"
+                          : t === "note"
+                            ? "tag-note"
+                            : "tag-default";
+
+            // File entries render as a clickable link
+            let bodyHtml;
+            if (t === "file" && entry.file_url) {
+              const fileName = (entry.text || "").replace(/^Uploaded:\s*/, "");
+              bodyHtml = `<a href="${esc(entry.file_url)}" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">${esc(fileName)}</a>`;
+            } else {
+              bodyHtml = linkify(entry.text);
+            }
 
             return `<div class="convo-entry">
               <div class="convo-meta-row">
@@ -2114,7 +2084,7 @@
               </div>
               <div class="convo-body">
                 ${entry.subject ? `<div class="convo-subject">Subject: ${esc(entry.subject)}</div>` : ""}
-                <div class="convo-text">${linkify(entry.text)}</div>
+                <div class="convo-text">${bodyHtml}</div>
               </div>
             </div>`;
           })
