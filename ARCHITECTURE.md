@@ -1,0 +1,209 @@
+# Starbot — Architecture Reference
+
+Read this before making any changes. This is the source of truth for how the system is technically structured.
+
+---
+
+## What This Is
+
+A B2B partner acquisition site for Starbot (robot barista franchise). Two parts:
+
+1. **Landing page** (`partner.starbot.co.uk`) — static HTML, captures leads from Meta ads
+2. **Dashboard** (`partner.starbot.co.uk/dashboard`) — Kanban CRM for managing leads manually
+
+No frameworks. No build step. No AI agents.
+
+---
+
+## Stack
+
+- Static HTML + vanilla JS (no React, no Next.js)
+- Vercel serverless functions (Node.js) for API routes
+- Supabase Postgres (project: `lxowggiqhuvwhzbktlsi`)
+- Resend for outbound email + inbound webhook
+- Meta Pixel + Conversion API for ad tracking
+- Google Tag Manager (`GTM-KLD4PZGM`)
+- SortableJS (CDN) for drag-and-drop
+- Supabase JS v2 (CDN) for frontend auth + queries
+
+---
+
+## File Structure
+
+```
+starbot/
+├── index.html              # Landing page (partner.starbot.co.uk)
+├── dashboard/
+│   └── index.html          # Kanban CRM dashboard (2100+ lines, all-in-one)
+├── api/
+│   ├── submit-lead.js      # Form submission → Supabase edge function + Meta CAPI
+│   ├── send-reply.js       # Outbound email via Resend + conversation log update
+│   └── inbound-email.js    # Resend inbound webhook → match lead → append to log
+├── vercel.json             # Rewrites, CSP headers, security headers
+├── package.json            # Dependencies for API routes (@supabase/supabase-js)
+├── package-lock.json       # Lock file
+├── .gitignore              # node_modules, .env, .vercel
+└── README.md               # One-liner
+```
+
+---
+
+## Database Schema (Supabase)
+
+**Project:** `lxowggiqhuvwhzbktlsi`
+**Table:** `starbot_leads` (RLS enabled)
+
+| Column           | Type        | Default         | Notes                                     |
+| ---------------- | ----------- | --------------- | ----------------------------------------- |
+| id               | uuid        | gen_random_uuid | Primary key                               |
+| name             | text        |                 | Combined "first last"                     |
+| first_name       | text        |                 | From form                                 |
+| last_name        | text        |                 | From form                                 |
+| company          | text        |                 | Company / building name                   |
+| role             | text        |                 | Contact's role                            |
+| email            | text        |                 | Required                                  |
+| phone            | text        |                 | Optional                                  |
+| message          | text        |                 | Form message field                        |
+| source           | text        |                 | e.g. "landing_page"                       |
+| utm_source       | text        |                 | Meta ads tracking                         |
+| utm_medium       | text        |                 | Meta ads tracking                         |
+| utm_campaign     | text        |                 | Meta ads tracking                         |
+| utm_content      | text        |                 | Meta ads tracking                         |
+| status           | text        | 'new'           | Pipeline stage                            |
+| notes            | text        |                 | Private notes (auto-save on blur)         |
+| conversation_log | jsonb       | '[]'            | Array of {date, from, text, tag, subject} |
+| created_at       | timestamptz | now()           | Row creation                              |
+| updated_at       | timestamptz | now()           | Auto-updated via trigger                  |
+
+**Pipeline stages (status values):** `new` → `contacted` → `interested` → `negotiating` → `won` → `lost`
+
+**Conversation log entry shape:**
+
+```json
+{
+  "date": "2026-04-09T10:00:00.000Z",
+  "from": "roman" | "lead" | "system",
+  "text": "message content",
+  "tag": "Note" | "Call" | "Meeting" | "Email" | "Reply" | "Inquiry",
+  "subject": "Re: Starbot Partnership"
+}
+```
+
+**RLS policies:**
+
+- `Dashboard read` — authenticated users can SELECT all rows
+- `Dashboard update` — authenticated users can UPDATE all rows
+- INSERT — handled by Supabase edge function (service_role), not by dashboard
+
+**Trigger:** `starbot_leads_updated_at` — sets `updated_at = now()` on every UPDATE.
+
+---
+
+## Auth
+
+Supabase built-in auth with `signInWithPassword`. Dashboard shows login screen first. No signup flow — users are created manually in Supabase Auth dashboard.
+
+- Frontend uses **anon key** (published in dashboard HTML, safe with RLS)
+- API routes use **service key** (env var, never in frontend)
+
+---
+
+## API Routes
+
+### POST /api/submit-lead
+
+**Purpose:** Landing page form submission handler.
+**Called by:** Landing page `index.html` form JS.
+**Does:**
+
+1. Validates required fields (first_name, last_name, email)
+2. Fires Meta CAPI "Lead" event (fire-and-forget) with hashed PII
+3. Forwards lead data to Supabase edge function (`starbot-lead-notify`)
+4. Returns `{ success: true, event_id }` for client-side pixel dedup
+
+**Env vars:** `META_CAPI_ACCESS_TOKEN`
+
+### POST /api/send-reply
+
+**Purpose:** Send outbound email to a lead via Resend.
+**Called by:** Dashboard "Send via Email" button.
+**Does:**
+
+1. Sends HTML email via Resend API (from: `Roman <hello@starbot.co.uk>`, reply-to: `leads@reply.starbot.co.uk`)
+2. Appends entry to lead's `conversation_log` in Supabase
+
+**Env vars:** `RESEND_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`
+**Request body:** `{ leadId, to, subject, body }`
+
+### POST /api/inbound-email
+
+**Purpose:** Resend inbound webhook handler — captures lead replies.
+**Called by:** Resend webhook when email arrives at `*@reply.starbot.co.uk`.
+**Does:**
+
+1. Extracts `email_id` from webhook payload
+2. Fetches full email content from Resend API
+3. Matches sender to a lead by email address
+4. Appends inbound message to lead's `conversation_log`
+
+**Env vars:** `RESEND_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`
+
+---
+
+## Email Infrastructure
+
+- **Outbound:** Resend, from `hello@starbot.co.uk`
+- **Reply-to:** `leads@reply.starbot.co.uk`
+- **Inbound:** Resend receiving on `reply.starbot.co.uk` → webhook → `/api/inbound-email`
+- **Domain:** `starbot.co.uk` must be verified in Resend for sending
+
+---
+
+## Dashboard Features
+
+All in `dashboard/index.html` (single file):
+
+- **Login:** Supabase signInWithPassword
+- **Kanban board:** 6 columns (new → contacted → interested → negotiating → won → lost), drag-and-drop via SortableJS
+- **Lead cards:** Company, contact name, role, relative time, status pill
+- **Detail modal:** Company header, pills (status + UTM), contact row (email + phone), conversation thread, compose area, notes, UTM data (collapsed)
+- **Conversation log:** Timeline layout (date + sender + tag in one row, body indented). Auto-prepends form submission as first entry (display-only, no DB write).
+- **Compose:** Log type selector (Note/Call/Meeting) + Log button, Send via Email button (reveals subject field on first click, sends on second)
+- **Action bar:** Date, Delete, Email shortcut, Stage advance, Close
+- **Search + filter:** By company/name, by status
+- **Mobile responsive:** Columns stack, modal full-width
+
+---
+
+## Vercel Configuration
+
+**Project:** `starbot` (ID: `prj_caPjmiG7M0ycgqIsMUfb2dnO1SUr`)
+**Org:** `team_tyYrLiDCRl6pGWlNUKijcehD`
+**Domain:** `partner.starbot.co.uk`
+
+**Rewrites:**
+
+- `/dashboard` → `/dashboard/index.html`
+- `/dashboard/` → `/dashboard/index.html`
+
+**Security headers** (all routes):
+
+- `X-Frame-Options: DENY`
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: strict-origin-when-cross-origin`
+- Content-Security-Policy with allowances for: Facebook (Meta Pixel), Google Tag Manager, Supabase, cdn.jsdelivr.net (CDN libs), Google Fonts
+
+**Deployment:** GitHub auto-deploy on `main` branch. Never run `vercel --prod` from a feature branch.
+
+---
+
+## Environment Variables
+
+| Variable                 | Used by                         | Purpose                   |
+| ------------------------ | ------------------------------- | ------------------------- |
+| `META_CAPI_ACCESS_TOKEN` | submit-lead.js                  | Meta Conversion API token |
+| `RESEND_API_KEY`         | send-reply.js, inbound-email.js | Resend email API          |
+| `SUPABASE_URL`           | send-reply.js, inbound-email.js | Supabase project URL      |
+| `SUPABASE_SERVICE_KEY`   | send-reply.js, inbound-email.js | Supabase service role key |
+
+The Supabase **anon key** is hardcoded in `dashboard/index.html` (safe — RLS enforced, read/update only for authenticated users).
