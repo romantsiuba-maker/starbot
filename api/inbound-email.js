@@ -1,23 +1,34 @@
 import { createClient } from "@supabase/supabase-js";
 
-// Strip quoted reply — everything after "On ... wrote:" or similar patterns
+// Strip quoted reply — return only the new text above the first quote marker
 function stripQuotedReply(text) {
   if (!text) return "";
-  // Match: "On <date> <name> wrote:" in any language/format
-  const patterns = [
-    /\r?\n\s*On .+ wrote:\s*$/s,
-    /\r?\n\s*Le .+ a écrit\s*:\s*$/s,
-    /\r?\n\s*Am .+ schrieb .+:\s*$/s,
-    /\r?\n\s*El .+ escribió:\s*$/s,
-    /\r?\n\s*------+ ?Original Message ?------+\s*$/s,
-    /\r?\n\s*------+ ?Forwarded message ?------+\s*$/s,
-    /\r?\n\s*From:.*\nSent:.*\nTo:.*\n/s,
-  ];
-  let result = text;
-  for (const pat of patterns) {
-    result = result.replace(pat, "");
+
+  const lines = text.split(/\r?\n/);
+  let cutIndex = lines.length;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    // "On ... wrote:" (Gmail, Apple Mail)
+    if (/^On .+ wrote:$/.test(line)) { cutIndex = i; break; }
+    // "Le ... a écrit :" (French)
+    if (/^Le .+ a écrit\s*:$/.test(line)) { cutIndex = i; break; }
+    // "Am ... schrieb ...:" (German)
+    if (/^Am .+ schrieb .+:$/.test(line)) { cutIndex = i; break; }
+    // "El ... escribió:" (Spanish)
+    if (/^El .+ escribió:$/.test(line)) { cutIndex = i; break; }
+    // "-------- Original Message --------" (Outlook)
+    if (/^-{4,}\s*Original Message\s*-{4,}$/.test(line)) { cutIndex = i; break; }
+    // "-------- Forwarded message --------"
+    if (/^-{4,}\s*Forwarded message\s*-{4,}$/.test(line)) { cutIndex = i; break; }
+    // Lines starting with ">" (quoted text block)
+    if (/^>/.test(line)) { cutIndex = i; break; }
+    // "From: ..." preceded by blank line (generic)
+    if (/^From:/.test(line) && i > 0 && lines[i - 1].trim() === "") { cutIndex = i; break; }
   }
-  return result.trim();
+
+  return lines.slice(0, cutIndex).join("\n").trim();
 }
 
 export default async function handler(req, res) {
