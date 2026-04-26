@@ -21,6 +21,7 @@ No frameworks. No build step. No AI agents.
 - Vercel serverless functions (Node.js) for API routes
 - Supabase Postgres (project: `lxowggiqhuvwhzbktlsi`)
 - Resend for outbound email + inbound webhook
+- Zoho CRM (lead sync via OAuth refresh-token flow)
 - Meta Pixel + Conversion API for ad tracking
 - Google Tag Manager (`GTM-KLD4PZGM`)
 - SortableJS (CDN) for drag-and-drop
@@ -120,8 +121,9 @@ Supabase built-in auth with `signInWithPassword`. Dashboard shows login screen f
 2. Fires Meta CAPI "Lead" event (fire-and-forget) with hashed PII
 3. Forwards lead data to Supabase edge function (`starbot-lead-notify`)
 4. Returns `{ success: true, event_id }` for client-side pixel dedup
+5. Pushes lead to Zoho CRM (fire-and-forget) via OAuth refresh-token flow
 
-**Env vars:** `META_CAPI_ACCESS_TOKEN`
+**Env vars:** `META_CAPI_ACCESS_TOKEN`, `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN`, `ZOHO_ACCOUNTS_URL`, `ZOHO_API_URL`
 
 ### POST /api/send-reply
 
@@ -199,11 +201,16 @@ All in `dashboard/index.html` (single file):
 
 ## Environment Variables
 
-| Variable                 | Used by                         | Purpose                   |
-| ------------------------ | ------------------------------- | ------------------------- |
-| `META_CAPI_ACCESS_TOKEN` | submit-lead.js                  | Meta Conversion API token |
-| `RESEND_API_KEY`         | send-reply.js, inbound-email.js | Resend email API          |
-| `SUPABASE_URL`           | send-reply.js, inbound-email.js | Supabase project URL      |
-| `SUPABASE_SERVICE_KEY`   | send-reply.js, inbound-email.js | Supabase service role key |
+| Variable                 | Used by                         | Purpose                                        |
+| ------------------------ | ------------------------------- | ---------------------------------------------- |
+| `META_CAPI_ACCESS_TOKEN` | submit-lead.js                  | Meta Conversion API token                      |
+| `RESEND_API_KEY`         | send-reply.js, inbound-email.js | Resend email API                               |
+| `SUPABASE_URL`           | send-reply.js, inbound-email.js | Supabase project URL                           |
+| `SUPABASE_SERVICE_KEY`   | send-reply.js, inbound-email.js | Supabase service role key                      |
+| `ZOHO_CLIENT_ID`         | submit-lead.js                  | Zoho OAuth client ID                           |
+| `ZOHO_CLIENT_SECRET`     | submit-lead.js                  | Zoho OAuth client secret                       |
+| `ZOHO_REFRESH_TOKEN`     | submit-lead.js                  | Zoho OAuth refresh token (long-lived)          |
+| `ZOHO_ACCOUNTS_URL`      | submit-lead.js                  | Zoho accounts base URL (e.g. accounts.zoho.eu) |
+| `ZOHO_API_URL`           | submit-lead.js                  | Zoho API base URL (e.g. www.zohoapis.eu)       |
 
 The Supabase **anon key** is hardcoded in `dashboard/index.html` (safe — RLS enforced, read/update only for authenticated users).

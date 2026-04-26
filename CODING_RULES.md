@@ -77,6 +77,7 @@ All secrets go in Vercel env vars, never hardcoded in source. Required vars are 
 ## 9. Security
 
 - Never expose Supabase service key, Resend API key, or Meta CAPI token in frontend code
+- Never expose Zoho credentials (`ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN`) in frontend code
 - The anon key in `dashboard/index.html` is safe because RLS is enforced
 - All API routes validate input before processing
 - Honeypot field (`website`) in landing page form catches bots
