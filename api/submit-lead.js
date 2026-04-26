@@ -50,7 +50,7 @@ function sendCapiEvent({
         event_name: "Lead",
         event_time: Math.floor(Date.now() / 1000),
         event_id: eventId,
-        event_source_url: sourceUrl || "https://partner.starbot.coffee",
+        event_source_url: sourceUrl || "https://partner.starbot.co.uk",
         action_source: "website",
         user_data: userData,
       },
@@ -74,6 +74,116 @@ function sendCapiEvent({
       }
     })
     .catch((err) => console.error("Meta CAPI Lead error:", err));
+}
+
+function buildZohoDescription(message, utm) {
+  const utmBlock =
+    `UTM Source: ${utm.source || "-"}\n` +
+    `UTM Medium: ${utm.medium || "-"}\n` +
+    `UTM Campaign: ${utm.campaign || "-"}\n` +
+    `UTM Content: ${utm.content || "-"}`;
+  if (message && message.trim()) {
+    return `${message.trim()}\n\n---\n${utmBlock}`;
+  }
+  return utmBlock;
+}
+
+function pushToZoho({
+  firstName,
+  lastName,
+  email,
+  phone,
+  company,
+  role,
+  message,
+  utmSource,
+  utmMedium,
+  utmCampaign,
+  utmContent,
+}) {
+  const clientId = process.env.ZOHO_CLIENT_ID;
+  const clientSecret = process.env.ZOHO_CLIENT_SECRET;
+  const refreshToken = process.env.ZOHO_REFRESH_TOKEN;
+  const accountsUrl = process.env.ZOHO_ACCOUNTS_URL;
+  const apiUrl = process.env.ZOHO_API_URL;
+
+  if (!clientId || !clientSecret || !refreshToken || !accountsUrl || !apiUrl) {
+    console.warn("Zoho env vars not all set, skipping Zoho push");
+    return;
+  }
+
+  (async () => {
+    const tokenParams = new URLSearchParams({
+      grant_type: "refresh_token",
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+    });
+
+    const tokenRes = await fetch(`${accountsUrl}/oauth/v2/token`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: tokenParams.toString(),
+    });
+
+    if (!tokenRes.ok) {
+      const errText = await tokenRes.text().catch(() => "");
+      console.error("Zoho OAuth failed:", tokenRes.status, errText);
+      return;
+    }
+
+    const tokenJson = await tokenRes.json().catch(() => ({}));
+    const accessToken = tokenJson.access_token;
+    if (!accessToken) {
+      console.error(
+        "Zoho OAuth failed: no access_token in response",
+        tokenJson,
+      );
+      return;
+    }
+
+    const leadRecord = {
+      Last_Name: lastName,
+      First_Name: firstName,
+      Email: email,
+      Company: company || "-",
+      Lead_Source: "Starbot Landing Page",
+      Description: buildZohoDescription(message, {
+        source: utmSource,
+        medium: utmMedium,
+        campaign: utmCampaign,
+        content: utmContent,
+      }),
+    };
+    if (phone) leadRecord.Phone = phone;
+    if (role) leadRecord.Title = role;
+
+    const leadRes = await fetch(`${apiUrl}/crm/v2/Leads`, {
+      method: "POST",
+      headers: {
+        Authorization: `Zoho-oauthtoken ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        data: [leadRecord],
+        trigger: ["workflow"],
+      }),
+    });
+
+    const leadBody = await leadRes.json().catch(() => ({}));
+    const record = leadBody?.data?.[0];
+
+    if (!leadRes.ok || record?.code !== "SUCCESS") {
+      console.error(
+        "Zoho lead push failed:",
+        leadRes.status,
+        JSON.stringify(leadBody),
+      );
+      return;
+    }
+
+    console.log("Zoho lead created:", record?.details?.id);
+  })().catch((err) => console.error("Zoho lead push error:", err));
 }
 
 export default async function handler(req, res) {
@@ -133,6 +243,21 @@ export default async function handler(req, res) {
       fbp: typeof fbp === "string" ? fbp.trim() || undefined : undefined,
       fbc: typeof fbc === "string" ? fbc.trim() || undefined : undefined,
       sourceUrl: source_url || undefined,
+    });
+
+    // Push to Zoho CRM (fire-and-forget, runs in parallel with Supabase save)
+    pushToZoho({
+      firstName: first_name.trim(),
+      lastName: last_name.trim(),
+      email: email.trim(),
+      phone: phone?.trim() || undefined,
+      company: company?.trim() || undefined,
+      role: role?.trim() || undefined,
+      message: message?.trim() || undefined,
+      utmSource: utm_source || undefined,
+      utmMedium: utm_medium || undefined,
+      utmCampaign: utm_campaign || undefined,
+      utmContent: utm_content || undefined,
     });
 
     // Forward to Supabase edge function (existing business logic)
