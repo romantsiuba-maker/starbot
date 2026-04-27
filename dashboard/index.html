@@ -1250,6 +1250,29 @@
         <div class="modal-contact-row" id="modal-contact-row"></div>
 
         <div class="modal-body">
+          <!-- Qualification (hidden when all 3 values empty) -->
+          <div
+            class="modal-section qualification-section"
+            id="qualification-section"
+            hidden
+          >
+            <div class="modal-section-title">Qualification</div>
+            <div class="modal-grid">
+              <div class="modal-field">
+                <div class="modal-label">Location type</div>
+                <div class="modal-value" id="qual-location"></div>
+              </div>
+              <div class="modal-field">
+                <div class="modal-label">Coffee timeline</div>
+                <div class="modal-value" id="qual-timeline"></div>
+              </div>
+              <div class="modal-field">
+                <div class="modal-label">London zone</div>
+                <div class="modal-value" id="qual-zone"></div>
+              </div>
+            </div>
+          </div>
+
           <!-- Conversation Thread -->
           <div class="modal-section">
             <div class="modal-section-title">
@@ -1473,7 +1496,7 @@
         const { data, error } = await sb
           .from("starbot_leads")
           .select(
-            "id, name, first_name, last_name, company, role, email, phone, message, source, utm_source, utm_medium, utm_campaign, utm_content, status, notes, conversation_log, created_at, updated_at, last_activity_at, last_viewed_at",
+            "id, name, first_name, last_name, company, role, email, phone, message, source, utm_source, utm_medium, utm_campaign, utm_content, location_type, coffee_timeline, london_zone, status, notes, conversation_log, created_at, updated_at, last_activity_at, last_viewed_at",
           )
           .order("created_at", { ascending: false });
 
@@ -1706,6 +1729,16 @@
           );
         }
         $("modal-contact-row").innerHTML = contactParts.join(" ");
+
+        // Qualification (hide if all 3 values empty — pre-quiz leads)
+        const hasQual =
+          lead.location_type || lead.coffee_timeline || lead.london_zone;
+        $("qualification-section").hidden = !hasQual;
+        if (hasQual) {
+          $("qual-location").textContent = lead.location_type || "—";
+          $("qual-timeline").textContent = lead.coffee_timeline || "—";
+          $("qual-zone").textContent = lead.london_zone || "—";
+        }
 
         // Notes (collapsed by default)
         $("modal-notes").value = lead.notes || "";
