@@ -555,6 +555,158 @@
         opacity: 0.6;
       }
 
+      /* ── QUIZ ── */
+      .quiz-progress {
+        margin-bottom: var(--sp-5);
+      }
+      .quiz-progress-text {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: var(--sp-2);
+      }
+      .quiz-progress-track {
+        height: 2px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .quiz-progress-bar {
+        height: 100%;
+        width: 0;
+        background: linear-gradient(
+          90deg,
+          var(--accent),
+          var(--accent-bright)
+        );
+        border-radius: 2px;
+        transition: width 0.4s ease-out;
+      }
+
+      .quiz-question h3 {
+        font-family: "Syne", sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1.3;
+        margin-bottom: var(--sp-2);
+        color: var(--text-primary);
+      }
+      .quiz-question > p {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: var(--sp-5);
+        line-height: 1.5;
+      }
+
+      .quiz-options {
+        display: flex;
+        flex-direction: column;
+        gap: var(--sp-2);
+        margin-bottom: var(--sp-3);
+      }
+      .quiz-option {
+        display: flex;
+        align-items: center;
+        gap: var(--sp-3);
+        width: 100%;
+        background: var(--glass-card);
+        backdrop-filter: blur(var(--glass-blur));
+        -webkit-backdrop-filter: blur(var(--glass-blur));
+        border: var(--glass-border);
+        border-left: 3px solid var(--accent);
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-primary);
+        text-align: left;
+        cursor: pointer;
+        transition:
+          transform 0.15s ease-out,
+          border-color 0.15s,
+          background 0.15s;
+      }
+      .quiz-option:hover {
+        transform: translateY(-1px);
+        border-color: rgba(63, 212, 213, 0.35);
+        border-left-color: var(--accent-bright);
+        background: rgba(10, 14, 20, 0.6);
+      }
+      .quiz-option:focus-visible {
+        outline: 2px solid var(--accent-bright);
+        outline-offset: 2px;
+      }
+      .quiz-option-icon {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        color: var(--accent);
+        display: inline-flex;
+      }
+      .quiz-option-icon svg {
+        width: 100%;
+        height: 100%;
+      }
+      .quiz-option-label {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .quiz-back {
+        display: inline-block;
+        background: none;
+        border: none;
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: var(--sp-1) 0;
+        margin-top: var(--sp-2);
+        transition: color 0.15s;
+      }
+      .quiz-back:hover {
+        color: var(--accent-bright);
+      }
+      .quiz-back:focus-visible {
+        outline: 2px solid var(--accent-bright);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+
+      .quiz-recap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--sp-2);
+        margin-bottom: var(--sp-5);
+        padding-bottom: var(--sp-5);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+      .quiz-recap-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-body);
+        background: rgba(45, 182, 183, 0.08);
+        border: 1px solid rgba(45, 182, 183, 0.2);
+        border-radius: 16px;
+        padding: 5px 11px;
+      }
+      .quiz-recap-check {
+        display: inline-flex;
+        width: 12px;
+        height: 12px;
+        color: var(--accent-bright);
+      }
+      .quiz-recap-check svg {
+        width: 100%;
+        height: 100%;
+      }
+
       /* ── ANIMATIONS ── */
       @keyframes fadeIn {
         from {
@@ -713,6 +865,7 @@
           display: none;
         }
         .form-card {
+          order: -1;
           animation: fadeUp 0.3s 0.2s both;
         }
         .benefits-accordion {
@@ -878,7 +1031,7 @@
     <!-- CONTENT -->
     <section class="content">
       <div class="pitch">
-        <div class="tagline">Now Partnering Across the UK</div>
+        <div class="tagline">Now Partnering Across London</div>
         <h1 class="headline">
           Premium robot coffee for your space.
           <span class="teal">We handle everything.</span>
@@ -906,7 +1059,7 @@
             <div class="benefit-content">
               <div class="benefit-title">Be the First</div>
               <p class="benefit-text">
-                No venue or office in the UK has a robot barista yet. Get there
+                No venue or office in London has a robot barista yet. Get there
                 before your competitors do.
               </p>
             </div>
@@ -1013,11 +1166,14 @@
         </div>
       </div>
 
-      <!-- FORM -->
+      <!-- QUIZ + FORM -->
       <div class="form-card" id="form-container">
-        <h2 class="form-title">Get a Free Consultation</h2>
-        <p class="form-subtitle">See if your location qualifies</p>
-        <form id="consultation-form">
+        <div id="quiz-section"></div>
+        <div id="form-section" hidden>
+          <div class="quiz-recap" id="quiz-recap"></div>
+          <h2 class="form-title">Get a Free Consultation</h2>
+          <p class="form-subtitle">See if your location qualifies</p>
+          <form id="consultation-form">
           <div style="display: flex; gap: 12px">
             <div class="form-group" style="flex: 1">
               <label for="first_name">First Name</label>
@@ -1111,6 +1267,7 @@
             No spam. We respond within 24 hours.
           </p>
         </form>
+        </div>
       </div>
     </section>
 
@@ -1122,7 +1279,7 @@
         </button>
         <div class="accordion-body">
           <div class="accordion-body-inner">
-            No venue or office in the UK has a robot barista yet. Get there
+            No venue or office in London has a robot barista yet. Get there
             before your competitors do.
           </div>
         </div>
@@ -1230,6 +1387,172 @@
         return match ? decodeURIComponent(match[2]) : null;
       }
 
+      // ── QUIZ ──
+      var QUIZ_ICONS = {
+        briefcase:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+        bed: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>',
+        cap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>',
+        dumbbell:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.4 14.4 9.6 9.6"/><path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"/><path d="m21.5 21.5-1.4-1.4"/><path d="M3.9 3.9 2.5 2.5"/><path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"/></svg>',
+        bag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+        train:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="16" x="4" y="3" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><path d="M8 15h.01"/><path d="M16 15h.01"/></svg>',
+        zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>',
+        calendar:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>',
+        calendarLong:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/><circle cx="16" cy="16" r="6"/><path d="M16 14v2l1.5 1"/></svg>',
+        compass:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/></svg>',
+        target:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+        arrowNE:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 16 8-8"/><path d="M10 8h6v6"/></svg>',
+        arrowSW:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16 8-8 8"/><path d="M14 16H8v-6"/></svg>',
+        globe:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>',
+        check:
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+      };
+
+      var QUIZ_QUESTIONS = [
+        {
+          heading: "What type of location do you manage?",
+          subhead: "Select the option that best describes your venue.",
+          options: [
+            { icon: "briefcase", label: "Office / Co-working" },
+            { icon: "bed", label: "Hotel / Hospitality" },
+            { icon: "cap", label: "University / Campus" },
+            { icon: "dumbbell", label: "Gym / Fitness" },
+            { icon: "bag", label: "Retail / Shopping Centre" },
+            { icon: "train", label: "Transport Hub / Station" },
+          ],
+        },
+        {
+          heading: "How soon are you looking to add coffee to your space?",
+          subhead: "This helps us prioritise your application.",
+          options: [
+            { icon: "zap", label: "This month" },
+            { icon: "calendar", label: "Next 1-3 months" },
+            { icon: "calendarLong", label: "Next 3-6 months" },
+            { icon: "compass", label: "Not sure yet — still exploring" },
+          ],
+        },
+        {
+          heading: "Where is your location?",
+          subhead: "We're rolling out across London first.",
+          options: [
+            { icon: "target", label: "Central London" },
+            { icon: "arrowNE", label: "North / East London" },
+            { icon: "arrowSW", label: "South / West London" },
+            { icon: "globe", label: "Outside London" },
+          ],
+        },
+      ];
+
+      var quizState = { q1: null, q2: null, q3: null, currentQuestion: 1 };
+
+      function quizEscape(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function renderQuiz(n) {
+        var q = QUIZ_QUESTIONS[n - 1];
+        var pct = Math.round((n / 3) * 100);
+        var html = "";
+        html += '<div class="quiz-progress">';
+        html +=
+          '<div class="quiz-progress-text">Question ' +
+          n +
+          " of 3 · " +
+          pct +
+          "%</div>";
+        html +=
+          '<div class="quiz-progress-track"><div class="quiz-progress-bar" style="width:' +
+          pct +
+          '%"></div></div>';
+        html += "</div>";
+        html += '<div class="quiz-question">';
+        html += "<h3>" + quizEscape(q.heading) + "</h3>";
+        html += "<p>" + quizEscape(q.subhead) + "</p>";
+        html += '<div class="quiz-options">';
+        for (var i = 0; i < q.options.length; i++) {
+          var opt = q.options[i];
+          html +=
+            '<button type="button" class="quiz-option" data-q="' +
+            n +
+            '" data-label="' +
+            quizEscape(opt.label) +
+            '">';
+          html +=
+            '<span class="quiz-option-icon" aria-hidden="true">' +
+            (QUIZ_ICONS[opt.icon] || "") +
+            "</span>";
+          html +=
+            '<span class="quiz-option-label">' +
+            quizEscape(opt.label) +
+            "</span>";
+          html += "</button>";
+        }
+        html += "</div>";
+        if (n > 1) {
+          html +=
+            '<button type="button" class="quiz-back" id="quiz-back-btn">← Back</button>';
+        }
+        html += "</div>";
+        var section = document.getElementById("quiz-section");
+        section.innerHTML = html;
+        section.querySelectorAll(".quiz-option").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            recordQuizAnswer(parseInt(btn.dataset.q, 10), btn.dataset.label);
+          });
+        });
+        var backBtn = document.getElementById("quiz-back-btn");
+        if (backBtn) backBtn.addEventListener("click", quizGoBack);
+      }
+
+      function recordQuizAnswer(n, label) {
+        quizState["q" + n] = label;
+        if (n < 3) {
+          quizState.currentQuestion = n + 1;
+          renderQuiz(n + 1);
+        } else {
+          renderQuizForm();
+        }
+      }
+
+      function quizGoBack() {
+        if (quizState.currentQuestion > 1) {
+          quizState.currentQuestion -= 1;
+          renderQuiz(quizState.currentQuestion);
+        }
+      }
+
+      function renderQuizForm() {
+        var labels = [quizState.q1, quizState.q2, quizState.q3];
+        var recapHtml = "";
+        for (var i = 0; i < labels.length; i++) {
+          recapHtml +=
+            '<span class="quiz-recap-pill">' +
+            '<span class="quiz-recap-check" aria-hidden="true">' +
+            QUIZ_ICONS.check +
+            "</span>" +
+            quizEscape(labels[i]) +
+            "</span>";
+        }
+        document.getElementById("quiz-recap").innerHTML = recapHtml;
+        document.getElementById("quiz-section").hidden = true;
+        document.getElementById("form-section").hidden = false;
+      }
+
+      renderQuiz(1);
+
       // Form submission → Vercel serverless function → CAPI + edge function
       var form = document.getElementById("consultation-form");
       form.addEventListener("submit", async function (e) {
@@ -1253,6 +1576,9 @@
               website: document.getElementById("website").value,
               source: "landing_page",
               source_url: window.location.href,
+              location_type: quizState.q1,
+              coffee_timeline: quizState.q2,
+              london_zone: quizState.q3,
               utm_source: utmSource,
               utm_medium: utmMedium,
               utm_campaign: utmCampaign,

@@ -76,16 +76,22 @@ function sendCapiEvent({
     .catch((err) => console.error("Meta CAPI Lead error:", err));
 }
 
-function buildZohoDescription(message, utm) {
+function buildZohoDescription(message, quiz, utm) {
   const utmBlock =
     `UTM Source: ${utm.source || "-"}\n` +
     `UTM Medium: ${utm.medium || "-"}\n` +
     `UTM Campaign: ${utm.campaign || "-"}\n` +
     `UTM Content: ${utm.content || "-"}`;
-  if (message && message.trim()) {
-    return `${message.trim()}\n\n---\n${utmBlock}`;
-  }
-  return utmBlock;
+  const quizBlock =
+    `Location type: ${quiz.locationType || "-"}\n` +
+    `Coffee timeline: ${quiz.coffeeTimeline || "-"}\n` +
+    `London zone: ${quiz.londonZone || "-"}`;
+
+  const sections = [];
+  if (message && message.trim()) sections.push(message.trim());
+  sections.push(quizBlock);
+  sections.push(utmBlock);
+  return sections.join("\n\n---\n");
 }
 
 function pushToZoho({
@@ -96,6 +102,9 @@ function pushToZoho({
   company,
   role,
   message,
+  locationType,
+  coffeeTimeline,
+  londonZone,
   utmSource,
   utmMedium,
   utmCampaign,
@@ -148,12 +157,20 @@ function pushToZoho({
       Email: email,
       Company: company || "-",
       Lead_Source: "Starbot Landing Page",
-      Description: buildZohoDescription(message, {
-        source: utmSource,
-        medium: utmMedium,
-        campaign: utmCampaign,
-        content: utmContent,
-      }),
+      Description: buildZohoDescription(
+        message,
+        {
+          locationType,
+          coffeeTimeline,
+          londonZone,
+        },
+        {
+          source: utmSource,
+          medium: utmMedium,
+          campaign: utmCampaign,
+          content: utmContent,
+        },
+      ),
     };
     if (phone) leadRecord.Phone = phone;
     if (role) leadRecord.Title = role;
@@ -203,6 +220,9 @@ export default async function handler(req, res) {
       message,
       website,
       source,
+      location_type,
+      coffee_timeline,
+      london_zone,
       utm_source,
       utm_medium,
       utm_campaign,
@@ -254,6 +274,9 @@ export default async function handler(req, res) {
       company: company?.trim() || undefined,
       role: role?.trim() || undefined,
       message: message?.trim() || undefined,
+      locationType: location_type || undefined,
+      coffeeTimeline: coffee_timeline || undefined,
+      londonZone: london_zone || undefined,
       utmSource: utm_source || undefined,
       utmMedium: utm_medium || undefined,
       utmCampaign: utm_campaign || undefined,
@@ -273,6 +296,9 @@ export default async function handler(req, res) {
       message: message?.trim() || null,
       website: website || "",
       source: source || "landing_page",
+      location_type: location_type || null,
+      coffee_timeline: coffee_timeline || null,
+      london_zone: london_zone || null,
       utm_source: utm_source || null,
       utm_medium: utm_medium || null,
       utm_campaign: utm_campaign || null,

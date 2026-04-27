@@ -70,6 +70,9 @@ starbot/
 | utm_medium       | text        |                 | Meta ads tracking                         |
 | utm_campaign     | text        |                 | Meta ads tracking                         |
 | utm_content      | text        |                 | Meta ads tracking                         |
+| location_type    | text        |                 | Quiz Q1: venue type                       |
+| coffee_timeline  | text        |                 | Quiz Q2: timeline to launch               |
+| london_zone      | text        |                 | Quiz Q3: London geography                 |
 | status           | text        | 'new'           | Pipeline stage                            |
 | notes            | text        |                 | Private notes (auto-save on blur)         |
 | conversation_log | jsonb       | '[]'            | Array of {date, from, text, tag, subject} |
@@ -119,9 +122,9 @@ Supabase built-in auth with `signInWithPassword`. Dashboard shows login screen f
 
 1. Validates required fields (first_name, last_name, email)
 2. Fires Meta CAPI "Lead" event (fire-and-forget) with hashed PII
-3. Forwards lead data to Supabase edge function (`starbot-lead-notify`)
+3. Forwards lead data to Supabase edge function (`starbot-lead-notify`), including the 3 quiz answers (`location_type`, `coffee_timeline`, `london_zone`) which the edge function persists to the matching columns
 4. Returns `{ success: true, event_id }` for client-side pixel dedup
-5. Pushes lead to Zoho CRM (fire-and-forget) via OAuth refresh-token flow
+5. Pushes lead to Zoho CRM (fire-and-forget) via OAuth refresh-token flow. Quiz answers are included in the Zoho lead Description (no separate Zoho custom fields)
 
 **Env vars:** `META_CAPI_ACCESS_TOKEN`, `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN`, `ZOHO_ACCOUNTS_URL`, `ZOHO_API_URL`
 
@@ -168,7 +171,7 @@ All in `dashboard/index.html` (single file):
 - **Login:** Supabase signInWithPassword
 - **Kanban board:** 6 columns (new → contacted → interested → negotiating → won → lost), drag-and-drop via SortableJS
 - **Lead cards:** Company, contact name, role, relative time, status pill
-- **Detail modal:** Company header, pills (status + UTM), contact row (email + phone), conversation thread, compose area, notes, UTM data (collapsed)
+- **Detail modal:** Company header, pills (status + UTM), contact row (email + phone), Qualification panel (location type, coffee timeline, London zone — shown when any quiz answer present, hidden for legacy pre-quiz leads), conversation thread, compose area, notes, UTM data (collapsed)
 - **Conversation log:** Timeline layout (date + sender + tag in one row, body indented). Auto-prepends form submission as first entry (display-only, no DB write).
 - **Compose:** Log type selector (Note/Call/Meeting) + Log button, Send via Email button (reveals subject field on first click, sends on second)
 - **Action bar:** Date, Delete, Email shortcut, Stage advance, Close
