@@ -516,6 +516,60 @@
         line-height: 1.6;
         color: var(--text-body);
       }
+      .success-divider {
+        display: flex;
+        align-items: center;
+        gap: var(--sp-3);
+        margin: var(--sp-6) 0 var(--sp-5);
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+      .success-divider::before,
+      .success-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .success-prompt {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: var(--sp-4);
+      }
+      .wa-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 22px;
+        border: 1px solid var(--accent);
+        border-radius: 10px;
+        background: transparent;
+        color: var(--accent-bright);
+        font-family: "Syne", sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        text-decoration: none;
+        transition:
+          background 0.2s,
+          color 0.2s,
+          transform 0.2s;
+      }
+      .wa-btn:hover {
+        background: var(--accent);
+        color: #ffffff;
+        transform: translateY(-1px);
+      }
+      .wa-btn:focus-visible {
+        outline: 2px solid var(--accent-bright);
+        outline-offset: 2px;
+      }
+      .wa-btn svg {
+        width: 16px;
+        height: 16px;
+      }
 
       /* ── PARTNERS ── */
       .partners {
@@ -1016,6 +1070,36 @@
               <rect x="2" y="9" width="4" height="12" />
               <circle cx="4" cy="4" r="2" /></svg
           ></a>
+          <a
+            href="https://wa.me/447448020018"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="WhatsApp"
+            style="
+              color: rgba(240, 242, 245, 0.4);
+              transition: color 0.2s;
+              display: flex;
+            "
+            onmouseover="this.style.color = '#3fd4d5'"
+            onmouseout="this.style.color = 'rgba(240,242,245,0.4)'"
+            ><svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path
+                d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"
+              />
+              <path
+                d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1"
+              /></svg
+          ></a>
         </div>
         <a
           href="https://www.starbot.coffee"
@@ -1358,6 +1442,8 @@
     </div>
 
     <script>
+      var WHATSAPP_NUMBER = "447448020018";
+
       // Accordion
       function toggleAccordion(btn) {
         btn.parentElement.classList.toggle("open");
@@ -1592,10 +1678,41 @@
             if (window.fbq && data.event_id) {
               fbq("track", "Lead", {}, { eventID: data.event_id });
             }
+            var firstName = (
+              document.getElementById("first_name").value || ""
+            ).trim();
+            var company = (
+              document.getElementById("company").value || ""
+            ).trim();
+            var waMessage = company
+              ? "Hi Starbot team, I just submitted an enquiry for " +
+                company +
+                ". My name is " +
+                firstName +
+                " and I'd like to talk faster about a robot barista in our space."
+              : "Hi Starbot team, I just submitted an enquiry. My name is " +
+                firstName +
+                " and I'd like to talk faster about a robot barista.";
+            var waUrl =
+              "https://wa.me/" +
+              WHATSAPP_NUMBER +
+              "?text=" +
+              encodeURIComponent(waMessage);
             document.getElementById("form-container").innerHTML =
               '<div class="success-state">' +
               '<div class="success-icon">\u2713</div>' +
               "<p>We're on it.<br>Expect a call or email within 24 hours.</p>" +
+              '<div class="success-divider">or</div>' +
+              '<p class="success-prompt">Want to talk faster?</p>' +
+              '<a class="wa-btn" href="' +
+              waUrl +
+              '" target="_blank" rel="noopener noreferrer">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+              '<path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"/>' +
+              '<path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1"/>' +
+              "</svg>" +
+              "Message us on WhatsApp \u2192" +
+              "</a>" +
               "</div>";
           } else {
             var errorData = await res.json();
