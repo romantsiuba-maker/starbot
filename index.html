@@ -240,7 +240,7 @@
         display: grid;
         grid-template-columns: 1.05fr 1fr;
         gap: var(--space-6);
-        align-items: stretch;
+        align-items: center;
       }
       .hero-text {
         display: flex;
@@ -336,8 +336,8 @@
         border-radius: var(--radius);
         overflow: hidden;
         border: 1px solid var(--border);
-        height: 100%;
-        min-height: 600px;
+        aspect-ratio: 4 / 5;
+        max-height: 540px;
         box-shadow:
           0 30px 60px -20px rgba(0, 0, 0, 0.6),
           0 0 60px -10px var(--accent-glow);
@@ -500,6 +500,8 @@
         gap: var(--space-3);
       }
       .compare-card {
+        display: flex;
+        flex-direction: column;
         padding: var(--space-4);
         border-radius: var(--radius);
         border: 1px solid var(--border);
@@ -568,7 +570,8 @@
         font-weight: 800;
         font-size: 32px;
         letter-spacing: -0.02em;
-        margin-top: var(--space-3);
+        margin-top: auto;
+        padding-top: var(--space-3);
       }
       .compare-card.new .compare-figure {
         color: var(--accent);
@@ -859,8 +862,6 @@
           gap: var(--space-4);
         }
         .hero-image {
-          min-height: auto;
-          aspect-ratio: 4 / 5;
           max-height: 70vh;
         }
         .hero-stats {
@@ -1241,14 +1242,22 @@
               </li>
               <li>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
-                We handle everything — beans, service, support
+                Monetise unused space in your venue
               </li>
               <li>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
-                Earn £5,000–£20,000 in your first 12–18 months
+                No plumbing — single power supply, 16A, plug-and-play
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                We manage everything — beans, service, support
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                Zero load on your team
               </li>
             </ul>
-            <div class="compare-figure">£5k–£20k earned</div>
+            <div class="compare-figure">Plug in. Earn. That's it.</div>
           </div>
         </div>
       </div>
