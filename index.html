@@ -460,7 +460,7 @@
       /* ── PHOTO GALLERY ─────────────────── */
       .gallery {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(6, 1fr);
         gap: var(--space-2);
       }
       .gallery-cell {
@@ -470,10 +470,11 @@
         overflow: hidden;
         border: 1px solid var(--border);
         background: var(--bg-elev);
-      }
-      .gallery-cell.wide {
         grid-column: span 2;
-        aspect-ratio: 16 / 11;
+      }
+      .gallery-cell:nth-child(1),
+      .gallery-cell:nth-child(2) {
+        grid-column: span 3;
       }
       .gallery-cell img {
         width: 100%;
@@ -874,12 +875,6 @@
         .steps {
           grid-template-columns: 1fr;
         }
-        .gallery {
-          grid-template-columns: repeat(2, 1fr);
-        }
-        .gallery-cell.wide {
-          grid-column: span 2;
-        }
         .compare {
           grid-template-columns: 1fr;
         }
@@ -901,9 +896,10 @@
         .gallery {
           grid-template-columns: 1fr;
         }
-        .gallery-cell.wide {
+        .gallery-cell,
+        .gallery-cell:nth-child(1),
+        .gallery-cell:nth-child(2) {
           grid-column: span 1;
-          aspect-ratio: 16 / 11;
         }
         .quiz-host {
           padding: var(--space-3);
@@ -1086,15 +1082,6 @@
           <p>Compact footprint, premium output, zero hassle.</p>
         </div>
         <div class="gallery">
-          <div class="gallery-cell wide">
-            <img
-              src="/images/starbot-lobby.jpg"
-              alt="Starbot in office lobby"
-              loading="lazy"
-              width="1200"
-              height="676"
-            />
-          </div>
           <div class="gallery-cell">
             <img
               src="/images/starbot-robot-arm.jpg"
