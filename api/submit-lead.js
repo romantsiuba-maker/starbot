@@ -1,6 +1,8 @@
 import { createHash } from "crypto";
 
 const META_PIXEL_ID = "831360616646272";
+const TIKTOK_EVENTS_API_URL =
+  "https://business-api.tiktok.com/open_api/v1.3/event/track/";
 const EDGE_FUNCTION_URL =
   "https://lxowggiqhuvwhzbktlsi.supabase.co/functions/v1/starbot-lead-notify";
 
@@ -74,6 +76,69 @@ function sendCapiEvent({
       }
     })
     .catch((err) => console.error("Meta CAPI Lead error:", err));
+}
+
+function sendTikTokEvent({
+  eventId,
+  email,
+  firstName,
+  lastName,
+  phone,
+  clientIp,
+  clientUserAgent,
+  sourceUrl,
+}) {
+  const pixelId = process.env.TIKTOK_PIXEL_ID;
+  const token = process.env.TIKTOK_ACCESS_TOKEN;
+  if (!pixelId || !token) {
+    console.warn(
+      "TIKTOK_PIXEL_ID or TIKTOK_ACCESS_TOKEN not set, skipping TikTok event",
+    );
+    return;
+  }
+
+  const user = {};
+  if (email) user.email = sha256(email);
+  if (firstName) user.first_name = sha256(firstName);
+  if (lastName) user.last_name = sha256(lastName);
+  if (phone) {
+    const digits = digitsOnly(phone);
+    if (digits.length >= 7) user.phone = sha256(digits);
+  }
+  if (clientIp) user.ip = clientIp;
+  if (clientUserAgent) user.user_agent = clientUserAgent;
+
+  const payload = {
+    event_source: "web",
+    event_source_id: pixelId,
+    data: [
+      {
+        event: "SubmitForm",
+        event_time: Math.floor(Date.now() / 1000),
+        event_id: eventId,
+        user,
+        page: { url: sourceUrl || "https://partner.starbot.co.uk" },
+      },
+    ],
+  };
+
+  fetch(TIKTOK_EVENTS_API_URL, {
+    method: "POST",
+    headers: {
+      "Access-Token": token,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  })
+    .then(async (res) => {
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        console.error(`TikTok Events API failed (${res.status}):`, text);
+      } else {
+        console.log("TikTok Events API SubmitForm sent successfully");
+      }
+    })
+    .catch((err) => console.error("TikTok Events API error:", err));
 }
 
 function buildZohoDescription(message, quiz, utm) {
@@ -227,8 +292,6 @@ export default async function handler(req, res) {
       utm_medium,
       utm_campaign,
       utm_content,
-      fbp,
-      fbc,
       source_url,
     } = body;
 
@@ -251,7 +314,7 @@ export default async function handler(req, res) {
       req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || undefined;
     const clientUserAgent = req.headers["user-agent"] || undefined;
 
-    // Fire Meta CAPI event (fire-and-forget)
+    // Fire Meta CAPI event (fire-and-forget; no-ops if META_CAPI_ACCESS_TOKEN unset)
     sendCapiEvent({
       eventId,
       email: email.trim(),
@@ -260,8 +323,18 @@ export default async function handler(req, res) {
       phone: phone?.trim() || undefined,
       clientIp,
       clientUserAgent,
-      fbp: typeof fbp === "string" ? fbp.trim() || undefined : undefined,
-      fbc: typeof fbc === "string" ? fbc.trim() || undefined : undefined,
+      sourceUrl: source_url || undefined,
+    });
+
+    // Fire TikTok Events API event (fire-and-forget)
+    sendTikTokEvent({
+      eventId,
+      email: email.trim(),
+      firstName: first_name.trim(),
+      lastName: last_name.trim(),
+      phone: phone?.trim() || undefined,
+      clientIp,
+      clientUserAgent,
       sourceUrl: source_url || undefined,
     });
 
