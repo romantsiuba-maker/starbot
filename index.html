@@ -473,10 +473,6 @@
         overflow: hidden;
         border: 1px solid var(--border);
         background: var(--bg-elev);
-        grid-column: span 2;
-      }
-      .gallery-cell:nth-child(1),
-      .gallery-cell:nth-child(2) {
         grid-column: span 3;
       }
       .gallery-cell img {
@@ -881,9 +877,7 @@
         .gallery {
           grid-template-columns: 1fr;
         }
-        .gallery-cell,
-        .gallery-cell:nth-child(1),
-        .gallery-cell:nth-child(2) {
+        .gallery-cell {
           grid-column: span 1;
         }
         .footer-inner {
@@ -1058,10 +1052,10 @@
           </div>
           <div class="hero-image">
             <img
-              src="/images/starbot-lobby.jpg"
-              alt="Starbot robot barista in a London office lobby"
-              width="1200"
-              height="676"
+              src="/images/starbot-interior.jpg"
+              alt="Starbot robot barista — interior close-up of the kiosk"
+              width="800"
+              height="1421"
               fetchpriority="high"
             />
           </div>
@@ -1157,15 +1151,6 @@
             <img
               src="/images/starbot-customer.jpg"
               alt="Customer collecting coffee from Starbot"
-              loading="lazy"
-              width="800"
-              height="1421"
-            />
-          </div>
-          <div class="gallery-cell">
-            <img
-              src="/images/starbot-interior.jpg"
-              alt="Starbot installation interior view"
               loading="lazy"
               width="800"
               height="1421"
