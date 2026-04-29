@@ -217,9 +217,8 @@ function pushToZoho({
     }
 
     const leadRecord = {
-      Last_Name: lastName,
+      Last_Name: lastName && lastName.trim() ? lastName : "-",
       First_Name: firstName,
-      Email: email,
       Company: company || "-",
       Lead_Source: "Starbot Landing Page",
       Description: buildZohoDescription(
@@ -237,6 +236,7 @@ function pushToZoho({
         },
       ),
     };
+    if (email) leadRecord.Email = email;
     if (phone) leadRecord.Phone = phone;
     if (role) leadRecord.Title = role;
 
@@ -299,11 +299,8 @@ export default async function handler(req, res) {
     if (!first_name || !first_name.trim()) {
       return res.status(400).json({ error: "First name is required" });
     }
-    if (!last_name || !last_name.trim()) {
-      return res.status(400).json({ error: "Last name is required" });
-    }
-    if (!email || !email.trim()) {
-      return res.status(400).json({ error: "Email is required" });
+    if (!phone || !phone.trim()) {
+      return res.status(400).json({ error: "Phone is required" });
     }
 
     // Generate event_id for dedup
@@ -314,13 +311,18 @@ export default async function handler(req, res) {
       req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || undefined;
     const clientUserAgent = req.headers["user-agent"] || undefined;
 
+    const trimmedFirstName = first_name.trim();
+    const trimmedLastName = last_name?.trim() || undefined;
+    const trimmedEmail = email?.trim() || undefined;
+    const trimmedPhone = phone?.trim() || undefined;
+
     // Fire Meta CAPI event (fire-and-forget; no-ops if META_CAPI_ACCESS_TOKEN unset)
     sendCapiEvent({
       eventId,
-      email: email.trim(),
-      firstName: first_name.trim(),
-      lastName: last_name.trim(),
-      phone: phone?.trim() || undefined,
+      email: trimmedEmail,
+      firstName: trimmedFirstName,
+      lastName: trimmedLastName,
+      phone: trimmedPhone,
       clientIp,
       clientUserAgent,
       sourceUrl: source_url || undefined,
@@ -329,10 +331,10 @@ export default async function handler(req, res) {
     // Fire TikTok Events API event (fire-and-forget)
     sendTikTokEvent({
       eventId,
-      email: email.trim(),
-      firstName: first_name.trim(),
-      lastName: last_name.trim(),
-      phone: phone?.trim() || undefined,
+      email: trimmedEmail,
+      firstName: trimmedFirstName,
+      lastName: trimmedLastName,
+      phone: trimmedPhone,
       clientIp,
       clientUserAgent,
       sourceUrl: source_url || undefined,
@@ -340,10 +342,10 @@ export default async function handler(req, res) {
 
     // Push to Zoho CRM (fire-and-forget, runs in parallel with Supabase save)
     pushToZoho({
-      firstName: first_name.trim(),
-      lastName: last_name.trim(),
-      email: email.trim(),
-      phone: phone?.trim() || undefined,
+      firstName: trimmedFirstName,
+      lastName: trimmedLastName,
+      email: trimmedEmail,
+      phone: trimmedPhone,
       company: company?.trim() || undefined,
       role: role?.trim() || undefined,
       message: message?.trim() || undefined,
@@ -357,15 +359,17 @@ export default async function handler(req, res) {
     });
 
     // Forward to Supabase edge function (existing business logic)
-    const combinedName = `${first_name.trim()} ${last_name.trim()}`;
+    const combinedName = trimmedLastName
+      ? `${trimmedFirstName} ${trimmedLastName}`
+      : trimmedFirstName;
     const edgePayload = {
       name: combinedName,
-      first_name: first_name.trim(),
-      last_name: last_name.trim(),
+      first_name: trimmedFirstName,
+      last_name: trimmedLastName || null,
       company: company || null,
       role: role || null,
-      email: email.trim(),
-      phone: phone?.trim() || null,
+      email: trimmedEmail || null,
+      phone: trimmedPhone || null,
       message: message?.trim() || null,
       website: website || "",
       source: source || "landing_page",
