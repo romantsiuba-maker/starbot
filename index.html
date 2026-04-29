@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Starbot — Premium Robot Coffee for Your Building</title>
+    <title>Starbot — Robot Barista for London Spaces</title>
     <meta
       name="description"
-      content="Premium robot coffee for your building. We handle everything. Zero staff, barista-quality, fully automated."
+      content="UK's first fully automated robot barista. We install at zero cost. You earn commission on every cup. London offices, hotels, universities, retail, transport hubs."
     />
     <link
       rel="icon"
@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
       rel="stylesheet"
     />
 
@@ -54,924 +54,863 @@
       }
 
       :root {
-        --text-primary: #f0f2f5;
-        --text-body: rgba(240, 242, 245, 0.85);
-        --text-muted: rgba(240, 242, 245, 0.5);
-        --accent: #2db6b7;
-        --accent-bright: #3fd4d5;
-        --accent-dark: #229394;
-        --accent-glow: rgba(45, 182, 183, 0.35);
-        --accent-glow-strong: rgba(63, 212, 213, 0.5);
-        --bg-body: #0a0e14;
-        --glass-card: rgba(10, 14, 20, 0.45);
-        --glass-form: rgba(10, 14, 20, 0.55);
-        --glass-nav: rgba(6, 10, 18, 0.5);
-        --glass-partners: rgba(6, 10, 18, 0.6);
-        --glass-border: 1px solid rgba(255, 255, 255, 0.12);
-        --glass-blur: 20px;
-        --glass-blur-strong: 24px;
-        --input-bg: rgba(255, 255, 255, 0.06);
-        --input-border: rgba(255, 255, 255, 0.1);
-        --sp-1: 4px;
-        --sp-2: 8px;
-        --sp-3: 12px;
-        --sp-4: 16px;
-        --sp-5: 20px;
-        --sp-6: 24px;
-        --sp-8: 32px;
-        --sp-10: 40px;
-        --sp-12: 48px;
-        --nav-h: 64px;
-        --partners-h: 52px;
-        --z-bg: 0;
-        --z-overlay: 1;
-        --z-content: 2;
-        --z-fixed: 10;
+        --bg: #080c10;
+        --bg-elev: #0f1419;
+        --bg-card: rgba(20, 26, 34, 0.6);
+        --border: rgba(255, 255, 255, 0.08);
+        --border-strong: rgba(255, 255, 255, 0.14);
+        --text: #f4f6f8;
+        --text-muted: rgba(244, 246, 248, 0.62);
+        --text-faint: rgba(244, 246, 248, 0.42);
+        --accent: #00d4b4;
+        --accent-bright: #1cf0d0;
+        --accent-dim: rgba(0, 212, 180, 0.18);
+        --accent-glow: rgba(0, 212, 180, 0.28);
+        --warn: #ff7a59;
+        --max-w: 1200px;
+        --radius: 16px;
+        --radius-sm: 10px;
+        --space-1: 8px;
+        --space-2: 16px;
+        --space-3: 24px;
+        --space-4: 32px;
+        --space-5: 48px;
+        --space-6: 64px;
+        --space-7: 96px;
+        --space-8: 128px;
+        --font-h: "Syne", system-ui, sans-serif;
+        --font-b: "DM Sans", system-ui, sans-serif;
       }
 
       html {
-        height: 100%;
+        scroll-behavior: smooth;
       }
+
       body {
-        font-family: "DM Sans", sans-serif;
-        color: var(--text-primary);
-        background: var(--bg-body);
+        font-family: var(--font-b);
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
         overflow-x: hidden;
-        min-height: 100%;
       }
 
-      /* ── BACKGROUND ── */
-      .bg-hero {
-        position: fixed;
-        inset: 0;
-        z-index: var(--z-bg);
-      }
-      .bg-hero img {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center center;
-        opacity: 0;
-        animation: bgCycle 10s ease-in-out infinite;
-      }
-      .bg-hero img:nth-child(1) {
-        animation-delay: 0s;
-      }
-      .bg-hero img:nth-child(2) {
-        animation-delay: 5s;
-      }
-      .bg-overlay {
-        position: fixed;
-        inset: 0;
-        z-index: var(--z-overlay);
-        background: linear-gradient(
-          to bottom right,
-          rgba(6, 10, 18, 0.7),
-          rgba(8, 12, 22, 0.55)
-        );
-      }
-      .bg-grain {
-        position: fixed;
-        inset: 0;
-        z-index: var(--z-overlay);
-        opacity: 0.03;
-        mix-blend-mode: overlay;
-        pointer-events: none;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-        background-repeat: repeat;
-        background-size: 256px;
-      }
-      .bg-glow {
-        position: fixed;
-        inset: 0;
-        z-index: var(--z-overlay);
-        background: radial-gradient(
-          ellipse at 15% 50%,
-          rgba(45, 182, 183, 0.08) 0%,
-          transparent 60%
-        );
-        pointer-events: none;
+      img {
+        display: block;
+        max-width: 100%;
       }
 
-      @keyframes bgCycle {
-        0% {
-          opacity: 0;
-        }
-        5% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 1;
-        }
-        55% {
-          opacity: 0;
-        }
-        100% {
-          opacity: 0;
-        }
+      a {
+        color: inherit;
+        text-decoration: none;
       }
 
-      /* ── NAV ── */
+      button {
+        font: inherit;
+        cursor: pointer;
+        border: none;
+        background: none;
+        color: inherit;
+      }
+
+      h1,
+      h2,
+      h3 {
+        font-family: var(--font-h);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.08;
+      }
+
+      h1 em,
+      h2 em {
+        font-style: normal;
+        color: var(--accent);
+      }
+
+      .container {
+        max-width: var(--max-w);
+        margin: 0 auto;
+        padding: 0 var(--space-3);
+      }
+
+      /* ── NAVBAR ─────────────────────────── */
       .nav {
-        position: fixed;
+        position: sticky;
         top: 0;
-        left: 0;
-        right: 0;
-        z-index: var(--z-fixed);
+        z-index: 50;
+        background: rgba(8, 12, 16, 0.78);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-inner {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        height: var(--nav-h);
-        padding: 0 var(--sp-12);
-        background: var(--glass-nav);
-        backdrop-filter: blur(var(--glass-blur));
-        -webkit-backdrop-filter: blur(var(--glass-blur));
-        border-bottom: var(--glass-border);
-        animation: fadeIn 0.3s both;
-      }
-      .nav-brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        text-decoration: none;
-        color: var(--text-primary);
-      }
-      .nav-brand img {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-      }
-      .nav-brand span {
-        font-family: "Syne", sans-serif;
-        font-weight: 700;
-        font-size: 17px;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-      }
-      .nav-link {
-        font-size: 14px;
-        color: var(--text-muted);
-        text-decoration: none;
-        cursor: pointer;
-        transition: color 0.2s;
-      }
-      .nav-link:hover {
-        color: var(--accent-bright);
-      }
-      .nav-link:focus-visible {
-        outline: 2px solid var(--accent-bright);
-        outline-offset: 2px;
-        border-radius: 4px;
-      }
-
-      /* ── CONTENT ── */
-      .content {
-        position: relative;
-        z-index: var(--z-content);
-        display: flex;
-        align-items: center;
-        gap: var(--sp-12);
-        padding: calc(var(--nav-h) + var(--sp-6)) var(--sp-12)
-          calc(var(--partners-h) + var(--sp-6));
-        max-width: 1320px;
+        padding: 14px var(--space-3);
+        max-width: var(--max-w);
         margin: 0 auto;
-        min-height: 100dvh;
       }
-      .pitch {
-        flex: 0 0 54%;
-        min-width: 0;
-      }
-      .form-card {
-        flex: 0 0 42%;
-        min-width: 0;
-      }
-
-      /* ── TAGLINE ── */
-      .tagline {
-        display: inline-block;
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: var(--accent-bright);
-        border: 1px solid rgba(45, 182, 183, 0.3);
-        border-radius: 20px;
-        padding: 6px 16px;
-        margin-bottom: var(--sp-4);
-        animation: fadeUp 0.3s 0.1s both;
-      }
-
-      /* ── HEADLINE ── */
-      .headline {
-        font-family: "Syne", sans-serif;
-        font-size: clamp(30px, 3vw, 44px);
+      .logo {
+        font-family: var(--font-h);
         font-weight: 800;
-        line-height: 1.12;
-        margin-bottom: var(--sp-4);
-        max-width: 560px;
-        animation: fadeUp 0.3s 0.2s both;
+        font-size: 22px;
+        letter-spacing: 0.04em;
       }
-      .headline .teal {
-        color: var(--accent-bright);
+      .logo-dot {
+        color: var(--accent);
       }
-
-      /* ── SUBHEADLINE ── */
-      .subheadline {
-        font-size: 16px;
-        line-height: 1.65;
-        color: var(--text-body);
-        max-width: 500px;
-        margin-bottom: var(--sp-6);
-        animation: fadeUp 0.3s 0.3s both;
-      }
-
-      /* ── BENEFITS ── */
-      .benefits {
+      .nav-right {
         display: flex;
-        flex-direction: column;
-        gap: var(--sp-2);
-        margin-bottom: var(--sp-5);
+        align-items: center;
+        gap: var(--space-2);
       }
-      .benefit {
+      .nav-socials {
         display: flex;
-        align-items: flex-start;
-        gap: var(--sp-3);
-        background: var(--glass-card);
-        backdrop-filter: blur(var(--glass-blur));
-        -webkit-backdrop-filter: blur(var(--glass-blur));
-        border-radius: 14px;
-        padding: 14px 18px;
-        border: var(--glass-border);
-        border-left: 4px solid var(--accent);
-        cursor: default;
+        gap: 4px;
+      }
+      .nav-icon {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
         transition:
-          transform 0.2s ease-out,
-          background 0.2s;
+          color 0.15s,
+          border-color 0.15s,
+          background 0.15s;
       }
-      .benefit:hover {
-        transform: translateY(-1px);
-        background: rgba(10, 14, 20, 0.55);
+      .nav-icon:hover {
+        color: var(--accent);
+        border-color: var(--accent-dim);
+        background: rgba(0, 212, 180, 0.06);
       }
-      .benefit:nth-child(1) {
-        animation: fadeUp 0.3s 0.4s both;
-      }
-      .benefit:nth-child(2) {
-        animation: fadeUp 0.3s 0.5s both;
-      }
-      .benefit:nth-child(3) {
-        animation: fadeUp 0.3s 0.6s both;
-      }
-      .benefit:nth-child(4) {
-        animation: fadeUp 0.3s 0.7s both;
-      }
-      .benefit:nth-child(5) {
-        animation: fadeUp 0.3s 0.8s both;
-      }
-      .benefit-icon {
-        flex-shrink: 0;
+      .nav-icon svg {
         width: 18px;
         height: 18px;
-        color: var(--accent);
-        margin-top: 1px;
       }
-      .benefit-content {
-        min-width: 0;
-      }
-      .benefit-title {
-        font-size: 14px;
+      .nav-cta {
+        padding: 10px 18px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: #06110d;
         font-weight: 600;
-        margin-bottom: 2px;
-        color: var(--text-primary);
+        font-size: 14px;
+        transition:
+          background 0.15s,
+          transform 0.15s,
+          box-shadow 0.15s;
       }
-      .benefit-text {
-        font-size: 13px;
-        line-height: 1.5;
-        color: var(--text-body);
-      }
-
-      /* ── STATS ── */
-      .stats {
-        display: flex;
-        gap: var(--sp-2);
-        flex-wrap: wrap;
-        animation: fadeIn 0.3s 0.9s both;
-      }
-      .stat {
-        font-size: 12px;
-        font-weight: 500;
-        color: var(--accent-bright);
-        background: rgba(45, 182, 183, 0.1);
-        border: 1px solid rgba(45, 182, 183, 0.2);
-        border-radius: 20px;
-        padding: 6px 14px;
+      .nav-cta:hover {
+        background: var(--accent-bright);
+        box-shadow: 0 0 28px var(--accent-glow);
       }
 
-      /* ── FORM CARD ── */
-      .form-card {
-        background: var(--glass-form);
-        backdrop-filter: blur(var(--glass-blur-strong));
-        -webkit-backdrop-filter: blur(var(--glass-blur-strong));
-        border-radius: 16px;
-        padding: var(--sp-8);
-        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
-        border: var(--glass-border);
-        border-top: 3px solid transparent;
-        border-image: linear-gradient(
-            90deg,
-            var(--accent),
-            var(--accent-bright)
-          )
-          1;
-        border-image-slice: 1;
-        animation: slideInRight 0.4s 0.3s both;
-      }
-      /* Fix border-image + border-radius conflict */
-      .form-card {
-        border-top: none;
+      /* ── HERO ──────────────────────────── */
+      .hero {
         position: relative;
+        padding: var(--space-7) 0 var(--space-6);
+        overflow: hidden;
       }
-      .form-card::before {
+      .hero::before {
         content: "";
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--accent), var(--accent-bright));
-        border-radius: 16px 16px 0 0;
+        top: -10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 900px;
+        height: 600px;
+        background:
+          radial-gradient(
+            ellipse at center,
+            var(--accent-dim) 0%,
+            transparent 60%
+          );
+        filter: blur(60px);
+        z-index: 0;
+        pointer-events: none;
       }
-      .form-title {
-        font-family: "Syne", sans-serif;
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: var(--sp-1);
+      .hero-grid {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 1.05fr 1fr;
+        gap: var(--space-6);
+        align-items: center;
       }
-      .form-subtitle {
-        font-size: 14px;
-        color: var(--text-muted);
-        margin-bottom: var(--sp-5);
+      .hero-text {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
       }
-      .form-group {
-        margin-bottom: 14px;
-      }
-      .form-group label {
-        display: block;
+      .hero-badge {
+        align-self: flex-start;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: rgba(0, 212, 180, 0.1);
+        border: 1px solid var(--accent-dim);
+        color: var(--accent);
         font-size: 13px;
         font-weight: 500;
-        margin-bottom: var(--sp-1);
-        color: var(--text-body);
+        letter-spacing: 0.02em;
       }
-      .form-group input {
-        width: 100%;
-        padding: 11px 14px;
-        border: 1px solid var(--input-border);
-        border-radius: 8px;
-        background: var(--input-bg);
-        font-family: "DM Sans", sans-serif;
-        font-size: 14px;
-        color: var(--text-primary);
-        transition:
-          border-color 0.2s,
-          background 0.2s;
-        outline: none;
+      .hero h1 {
+        font-size: clamp(40px, 6vw, 72px);
       }
-      .form-group input::placeholder {
+      .hero-sub {
+        font-size: clamp(17px, 1.5vw, 19px);
         color: var(--text-muted);
+        max-width: 520px;
       }
-      .form-group input:focus {
-        border-color: var(--accent);
-        background: rgba(255, 255, 255, 0.09);
-      }
-      .form-group input:focus-visible {
-        outline: 2px solid var(--accent-bright);
-        outline-offset: 1px;
-      }
-      .submit-btn {
-        width: 100%;
-        padding: 14px;
-        border: none;
-        border-radius: 10px;
-        background: linear-gradient(
-          135deg,
-          var(--accent),
-          var(--accent-bright)
-        );
-        color: var(--bg-body);
-        font-family: "Syne", sans-serif;
-        font-size: 16px;
-        font-weight: 700;
-        cursor: pointer;
-        box-shadow: 0 4px 24px var(--accent-glow);
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s;
-        margin-top: var(--sp-1);
-      }
-      .submit-btn:hover:not(:disabled) {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 32px var(--accent-glow-strong);
-      }
-      .submit-btn:focus-visible {
-        outline: 2px solid var(--accent-bright);
-        outline-offset: 2px;
-      }
-      .submit-btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-      .trust-line {
+      .hero-ctas {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-top: var(--sp-3);
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: var(--space-1);
       }
-      .trust-line svg {
-        width: 13px;
-        height: 13px;
-        opacity: 0.6;
-      }
-      .success-state {
-        text-align: center;
-        padding: var(--sp-12) var(--sp-4);
-      }
-      .success-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
-        background: linear-gradient(
-          135deg,
-          var(--accent),
-          var(--accent-bright)
-        );
-        color: var(--bg-body);
-        font-size: 26px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto var(--sp-4);
-      }
-      .success-state p {
-        font-size: 16px;
-        line-height: 1.6;
-        color: var(--text-body);
-      }
-      .success-divider {
-        display: flex;
-        align-items: center;
-        gap: var(--sp-3);
-        margin: var(--sp-6) 0 var(--sp-5);
-        font-size: 11px;
-        font-weight: 500;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: var(--text-muted);
-      }
-      .success-divider::before,
-      .success-divider::after {
-        content: "";
-        flex: 1;
-        height: 1px;
-        background: rgba(255, 255, 255, 0.1);
-      }
-      .success-prompt {
-        font-size: 14px;
-        color: var(--text-muted);
-        margin-bottom: var(--sp-4);
-      }
-      .wa-btn {
+      .btn {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 12px 22px;
-        border: 1px solid var(--accent);
-        border-radius: 10px;
-        background: transparent;
-        color: var(--accent-bright);
-        font-family: "Syne", sans-serif;
-        font-size: 16px;
-        font-weight: 700;
-        text-decoration: none;
+        padding: 14px 24px;
+        border-radius: 999px;
+        font-family: var(--font-b);
+        font-weight: 600;
+        font-size: 15px;
         transition:
-          background 0.2s,
-          color 0.2s,
-          transform 0.2s;
+          background 0.15s,
+          color 0.15s,
+          border-color 0.15s,
+          box-shadow 0.15s,
+          transform 0.15s;
       }
-      .wa-btn:hover {
+      .btn-primary {
         background: var(--accent);
-        color: #ffffff;
-        transform: translateY(-1px);
+        color: #06110d;
+        box-shadow: 0 0 0 0 var(--accent-glow);
       }
-      .wa-btn:focus-visible {
-        outline: 2px solid var(--accent-bright);
-        outline-offset: 2px;
+      .btn-primary:hover {
+        background: var(--accent-bright);
+        box-shadow: 0 0 32px var(--accent-glow);
       }
-      .wa-btn svg {
-        width: 16px;
-        height: 16px;
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid var(--border-strong);
+        color: var(--text);
+      }
+      .btn-ghost:hover {
+        border-color: var(--accent-dim);
+        color: var(--accent);
       }
 
-      /* ── PARTNERS ── */
-      .partners {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: var(--z-fixed);
+      .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-3);
+        margin-top: var(--space-3);
+        padding-top: var(--space-3);
+        border-top: 1px solid var(--border);
+      }
+      .stat-num {
+        font-family: var(--font-h);
+        font-weight: 700;
+        font-size: 26px;
+        color: var(--accent);
+        letter-spacing: -0.02em;
+      }
+      .stat-lbl {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      .hero-image {
+        position: relative;
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+        box-shadow:
+          0 30px 60px -20px rgba(0, 0, 0, 0.6),
+          0 0 60px -10px var(--accent-glow);
+      }
+      .hero-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        aspect-ratio: 4 / 3;
+      }
+      .hero-image::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          transparent 60%,
+          rgba(8, 12, 16, 0.6) 100%
+        );
+        pointer-events: none;
+      }
+
+      /* ── SOCIAL PROOF ──────────────────── */
+      .proof {
+        padding: var(--space-3) 0;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-elev);
+      }
+      .proof-inner {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 36px;
-        height: var(--partners-h);
-        padding: 0 var(--sp-12);
-        background: var(--glass-partners);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-top: var(--glass-border);
-        animation: fadeIn 0.3s 1s both;
-      }
-      .partners-label {
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
+        gap: 12px;
+        font-size: 14px;
         color: var(--text-muted);
-        margin-right: 4px;
+        text-align: center;
       }
-      .partners img {
-        height: 22px;
-        object-fit: contain;
-        filter: brightness(0) invert(1);
-        opacity: 0.3;
-        transition: opacity 0.3s;
+      .proof-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 10px var(--accent);
+        animation: pulse 2s infinite;
+        flex-shrink: 0;
       }
-      .partners img:hover {
-        opacity: 0.6;
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.4;
+        }
+      }
+      .proof strong {
+        color: var(--text);
+        font-weight: 600;
       }
 
-      /* ── QUIZ ── */
+      /* ── HOW IT WORKS ──────────────────── */
+      .section {
+        padding: var(--space-7) 0;
+      }
+      .section-head {
+        text-align: center;
+        max-width: 720px;
+        margin: 0 auto var(--space-5);
+      }
+      .section-eyebrow {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 12px;
+      }
+      .section-head h2 {
+        font-size: clamp(32px, 4vw, 48px);
+      }
+      .section-head p {
+        margin-top: var(--space-2);
+        color: var(--text-muted);
+        font-size: 17px;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-3);
+      }
+      .step {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: var(--space-4);
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s,
+          transform 0.2s;
+      }
+      .step:hover {
+        border-color: var(--accent-dim);
+        box-shadow: 0 0 40px -10px var(--accent-glow);
+        transform: translateY(-2px);
+      }
+      .step-num {
+        font-family: var(--font-h);
+        font-weight: 700;
+        font-size: 13px;
+        letter-spacing: 0.16em;
+        color: var(--accent);
+        margin-bottom: var(--space-2);
+      }
+      .step h3 {
+        font-size: 22px;
+        margin-bottom: 8px;
+      }
+      .step p {
+        color: var(--text-muted);
+        font-size: 15px;
+      }
+
+      /* ── PHOTO GALLERY ─────────────────── */
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-2);
+      }
+      .gallery-cell {
+        position: relative;
+        aspect-ratio: 3 / 4;
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--bg-elev);
+      }
+      .gallery-cell.wide {
+        grid-column: span 2;
+        aspect-ratio: 16 / 11;
+      }
+      .gallery-cell img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s ease;
+      }
+      .gallery-cell:hover img {
+        transform: scale(1.04);
+      }
+
+      /* ── COMPARISON ────────────────────── */
+      .compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-3);
+      }
+      .compare-card {
+        padding: var(--space-4);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+      }
+      .compare-card.old {
+        opacity: 0.7;
+      }
+      .compare-card.new {
+        border-color: var(--accent-dim);
+        background: linear-gradient(
+          145deg,
+          rgba(0, 212, 180, 0.06) 0%,
+          var(--bg-card) 60%
+        );
+        box-shadow: 0 0 50px -10px var(--accent-glow);
+      }
+      .compare-tag {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+      }
+      .compare-card.old .compare-tag {
+        color: var(--text-faint);
+      }
+      .compare-card.new .compare-tag {
+        color: var(--accent);
+      }
+      .compare-card h3 {
+        font-size: 24px;
+        margin-bottom: var(--space-2);
+      }
+      .compare-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: var(--space-2);
+      }
+      .compare-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 15px;
+        color: var(--text-muted);
+      }
+      .compare-list li svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .compare-card.old .compare-list li svg {
+        color: var(--warn);
+      }
+      .compare-card.new .compare-list li svg {
+        color: var(--accent);
+      }
+      .compare-card.new .compare-list li {
+        color: var(--text);
+      }
+      .compare-figure {
+        font-family: var(--font-h);
+        font-weight: 800;
+        font-size: 32px;
+        letter-spacing: -0.02em;
+        margin-top: var(--space-3);
+      }
+      .compare-card.new .compare-figure {
+        color: var(--accent);
+      }
+
+      /* ── QUIZ + FORM ──────────────────── */
+      .form-section {
+        padding: var(--space-7) 0;
+        background: linear-gradient(
+          180deg,
+          var(--bg) 0%,
+          var(--bg-elev) 100%
+        );
+      }
+      .quiz-host {
+        max-width: 640px;
+        margin: 0 auto;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: var(--space-5);
+        box-shadow: 0 0 60px -20px var(--accent-glow);
+      }
+
       .quiz-progress {
-        margin-bottom: var(--sp-5);
+        margin-bottom: var(--space-3);
       }
       .quiz-progress-text {
-        font-size: 11px;
-        font-weight: 500;
-        letter-spacing: 1px;
-        text-transform: uppercase;
+        font-size: 13px;
         color: var(--text-muted);
-        margin-bottom: var(--sp-2);
+        margin-bottom: 8px;
+        font-weight: 500;
       }
       .quiz-progress-track {
-        height: 2px;
+        height: 6px;
         background: rgba(255, 255, 255, 0.06);
-        border-radius: 2px;
+        border-radius: 999px;
         overflow: hidden;
       }
       .quiz-progress-bar {
         height: 100%;
-        width: 0;
         background: linear-gradient(
           90deg,
-          var(--accent),
-          var(--accent-bright)
+          var(--accent) 0%,
+          var(--accent-bright) 100%
         );
-        border-radius: 2px;
-        transition: width 0.4s ease-out;
+        border-radius: 999px;
+        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 0 12px var(--accent-glow);
       }
 
       .quiz-question h3 {
-        font-family: "Syne", sans-serif;
-        font-size: 20px;
-        font-weight: 700;
-        line-height: 1.3;
-        margin-bottom: var(--sp-2);
-        color: var(--text-primary);
+        font-size: 24px;
+        margin-bottom: 6px;
       }
       .quiz-question > p {
-        font-size: 14px;
         color: var(--text-muted);
-        margin-bottom: var(--sp-5);
-        line-height: 1.5;
+        font-size: 15px;
+        margin-bottom: var(--space-3);
       }
-
       .quiz-options {
-        display: flex;
-        flex-direction: column;
-        gap: var(--sp-2);
-        margin-bottom: var(--sp-3);
+        display: grid;
+        gap: 10px;
       }
       .quiz-option {
         display: flex;
         align-items: center;
-        gap: var(--sp-3);
-        width: 100%;
-        background: var(--glass-card);
-        backdrop-filter: blur(var(--glass-blur));
-        -webkit-backdrop-filter: blur(var(--glass-blur));
-        border: var(--glass-border);
-        border-left: 3px solid var(--accent);
-        border-radius: 12px;
+        gap: 14px;
         padding: 14px 16px;
-        font-family: "DM Sans", sans-serif;
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
         text-align: left;
-        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--text);
         transition:
-          transform 0.15s ease-out,
+          background 0.15s,
           border-color 0.15s,
-          background 0.15s;
+          transform 0.1s;
       }
       .quiz-option:hover {
-        transform: translateY(-1px);
-        border-color: rgba(63, 212, 213, 0.35);
-        border-left-color: var(--accent-bright);
-        background: rgba(10, 14, 20, 0.6);
+        background: rgba(0, 212, 180, 0.06);
+        border-color: var(--accent-dim);
       }
-      .quiz-option:focus-visible {
-        outline: 2px solid var(--accent-bright);
-        outline-offset: 2px;
+      .quiz-option:active {
+        transform: scale(0.98);
       }
       .quiz-option-icon {
+        width: 36px;
+        height: 36px;
         flex-shrink: 0;
-        width: 20px;
-        height: 20px;
-        color: var(--accent);
         display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: var(--accent-dim);
+        color: var(--accent);
       }
       .quiz-option-icon svg {
-        width: 100%;
-        height: 100%;
+        width: 20px;
+        height: 20px;
       }
-      .quiz-option-label {
-        flex: 1;
-        min-width: 0;
-      }
-
       .quiz-back {
-        display: inline-block;
-        background: none;
-        border: none;
-        font-family: "DM Sans", sans-serif;
+        margin-top: var(--space-3);
         font-size: 13px;
         color: var(--text-muted);
-        cursor: pointer;
-        padding: var(--sp-1) 0;
-        margin-top: var(--sp-2);
-        transition: color 0.15s;
+        font-weight: 500;
       }
       .quiz-back:hover {
-        color: var(--accent-bright);
-      }
-      .quiz-back:focus-visible {
-        outline: 2px solid var(--accent-bright);
-        outline-offset: 2px;
-        border-radius: 4px;
+        color: var(--accent);
       }
 
       .quiz-recap {
         display: flex;
         flex-wrap: wrap;
-        gap: var(--sp-2);
-        margin-bottom: var(--sp-5);
-        padding-bottom: var(--sp-5);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        gap: 8px;
+        margin-bottom: var(--space-3);
       }
       .quiz-recap-pill {
         display: inline-flex;
         align-items: center;
         gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(0, 212, 180, 0.08);
+        border: 1px solid var(--accent-dim);
+        color: var(--accent);
         font-size: 12px;
         font-weight: 500;
-        color: var(--text-body);
-        background: rgba(45, 182, 183, 0.08);
-        border: 1px solid rgba(45, 182, 183, 0.2);
-        border-radius: 16px;
-        padding: 5px 11px;
-      }
-      .quiz-recap-check {
-        display: inline-flex;
-        width: 12px;
-        height: 12px;
-        color: var(--accent-bright);
       }
       .quiz-recap-check svg {
+        width: 12px;
+        height: 12px;
+        display: block;
+      }
+
+      .form-head h3 {
+        font-size: 26px;
+        margin-bottom: 6px;
+      }
+      .form-head > p {
+        color: var(--text-muted);
+        font-size: 15px;
+        margin-bottom: var(--space-3);
+      }
+
+      .form-field {
+        margin-bottom: var(--space-2);
+      }
+      .form-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+      .form-label .opt {
+        color: var(--text-faint);
+        font-weight: 400;
+      }
+      .form-input {
         width: 100%;
-        height: 100%;
+        padding: 12px 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        color: var(--text);
+        font-family: var(--font-b);
+        font-size: 15px;
+        transition:
+          border-color 0.15s,
+          background 0.15s,
+          box-shadow 0.15s;
+      }
+      .form-input:focus {
+        outline: none;
+        border-color: var(--accent);
+        background: rgba(0, 212, 180, 0.04);
+        box-shadow: 0 0 0 3px rgba(0, 212, 180, 0.18);
+      }
+      .form-honeypot {
+        position: absolute;
+        left: -10000px;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
       }
 
-      /* ── ANIMATIONS ── */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
+      .form-cta {
+        width: 100%;
+        margin-top: var(--space-1);
+        padding: 16px;
+        font-size: 16px;
       }
-      @keyframes fadeUp {
-        from {
-          opacity: 0;
-          transform: translateY(14px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      @keyframes slideInRight {
-        from {
-          opacity: 0;
-          transform: translateX(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateX(0);
-        }
+      .form-microcopy {
+        text-align: center;
+        font-size: 13px;
+        color: var(--text-faint);
+        margin-top: 12px;
       }
 
-      @media (prefers-reduced-motion: reduce) {
-        .bg-hero,
-        .tagline,
-        .headline,
-        .subheadline,
-        .benefit,
-        .stats,
-        .form-card,
-        .partners,
-        .nav {
-          animation: none !important;
-          opacity: 1 !important;
-        }
-        .bg-hero img {
-          animation: none !important;
-          opacity: 0 !important;
-        }
-        .bg-hero img:nth-child(1) {
-          opacity: 1 !important;
-        }
-      }
-
-      /* ── MOBILE ACCORDION ── */
-      .benefits-accordion {
-        display: none;
+      .form-divider {
         position: relative;
-        z-index: var(--z-content);
+        text-align: center;
+        margin: var(--space-3) 0;
+        color: var(--text-faint);
+        font-size: 13px;
       }
-      .accordion-item {
-        background: var(--glass-card);
-        backdrop-filter: blur(var(--glass-blur));
-        -webkit-backdrop-filter: blur(var(--glass-blur));
-        border: var(--glass-border);
-        border-radius: 14px;
-        margin-bottom: var(--sp-2);
-        overflow: hidden;
+      .form-divider::before,
+      .form-divider::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: calc(50% - 24px);
+        height: 1px;
+        background: var(--border);
       }
-      .accordion-item.hidden-mobile {
-        display: none;
+      .form-divider::before {
+        left: 0;
       }
-      .accordion-header {
+      .form-divider::after {
+        right: 0;
+      }
+
+      .wa-btn {
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        padding: 14px 16px;
-        cursor: pointer;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px;
+        border-radius: var(--radius-sm);
+        background: rgba(37, 211, 102, 0.1);
+        border: 1px solid rgba(37, 211, 102, 0.35);
+        color: #25d366;
+        font-weight: 600;
         font-size: 15px;
-        font-weight: 600;
-        color: var(--text-primary);
-        border: none;
-        background: none;
-        width: 100%;
-        font-family: "DM Sans", sans-serif;
-        text-align: left;
-        border-left: 3px solid var(--accent);
+        transition:
+          background 0.15s,
+          border-color 0.15s;
       }
-      .accordion-header .chevron {
-        transition: transform 0.2s;
-        font-size: 12px;
+      .wa-btn:hover {
+        background: rgba(37, 211, 102, 0.18);
+        border-color: rgba(37, 211, 102, 0.6);
+      }
+      .wa-btn svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .success-state {
+        text-align: center;
+        padding: var(--space-3) 0;
+      }
+      .success-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--accent-dim);
+        color: var(--accent);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        margin-bottom: var(--space-2);
+        box-shadow: 0 0 30px var(--accent-glow);
+      }
+      .success-state h3 {
+        font-size: 26px;
+        margin-bottom: 8px;
+      }
+      .success-state p {
         color: var(--text-muted);
-      }
-      .accordion-item.open .accordion-header .chevron {
-        transform: rotate(180deg);
-      }
-      .accordion-body {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease-out;
-      }
-      .accordion-body-inner {
-        padding: 0 16px 14px;
-        font-size: 13px;
-        line-height: 1.5;
-        color: var(--text-body);
-      }
-      .accordion-item.open .accordion-body {
-        max-height: 120px;
-      }
-      .show-all-btn {
-        display: none;
-        width: 100%;
-        padding: 10px;
-        margin-top: var(--sp-2);
-        border: 1px solid rgba(45, 182, 183, 0.3);
-        border-radius: 10px;
-        background: transparent;
-        color: var(--accent-bright);
-        font-family: "DM Sans", sans-serif;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background 0.2s;
-      }
-      .show-all-btn:hover {
-        background: rgba(45, 182, 183, 0.08);
+        margin-bottom: var(--space-3);
       }
 
-      /* ── RESPONSIVE ── */
-      @media (max-width: 920px) {
-        .nav {
-          padding: 0 20px;
+      /* ── FOOTER ────────────────────────── */
+      .footer {
+        padding: var(--space-5) 0;
+        border-top: 1px solid var(--border);
+        background: var(--bg-elev);
+      }
+      .footer-inner {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        align-items: center;
+        justify-content: space-between;
+      }
+      .footer-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        color: var(--text-muted);
+        font-size: 14px;
+      }
+      .footer-meta a:hover {
+        color: var(--accent);
+      }
+
+      /* ── RESPONSIVE ────────────────────── */
+      @media (max-width: 960px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+          gap: var(--space-4);
         }
-        .content {
+        .hero-stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .steps {
+          grid-template-columns: 1fr;
+        }
+        .gallery {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .gallery-cell.wide {
+          grid-column: span 2;
+        }
+        .compare {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .nav-cta {
+          display: none;
+        }
+        .section {
+          padding: var(--space-6) 0;
+        }
+        .hero {
+          padding: var(--space-5) 0 var(--space-5);
+        }
+        .hero h1 {
+          font-size: 38px;
+        }
+        .gallery {
+          grid-template-columns: 1fr;
+        }
+        .gallery-cell.wide {
+          grid-column: span 1;
+          aspect-ratio: 16 / 11;
+        }
+        .quiz-host {
+          padding: var(--space-3);
+        }
+        .footer-inner {
           flex-direction: column;
-          align-items: stretch;
-          padding: calc(var(--nav-h) + var(--sp-5)) 20px
-            calc(var(--partners-h) + var(--sp-5));
-          gap: var(--sp-5);
-          min-height: auto;
-        }
-        .pitch,
-        .form-card {
-          flex: none;
-        }
-        .headline {
-          font-size: 28px;
-        }
-        .subheadline {
-          font-size: 15px;
-          margin-bottom: var(--sp-4);
-        }
-        .benefits {
-          display: none;
-        }
-        .stats {
-          display: none;
-        }
-        .form-card {
-          animation: fadeUp 0.3s 0.2s both;
-        }
-        .benefits-accordion {
-          display: block;
-          padding: 0 20px;
-          margin-bottom: var(--sp-4);
-        }
-        .accordion-item:nth-child(n + 3) {
-          display: none;
-        }
-        .accordion-item:nth-child(n + 3).shown {
-          display: block;
-        }
-        .show-all-btn {
-          display: block;
-          margin-left: 20px;
-          margin-right: 20px;
-        }
-        .show-all-btn.expanded {
-          display: none;
-        }
-        .partners {
-          padding: 0 20px;
-          gap: 20px;
-        }
-        .partners img {
-          height: 18px;
-        }
-      }
-
-      @media (min-width: 921px) and (max-width: 1100px) {
-        .nav {
-          padding: 0 32px;
-        }
-        .content {
-          gap: var(--sp-8);
-          padding-left: 32px;
-          padding-right: 32px;
-        }
-        .pitch {
-          flex: 0 0 54%;
-        }
-        .form-card {
-          flex: 0 0 42%;
-          padding: var(--sp-6);
-        }
-        .partners {
-          padding: 0 32px;
+          align-items: flex-start;
         }
       }
     </style>
@@ -988,479 +927,389 @@
     ></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-    <!-- BACKGROUND -->
-    <div class="bg-hero">
-      <img
-        src="https://cdn.prod.website-files.com/66e09bcd111e1de7c4153094/682b01a892f3d707bea4059b_DSC00465%20(1).jpg"
-        alt=""
-      />
-      <img
-        src="https://cdn.prod.website-files.com/66e09bcd111e1de7c4153094/682af6df059f9eeeaf361e85__DSC2732.jpg"
-        alt=""
-      />
-    </div>
-    <div class="bg-overlay"></div>
-    <div class="bg-grain"></div>
-    <div class="bg-glow"></div>
-
-    <!-- NAV -->
-    <nav class="nav">
-      <a
-        href="https://www.starbot.coffee"
-        class="nav-brand"
-        target="_blank"
-        rel="noopener"
-      >
-        <img
-          src="https://cdn.prod.website-files.com/66e09bcd111e1de7c4153094/66e2ed572ec9bccbb6a241bc_favicon-lg.png"
-          alt="Starbot"
-          width="30"
-          height="30"
-        />
-        <span>Starbot</span>
-      </a>
-      <div style="display: flex; align-items: center; gap: 20px">
-        <div style="display: flex; align-items: center; gap: 14px">
-          <a
-            href="https://www.instagram.com/starbot.coffee"
-            target="_blank"
-            rel="noopener"
-            style="
-              color: rgba(240, 242, 245, 0.4);
-              transition: color 0.2s;
-              display: flex;
-            "
-            onmouseover="this.style.color = '#3fd4d5'"
-            onmouseout="this.style.color = 'rgba(240,242,245,0.4)'"
-            ><svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
+    <!-- ── NAVBAR ─────────────────────────────────────────── -->
+    <header class="nav">
+      <div class="nav-inner">
+        <a href="#" class="logo" aria-label="Starbot home">
+          STARBOT<span class="logo-dot">.</span>
+        </a>
+        <div class="nav-right">
+          <div class="nav-socials">
+            <a
+              class="nav-icon"
+              href="https://www.instagram.com/starbot.coffee/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
             >
-              <rect x="2" y="2" width="20" height="20" rx="5" />
-              <circle cx="12" cy="12" r="5" />
-              <circle
-                cx="17.5"
-                cy="6.5"
-                r="1.5"
-                fill="currentColor"
-                stroke="none"
-              /></svg
-          ></a>
-          <a
-            href="https://www.linkedin.com/company/starbot/"
-            target="_blank"
-            rel="noopener"
-            style="
-              color: rgba(240, 242, 245, 0.4);
-              transition: color 0.2s;
-              display: flex;
-            "
-            onmouseover="this.style.color = '#3fd4d5'"
-            onmouseout="this.style.color = 'rgba(240,242,245,0.4)'"
-            ><svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+              </svg>
+            </a>
+            <a
+              class="nav-icon"
+              href="https://www.linkedin.com/company/starbotcoffee/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
             >
-              <path
-                d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-4 0v7h-4v-7a6 6 0 016-6z"
-              />
-              <rect x="2" y="9" width="4" height="12" />
-              <circle cx="4" cy="4" r="2" /></svg
-          ></a>
-          <a
-            href="https://wa.me/447448020018"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="WhatsApp"
-            style="
-              color: rgba(240, 242, 245, 0.4);
-              transition: color 0.2s;
-              display: flex;
-            "
-            onmouseover="this.style.color = '#3fd4d5'"
-            onmouseout="this.style.color = 'rgba(240,242,245,0.4)'"
-            ><svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z" />
+                <rect x="2" y="9" width="4" height="12" />
+                <circle cx="4" cy="4" r="2" />
+              </svg>
+            </a>
+            <a
+              class="nav-icon"
+              id="nav-wa"
+              href="https://wa.me/447448020018"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp"
             >
-              <path
-                d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"
-              />
-              <path
-                d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1"
-              /></svg
-          ></a>
-        </div>
-        <a
-          href="https://www.starbot.coffee"
-          class="nav-link"
-          target="_blank"
-          rel="noopener"
-          >starbot.coffee &rarr;</a
-        >
-      </div>
-    </nav>
-
-    <!-- CONTENT -->
-    <section class="content">
-      <div class="pitch">
-        <div class="tagline">Now Partnering Across London</div>
-        <h1 class="headline">
-          Premium robot coffee for your space.
-          <span class="teal">We handle everything.</span>
-        </h1>
-        <p class="subheadline">
-          Your customers and employees already drink coffee every day. Give them
-          barista-quality drinks made by a robotic arm — on demand, all day. We
-          install for free, supply everything, and handle all maintenance.
-        </p>
-
-        <div class="benefits">
-          <div class="benefit">
-            <svg
-              class="benefit-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-            </svg>
-            <div class="benefit-content">
-              <div class="benefit-title">Be the First</div>
-              <p class="benefit-text">
-                No venue or office in London has a robot barista yet. Get there
-                before your competitors do.
-              </p>
-            </div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
+                <path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" />
+              </svg>
+            </a>
           </div>
-          <div class="benefit">
-            <svg
-              class="benefit-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg>
-            <div class="benefit-content">
-              <div class="benefit-title">Free Installation, Zero Risk</div>
-              <p class="benefit-text">
-                We place the robot at zero cost. No upfront investment, no
-                contracts to start.
-              </p>
-            </div>
-          </div>
-          <div class="benefit">
-            <svg
-              class="benefit-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path
-                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
-              />
-            </svg>
-            <div class="benefit-content">
-              <div class="benefit-title">We Handle Everything</div>
-              <p class="benefit-text">
-                Beans, maintenance, servicing, supply chain — all on us. Your
-                team does literally nothing.
-              </p>
-            </div>
-          </div>
-          <div class="benefit">
-            <svg
-              class="benefit-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
-              <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
-              <line x1="6" y1="2" x2="6" y2="4" />
-              <line x1="10" y1="2" x2="10" y2="4" />
-              <line x1="14" y1="2" x2="14" y2="4" />
-            </svg>
-            <div class="benefit-content">
-              <div class="benefit-title">Premium Coffee, Every Cup</div>
-              <p class="benefit-text">
-                Grade 1 speciality blend, 50+ drinks, robotic precision.
-                Consistent quality, no bad batches.
-              </p>
-            </div>
-          </div>
-          <div class="benefit">
-            <svg
-              class="benefit-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <polygon
-                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-              />
-            </svg>
-            <div class="benefit-content">
-              <div class="benefit-title">Elevate Your Workplace</div>
-              <p class="benefit-text">
-                Turn your lobby into a talking point. Boost employee experience
-                with something nobody else has.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="stats">
-          <span class="stat">Free installation</span>
-          <span class="stat">50+ drinks</span>
-          <span class="stat">Fully managed</span>
-          <span class="stat">0 staff required</span>
+          <a href="#form-section" class="nav-cta">Get in touch</a>
         </div>
       </div>
+    </header>
 
-      <!-- QUIZ + FORM -->
-      <div class="form-card" id="form-container">
-        <div id="quiz-section"></div>
-        <div id="form-section" hidden>
-          <div class="quiz-recap" id="quiz-recap"></div>
-          <h2 class="form-title">Get a Free Consultation</h2>
-          <p class="form-subtitle">See if your location qualifies</p>
-          <form id="consultation-form">
-          <div style="display: flex; gap: 12px">
-            <div class="form-group" style="flex: 1">
-              <label for="first_name">First Name</label>
-              <input
-                type="text"
-                id="first_name"
-                name="first_name"
-                placeholder="First name"
-                required
-              />
-            </div>
-            <div class="form-group" style="flex: 1">
-              <label for="last_name">Last Name</label>
-              <input
-                type="text"
-                id="last_name"
-                name="last_name"
-                placeholder="Last name"
-                required
-              />
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="company">Company / Building</label>
-            <input
-              type="text"
-              id="company"
-              name="company"
-              placeholder="Company or building name"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label for="role">Your Role</label>
-            <input
-              type="text"
-              id="role"
-              name="role"
-              placeholder="e.g. Facility Manager"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="you@company.com"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label for="phone">Phone (optional)</label>
-            <input type="tel" id="phone" name="phone" placeholder="+44..." />
-          </div>
-          <div class="form-group">
-            <label for="message">Message (optional)</label>
-            <input
-              type="text"
-              id="message"
-              name="message"
-              placeholder="Tell us about your space or any questions"
-            />
-          </div>
-          <div style="position: absolute; left: -9999px; top: -9999px">
-            <label for="website">Website</label>
-            <input
-              type="text"
-              id="website"
-              name="website"
-              tabindex="-1"
-              autocomplete="off"
-            />
-          </div>
-          <button type="submit" class="submit-btn">
-            Book My Free Consultation
-          </button>
-          <p class="trust-line">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-            No spam. We respond within 24 hours.
+    <!-- ── HERO ───────────────────────────────────────────── -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-text">
+          <span class="hero-badge"
+            >UK's First Fully Automated Robot Barista</span
+          >
+          <h1>
+            Your space earns.<br /><em>Every single cup.</em>
+          </h1>
+          <p class="hero-sub">
+            We install a robot barista at zero cost. You earn commission on
+            every cup sold.
           </p>
-        </form>
+          <div class="hero-ctas">
+            <a href="#quiz" class="btn btn-primary"
+              >See If My Space Qualifies</a
+            >
+            <a href="#how-it-works" class="btn btn-ghost">How It Works</a>
+          </div>
+          <div class="hero-stats">
+            <div>
+              <div class="stat-num">&lt;90s</div>
+              <div class="stat-lbl">Order to cup</div>
+            </div>
+            <div>
+              <div class="stat-num">2.5m²</div>
+              <div class="stat-lbl">Footprint needed</div>
+            </div>
+            <div>
+              <div class="stat-num">£0</div>
+              <div class="stat-lbl">Your workload</div>
+            </div>
+            <div>
+              <div class="stat-num">1st</div>
+              <div class="stat-lbl">In the UK</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-image">
+          <img
+            src="/images/starbot-lobby.jpg"
+            alt="Starbot robot barista in a London office lobby"
+            width="1200"
+            height="676"
+            fetchpriority="high"
+          />
         </div>
       </div>
     </section>
 
-    <!-- MOBILE ACCORDION -->
-    <div class="benefits-accordion" id="benefits-accordion">
-      <div class="accordion-item">
-        <button class="accordion-header" onclick="toggleAccordion(this)">
-          Be the First <span class="chevron">&#9660;</span>
-        </button>
-        <div class="accordion-body">
-          <div class="accordion-body-inner">
-            No venue or office in London has a robot barista yet. Get there
-            before your competitors do.
-          </div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <button class="accordion-header" onclick="toggleAccordion(this)">
-          Free Installation, Zero Risk <span class="chevron">&#9660;</span>
-        </button>
-        <div class="accordion-body">
-          <div class="accordion-body-inner">
-            We place the robot at zero cost. No upfront investment, no contracts
-            to start.
-          </div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <button class="accordion-header" onclick="toggleAccordion(this)">
-          We Handle Everything <span class="chevron">&#9660;</span>
-        </button>
-        <div class="accordion-body">
-          <div class="accordion-body-inner">
-            Beans, maintenance, servicing, supply chain — all on us. Your team
-            does literally nothing.
-          </div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <button class="accordion-header" onclick="toggleAccordion(this)">
-          Premium Coffee, Every Cup <span class="chevron">&#9660;</span>
-        </button>
-        <div class="accordion-body">
-          <div class="accordion-body-inner">
-            Grade 1 speciality blend, 50+ drinks, robotic precision. Consistent
-            quality, no bad batches.
-          </div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <button class="accordion-header" onclick="toggleAccordion(this)">
-          Elevate Your Workplace <span class="chevron">&#9660;</span>
-        </button>
-        <div class="accordion-body">
-          <div class="accordion-body-inner">
-            Turn your lobby into a talking point. Boost employee experience with
-            something nobody else has.
-          </div>
-        </div>
+    <!-- ── SOCIAL PROOF ───────────────────────────────────── -->
+    <div class="proof">
+      <div class="container proof-inner">
+        <span class="proof-dot" aria-hidden="true"></span>
+        <span
+          >Already live at <strong>City St George's, University of London</strong></span
+        >
       </div>
     </div>
-    <button class="show-all-btn" id="show-all-btn" onclick="showAllBenefits()">
-      Show all benefits
-    </button>
 
-    <!-- PARTNERS -->
-    <div class="partners">
-      <span class="partners-label">Partners</span>
-      <img
-        src="https://cdn.prod.website-files.com/66e09bcd111e1de7c4153094/6824c584241e854a307b3b53_Minor_Figures_L.png"
-        alt="Minor Figures"
-        loading="lazy"
-      />
-      <img
-        src="https://cdn.prod.website-files.com/66e09bcd111e1de7c4153094/6824c6a69b80ae151c584207_shott-beverag4s-logo.png"
-        alt="Shott Beverages"
-        loading="lazy"
-      />
-      <img
-        src="https://cdn.prod.website-files.com/66e09bcd111e1de7c4153094/6824cc7ce54209a79fb82324_YTD-Fina.png"
-        alt="YTD Finance"
-        loading="lazy"
-      />
-      <img
-        src="https://cdn.prod.website-files.com/66e09bcd111e1de7c4153094/6824c800b9613c8fa0fd2dad_code194-logo-da55rk-green.png"
-        alt="Code194"
-        loading="lazy"
-      />
-    </div>
+    <!-- ── HOW IT WORKS ───────────────────────────────────── -->
+    <section class="section" id="how-it-works">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-eyebrow">How it works</div>
+          <h2>Three steps. Then it runs itself.</h2>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">Step 01</div>
+            <h3>You get in touch</h3>
+            <p>
+              We assess your space. Footfall, layout, power, water — we
+              confirm it qualifies in one short call.
+            </p>
+          </div>
+          <div class="step">
+            <div class="step-num">Step 02</div>
+            <h3>We install and run everything</h3>
+            <p>
+              Beans, maintenance, restocking, self-cleaning, support — all
+              handled by us. You don't lift a finger.
+            </p>
+          </div>
+          <div class="step">
+            <div class="step-num">Step 03</div>
+            <h3>You earn commission</h3>
+            <p>
+              Every cup is tracked. We pay you on a clear schedule. Your space
+              becomes a quiet revenue line.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
+    <!-- ── PHOTO GALLERY ──────────────────────────────────── -->
+    <section class="section" style="padding-top: 0">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-eyebrow">In the wild</div>
+          <h2>Already serving in London.</h2>
+          <p>Compact footprint, premium output, zero hassle.</p>
+        </div>
+        <div class="gallery">
+          <div class="gallery-cell wide">
+            <img
+              src="/images/starbot-lobby.jpg"
+              alt="Starbot in office lobby"
+              loading="lazy"
+              width="1200"
+              height="676"
+            />
+          </div>
+          <div class="gallery-cell">
+            <img
+              src="/images/starbot-robot-arm.jpg"
+              alt="Starbot robot arm pulling an espresso shot"
+              loading="lazy"
+              width="800"
+              height="1421"
+            />
+          </div>
+          <div class="gallery-cell">
+            <img
+              src="/images/starbot-customer.jpg"
+              alt="Customer collecting coffee from Starbot"
+              loading="lazy"
+              width="800"
+              height="1421"
+            />
+          </div>
+          <div class="gallery-cell">
+            <img
+              src="/images/starbot-interior.jpg"
+              alt="Starbot installation interior view"
+              loading="lazy"
+              width="800"
+              height="1421"
+            />
+          </div>
+          <div class="gallery-cell">
+            <img
+              src="/images/starbot-in-action.jpg"
+              alt="Starbot robot barista preparing a drink"
+              loading="lazy"
+              width="800"
+              height="1421"
+            />
+          </div>
+          <div class="gallery-cell">
+            <img
+              src="/images/starbot-customers.jpg"
+              alt="Customers ordering from Starbot"
+              loading="lazy"
+              width="800"
+              height="1421"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── COMPARISON ─────────────────────────────────────── -->
+    <section class="section" style="padding-top: 0">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-eyebrow">The maths</div>
+          <h2>
+            Opening a café costs £200,000.<br />Hosting one costs you nothing.
+          </h2>
+        </div>
+        <div class="compare">
+          <div class="compare-card old">
+            <div class="compare-tag">Traditional café</div>
+            <h3>Your money. Your problem.</h3>
+            <ul class="compare-list">
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                £200,000+ setup and fit-out
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                Staff, training, rotas, sick days
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                You carry every risk
+              </li>
+            </ul>
+            <div class="compare-figure">£200,000+</div>
+          </div>
+          <div class="compare-card new">
+            <div class="compare-tag">Starbot at your location</div>
+            <h3>Our money. Our problem.</h3>
+            <ul class="compare-list">
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                £0 investment from you
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                We handle everything — beans, service, support
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                Earn £5,000–£20,000 in your first 12–18 months
+              </li>
+            </ul>
+            <div class="compare-figure">£5k–£20k earned</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── QUIZ + FORM ────────────────────────────────────── -->
+    <section class="form-section" id="form-section">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-eyebrow">3 quick questions</div>
+          <h2>See if your space qualifies.</h2>
+          <p>
+            Takes 30 seconds. Then we'll arrange a visit — no commitment.
+          </p>
+        </div>
+
+        <div class="quiz-host">
+          <div id="quiz" class="quiz-anchor"></div>
+          <div id="quiz-section"></div>
+
+          <div id="form-container" hidden>
+            <div id="quiz-recap" class="quiz-recap"></div>
+            <div class="form-head">
+              <h3>Your space looks like a great fit.</h3>
+              <p>
+                We'll call you to arrange a visit — no commitment needed.
+              </p>
+            </div>
+            <form id="consultation-form" novalidate>
+              <div class="form-field">
+                <label class="form-label" for="first_name">First name</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  id="first_name"
+                  name="first_name"
+                  autocomplete="given-name"
+                  required
+                />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="phone">Phone</label>
+                <input
+                  class="form-input"
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  autocomplete="tel"
+                  required
+                />
+              </div>
+              <div class="form-field">
+                <label class="form-label" for="email"
+                  >Email <span class="opt">(optional)</span></label
+                >
+                <input
+                  class="form-input"
+                  type="email"
+                  id="email"
+                  name="email"
+                  autocomplete="email"
+                />
+              </div>
+              <input
+                class="form-honeypot"
+                type="text"
+                id="website"
+                name="website"
+                tabindex="-1"
+                autocomplete="off"
+                aria-hidden="true"
+              />
+              <button
+                type="submit"
+                class="btn btn-primary form-cta"
+                id="form-submit-btn"
+              >
+                Let's See Your Space
+              </button>
+              <p class="form-microcopy">
+                No spam. We respond within 24 hours.
+              </p>
+              <div class="form-divider">or</div>
+              <a
+                class="wa-btn"
+                id="form-wa-btn"
+                href="https://wa.me/447448020018"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
+                  <path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" />
+                </svg>
+                Talk to us on WhatsApp
+              </a>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ─────────────────────────────────────────── -->
+    <footer class="footer">
+      <div class="container footer-inner">
+        <a href="#" class="logo" aria-label="Starbot home">
+          STARBOT<span class="logo-dot">.</span>
+        </a>
+        <div class="footer-meta">
+          <a href="https://starbot.co.uk" target="_blank" rel="noopener noreferrer">starbot.co.uk</a>
+          <a href="mailto:hello@starbot.co.uk">hello@starbot.co.uk</a>
+          <a href="tel:+447448020018">+44 7448 020018</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ── SCRIPT ─────────────────────────────────────────── -->
     <script>
       var WHATSAPP_NUMBER = "447448020018";
-
-      // Accordion
-      function toggleAccordion(btn) {
-        btn.parentElement.classList.toggle("open");
-      }
-
-      // Show all benefits (mobile)
-      function showAllBenefits() {
-        document.querySelectorAll(".accordion-item").forEach(function (el) {
-          el.classList.add("shown");
-        });
-        document.getElementById("show-all-btn").classList.add("expanded");
-      }
 
       // UTM capture
       var urlParams = new URLSearchParams(window.location.search);
@@ -1513,7 +1362,7 @@
           ],
         },
         {
-          heading: "How soon are you looking to add coffee to your space?",
+          heading: "How soon are you looking to add coffee?",
           subhead: "This helps us prioritise your application.",
           options: [
             { icon: "zap", label: "This month" },
@@ -1605,7 +1454,7 @@
           quizState.currentQuestion = n + 1;
           renderQuiz(n + 1);
         } else {
-          renderQuizForm();
+          showForm();
         }
       }
 
@@ -1616,7 +1465,7 @@
         }
       }
 
-      function renderQuizForm() {
+      function showForm() {
         var labels = [quizState.q1, quizState.q2, quizState.q3];
         var recapHtml = "";
         for (var i = 0; i < labels.length; i++) {
@@ -1630,16 +1479,52 @@
         }
         document.getElementById("quiz-recap").innerHTML = recapHtml;
         document.getElementById("quiz-section").hidden = true;
-        document.getElementById("form-section").hidden = false;
+        document.getElementById("form-container").hidden = false;
+        document.getElementById("first_name").focus();
       }
 
       renderQuiz(1);
 
-      // Form submission → Vercel serverless function → CAPI + edge function
+      // ── WhatsApp pre-fill (live as user types first_name) ──
+      function buildWaUrl(firstName) {
+        var msg = firstName
+          ? "Hi Starbot team, I'm " +
+            firstName +
+            " and I'd like to talk about a robot barista in our space."
+          : "Hi Starbot team, I'd like to talk about a robot barista in our space.";
+        return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(msg);
+      }
+      function refreshWaButtons() {
+        var firstNameEl = document.getElementById("first_name");
+        var firstName = firstNameEl ? (firstNameEl.value || "").trim() : "";
+        var url = buildWaUrl(firstName);
+        var formWa = document.getElementById("form-wa-btn");
+        if (formWa) formWa.href = url;
+      }
+      var firstNameInput = document.getElementById("first_name");
+      if (firstNameInput) firstNameInput.addEventListener("input", refreshWaButtons);
+      refreshWaButtons();
+
+      // ── Form submission ──
       var form = document.getElementById("consultation-form");
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
-        var btn = form.querySelector('button[type="submit"]');
+        var btn = document.getElementById("form-submit-btn");
+        var firstNameVal = (document.getElementById("first_name").value || "").trim();
+        var phoneVal = (document.getElementById("phone").value || "").trim();
+        var emailVal = (document.getElementById("email").value || "").trim();
+
+        if (!firstNameVal) {
+          btn.textContent = "Please enter your first name";
+          setTimeout(function () { btn.textContent = "Let's See Your Space"; }, 2500);
+          return;
+        }
+        if (!phoneVal) {
+          btn.textContent = "Phone number required";
+          setTimeout(function () { btn.textContent = "Let's See Your Space"; }, 2500);
+          return;
+        }
+
         btn.disabled = true;
         btn.textContent = "Sending...";
 
@@ -1648,13 +1533,10 @@
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              first_name: document.getElementById("first_name").value,
-              last_name: document.getElementById("last_name").value,
-              company: document.getElementById("company").value,
-              role: document.getElementById("role").value,
-              email: document.getElementById("email").value,
-              phone: document.getElementById("phone").value || null,
-              message: document.getElementById("message").value || null,
+              first_name: firstNameVal,
+              last_name: "",
+              phone: phoneVal,
+              email: emailVal || null,
               website: document.getElementById("website").value,
               source: "landing_page",
               source_url: window.location.href,
@@ -1669,36 +1551,15 @@
           });
           if (res.ok) {
             var data = await res.json();
-            // Fire TikTok Pixel SubmitForm event with same event_id for dedup
             if (window.ttq && data.event_id) {
               ttq.track("SubmitForm", { event_id: data.event_id });
             }
-            var firstName = (
-              document.getElementById("first_name").value || ""
-            ).trim();
-            var company = (
-              document.getElementById("company").value || ""
-            ).trim();
-            var waMessage = company
-              ? "Hi Starbot team, I just submitted an enquiry for " +
-                company +
-                ". My name is " +
-                firstName +
-                " and I'd like to talk faster about a robot barista in our space."
-              : "Hi Starbot team, I just submitted an enquiry. My name is " +
-                firstName +
-                " and I'd like to talk faster about a robot barista.";
-            var waUrl =
-              "https://wa.me/" +
-              WHATSAPP_NUMBER +
-              "?text=" +
-              encodeURIComponent(waMessage);
+            var waUrl = buildWaUrl(firstNameVal);
             document.getElementById("form-container").innerHTML =
               '<div class="success-state">' +
-              '<div class="success-icon">\u2713</div>' +
-              "<p>We're on it.<br>Expect a call or email within 24 hours.</p>" +
-              '<div class="success-divider">or</div>' +
-              '<p class="success-prompt">Want to talk faster?</p>' +
+              '<div class="success-icon">✓</div>' +
+              "<h3>We're on it.</h3>" +
+              "<p>Expect a call within 24 hours.</p>" +
               '<a class="wa-btn" href="' +
               waUrl +
               '" target="_blank" rel="noopener noreferrer">' +
@@ -1706,23 +1567,22 @@
               '<path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9"/>' +
               '<path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1"/>' +
               "</svg>" +
-              "Message us on WhatsApp \u2192" +
+              "Talk faster on WhatsApp →" +
               "</a>" +
               "</div>";
           } else {
-            var errorData = await res.json();
-            btn.textContent =
-              errorData.error || "Something went wrong — try again";
+            var errorData = await res.json().catch(function () { return {}; });
+            btn.textContent = errorData.error || "Something went wrong — try again";
             btn.disabled = false;
             setTimeout(function () {
-              btn.textContent = "Book My Free Consultation";
+              btn.textContent = "Let's See Your Space";
             }, 3000);
           }
         } catch (err) {
           btn.textContent = "Connection error — try again";
           btn.disabled = false;
           setTimeout(function () {
-            btn.textContent = "Book My Free Consultation";
+            btn.textContent = "Let's See Your Space";
           }, 3000);
         }
       });

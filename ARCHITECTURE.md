@@ -8,7 +8,7 @@ Read this before making any changes. This is the source of truth for how the sys
 
 A B2B partner acquisition site for Starbot (robot barista franchise). Two parts:
 
-1. **Landing page** (`partner.starbot.co.uk`) — static HTML, captures leads from Meta ads
+1. **Landing page** (`partner.starbot.co.uk`) — static HTML, single-file. London-positioned commission narrative. Hero + social proof + how-it-works + photo gallery + comparison block + 3-question qualification quiz + simplified lead form (first_name + phone required, email optional). Captures leads from TikTok ads
 2. **Dashboard** (`partner.starbot.co.uk/dashboard`) — Kanban CRM for managing leads manually
 
 No frameworks. No build step. No AI agents.
@@ -33,11 +33,12 @@ No frameworks. No build step. No AI agents.
 
 ```
 starbot/
-├── index.html              # Landing page (partner.starbot.co.uk)
+├── index.html              # Landing page (partner.starbot.co.uk) — v2, single-file
+├── images/                 # Hero + gallery photos (6 starbot-*.jpg)
 ├── dashboard/
 │   └── index.html          # Kanban CRM dashboard (2100+ lines, all-in-one)
 ├── api/
-│   ├── submit-lead.js      # Form submission → Supabase edge function + Meta CAPI
+│   ├── submit-lead.js      # Form submission → Supabase edge function + Zoho + TikTok Events API + Meta CAPI (deprecated)
 │   ├── send-reply.js       # Outbound email via Resend + conversation log update
 │   └── inbound-email.js    # Resend inbound webhook → match lead → append to log
 ├── vercel.json             # Rewrites, CSP headers, security headers
@@ -120,11 +121,11 @@ Supabase built-in auth with `signInWithPassword`. Dashboard shows login screen f
 **Called by:** Landing page `index.html` form JS.
 **Does:**
 
-1. Validates required fields (first_name, last_name, email)
+1. Validates required fields (`first_name`, `phone`). `last_name` and `email` are optional — frontend may send empty/null
 2. Fires TikTok Events API "SubmitForm" event (fire-and-forget) with hashed PII. Also fires Meta CAPI "Lead" event if `META_CAPI_ACCESS_TOKEN` is still set (deprecated path)
 3. Forwards lead data to Supabase edge function (`starbot-lead-notify`), including the 3 quiz answers (`location_type`, `coffee_timeline`, `london_zone`) which the edge function persists to the matching columns
 4. Returns `{ success: true, event_id }` for client-side pixel dedup
-5. Pushes lead to Zoho CRM (fire-and-forget) via OAuth refresh-token flow. Quiz answers are included in the Zoho lead Description (no separate Zoho custom fields)
+5. Pushes lead to Zoho CRM (fire-and-forget) via OAuth refresh-token flow. `Last_Name` defaults to `"-"` if not supplied (Zoho requires the field). `Email` is omitted from the payload when not supplied. Quiz answers are included in the Zoho lead Description (no separate Zoho custom fields)
 
 **Env vars:** `TIKTOK_PIXEL_ID`, `TIKTOK_ACCESS_TOKEN`, `META_CAPI_ACCESS_TOKEN` (deprecated), `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN`, `ZOHO_ACCOUNTS_URL`, `ZOHO_API_URL`
 
