@@ -8,7 +8,7 @@ Read this before making any changes. This is the source of truth for how the sys
 
 A B2B partner acquisition site for Starbot (robot barista franchise). Two parts:
 
-1. **Landing page** (`partner.starbot.co.uk`) — static HTML, single-file. London-positioned commission narrative. Hero + social proof + how-it-works + photo gallery + comparison block + 3-question qualification quiz + simplified lead form (first_name + phone required, email optional). Captures leads from TikTok ads
+1. **Landing page** (`partner.starbot.co.uk`) — static HTML, single-file. London-positioned commission narrative. Hero with embedded lead form (first_name + phone required, email optional) + social proof + how-it-works + photo gallery + comparison block + 3-question qualification quiz (secondary path that funnels back to the hero form via a "Fill the form above" CTA). Captures leads from TikTok ads
 2. **Dashboard** (`partner.starbot.co.uk/dashboard`) — Kanban CRM for managing leads manually
 
 No frameworks. No build step. No AI agents.
