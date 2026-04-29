@@ -266,24 +266,10 @@
         color: var(--text-muted);
         max-width: 520px;
       }
-      .hero-form {
+      .hero-quiz {
         margin-top: var(--space-3);
-        max-width: 440px;
+        max-width: 460px;
         scroll-margin-top: 96px;
-      }
-      .hero-form-head {
-        margin-bottom: var(--space-2);
-      }
-      .hero-form-head h3 {
-        font-family: var(--font-h);
-        font-weight: 700;
-        font-size: 19px;
-        margin-bottom: 4px;
-        color: var(--text);
-      }
-      .hero-form-head p {
-        font-size: 14px;
-        color: var(--text-muted);
       }
       .hero-stats-band {
         position: relative;
@@ -585,24 +571,6 @@
       }
 
       /* ── QUIZ + FORM ──────────────────── */
-      .quiz-section {
-        padding: var(--space-7) 0;
-        background: linear-gradient(
-          180deg,
-          var(--bg) 0%,
-          var(--bg-elev) 100%
-        );
-      }
-      .quiz-host {
-        max-width: 640px;
-        margin: 0 auto;
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: var(--space-5);
-        box-shadow: 0 0 60px -20px var(--accent-glow);
-      }
-
       .quiz-progress {
         margin-bottom: var(--space-3);
       }
@@ -918,9 +886,6 @@
         .gallery-cell:nth-child(2) {
           grid-column: span 1;
         }
-        .quiz-host {
-          padding: var(--space-3);
-        }
         .footer-inner {
           flex-direction: column;
           align-items: flex-start;
@@ -1008,80 +973,87 @@
               We install a robot barista at zero cost. You earn commission on
               every cup sold.
             </p>
-            <div id="form-section" class="hero-form">
-              <div class="hero-form-head">
-                <h3>See if your space qualifies</h3>
-                <p>Quick chat — no commitment.</p>
-              </div>
-              <form id="consultation-form" novalidate>
-                <div class="form-field">
-                  <label class="form-label" for="first_name">First name</label>
+            <div id="form-section" class="hero-quiz">
+              <div id="quiz-section"></div>
+              <div id="form-container" hidden>
+                <div id="quiz-recap" class="quiz-recap"></div>
+                <div class="form-head">
+                  <h3>Your space looks like a great fit.</h3>
+                  <p>
+                    Share your details and we'll get back to you with the right
+                    next step.
+                  </p>
+                </div>
+                <form id="consultation-form" novalidate>
+                  <div class="form-field">
+                    <label class="form-label" for="first_name">First name</label>
+                    <input
+                      class="form-input"
+                      type="text"
+                      id="first_name"
+                      name="first_name"
+                      autocomplete="given-name"
+                      required
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="phone">Phone</label>
+                    <input
+                      class="form-input"
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      autocomplete="tel"
+                      required
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label class="form-label" for="email"
+                      >Email <span class="opt">(optional)</span></label
+                    >
+                    <input
+                      class="form-input"
+                      type="email"
+                      id="email"
+                      name="email"
+                      autocomplete="email"
+                    />
+                  </div>
                   <input
-                    class="form-input"
+                    class="form-honeypot"
                     type="text"
-                    id="first_name"
-                    name="first_name"
-                    autocomplete="given-name"
-                    required
+                    id="website"
+                    name="website"
+                    tabindex="-1"
+                    autocomplete="off"
+                    aria-hidden="true"
                   />
-                </div>
-                <div class="form-field">
-                  <label class="form-label" for="phone">Phone</label>
-                  <input
-                    class="form-input"
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    autocomplete="tel"
-                    required
-                  />
-                </div>
-                <div class="form-field">
-                  <label class="form-label" for="email"
-                    >Email <span class="opt">(optional)</span></label
+                  <button
+                    type="submit"
+                    class="btn btn-primary form-cta"
+                    id="form-submit-btn"
                   >
-                  <input
-                    class="form-input"
-                    type="email"
-                    id="email"
-                    name="email"
-                    autocomplete="email"
-                  />
-                </div>
-                <input
-                  class="form-honeypot"
-                  type="text"
-                  id="website"
-                  name="website"
-                  tabindex="-1"
-                  autocomplete="off"
-                  aria-hidden="true"
-                />
-                <button
-                  type="submit"
-                  class="btn btn-primary form-cta"
-                  id="form-submit-btn"
-                >
-                  Let's See Your Space
-                </button>
-                <p class="form-microcopy">
-                  No spam. We respond within 24 hours.
-                </p>
-                <div class="form-divider">or</div>
-                <a
-                  class="wa-btn"
-                  id="form-wa-btn"
-                  href="https://wa.me/447448020018"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
-                    <path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" />
-                  </svg>
-                  Talk to us on WhatsApp
-                </a>
-              </form>
+                    Let's See Your Space
+                  </button>
+                  <p class="form-microcopy">
+                    No spam. We respond within 24 hours.
+                  </p>
+                  <div class="form-divider">or</div>
+                  <a
+                    class="wa-btn"
+                    id="form-wa-btn"
+                    href="https://wa.me/447448020018"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
+                      <path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" />
+                    </svg>
+                    Talk to us on WhatsApp
+                  </a>
+                </form>
+              </div>
             </div>
           </div>
           <div class="hero-image">
@@ -1273,42 +1245,6 @@
       </div>
     </section>
 
-    <!-- ── QUIZ (secondary path; funnels back to hero form) ── -->
-    <section class="quiz-section">
-      <div class="container">
-        <div class="section-head">
-          <div class="section-eyebrow">Need more info?</div>
-          <h2>See if your space qualifies in 30 seconds.</h2>
-          <p>
-            Three quick questions, then we'll get back to you with the right
-            details.
-          </p>
-        </div>
-
-        <div class="quiz-host">
-          <div id="quiz-section"></div>
-
-          <div id="quiz-finish" hidden>
-            <div id="quiz-recap" class="quiz-recap"></div>
-            <div class="form-head">
-              <h3>Your space looks like a great fit.</h3>
-              <p>
-                Now share your details so we can get back to you with the right
-                next step.
-              </p>
-            </div>
-            <a
-              href="#form-section"
-              class="btn btn-primary form-cta"
-              id="quiz-to-form-btn"
-            >
-              Fill the form above
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- ── FOOTER ─────────────────────────────────────────── -->
     <footer class="footer">
       <div class="container footer-inner">
@@ -1470,7 +1406,7 @@
           quizState.currentQuestion = n + 1;
           renderQuiz(n + 1);
         } else {
-          showQuizFinish();
+          showForm();
         }
       }
 
@@ -1481,7 +1417,7 @@
         }
       }
 
-      function showQuizFinish() {
+      function showForm() {
         var labels = [quizState.q1, quizState.q2, quizState.q3];
         var recapHtml = "";
         for (var i = 0; i < labels.length; i++) {
@@ -1495,21 +1431,11 @@
         }
         document.getElementById("quiz-recap").innerHTML = recapHtml;
         document.getElementById("quiz-section").hidden = true;
-        document.getElementById("quiz-finish").hidden = false;
+        document.getElementById("form-container").hidden = false;
+        document.getElementById("first_name").focus({ preventScroll: true });
       }
 
       renderQuiz(1);
-
-      // Quiz finish → hero form: focus first_name after the smooth scroll
-      var quizToFormBtn = document.getElementById("quiz-to-form-btn");
-      if (quizToFormBtn) {
-        quizToFormBtn.addEventListener("click", function () {
-          setTimeout(function () {
-            var fn = document.getElementById("first_name");
-            if (fn) fn.focus({ preventScroll: true });
-          }, 600);
-        });
-      }
 
       // ── WhatsApp pre-fill (live as user types first_name) ──
       function buildWaUrl(firstName) {
