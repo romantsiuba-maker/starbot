@@ -22,7 +22,7 @@ No frameworks. No build step. No AI agents.
 - Supabase Postgres (project: `lxowggiqhuvwhzbktlsi`)
 - Resend for outbound email + inbound webhook
 - Zoho CRM (lead sync via OAuth refresh-token flow)
-- Meta Pixel + Conversion API for ad tracking
+- TikTok Pixel + TikTok Events API for ad tracking (Meta CAPI server-side kept but disabled via env)
 - Google Tag Manager (`GTM-KLD4PZGM`)
 - SortableJS (CDN) for drag-and-drop
 - Supabase JS v2 (CDN) for frontend auth + queries
@@ -121,12 +121,12 @@ Supabase built-in auth with `signInWithPassword`. Dashboard shows login screen f
 **Does:**
 
 1. Validates required fields (first_name, last_name, email)
-2. Fires Meta CAPI "Lead" event (fire-and-forget) with hashed PII
+2. Fires TikTok Events API "SubmitForm" event (fire-and-forget) with hashed PII. Also fires Meta CAPI "Lead" event if `META_CAPI_ACCESS_TOKEN` is still set (deprecated path)
 3. Forwards lead data to Supabase edge function (`starbot-lead-notify`), including the 3 quiz answers (`location_type`, `coffee_timeline`, `london_zone`) which the edge function persists to the matching columns
 4. Returns `{ success: true, event_id }` for client-side pixel dedup
 5. Pushes lead to Zoho CRM (fire-and-forget) via OAuth refresh-token flow. Quiz answers are included in the Zoho lead Description (no separate Zoho custom fields)
 
-**Env vars:** `META_CAPI_ACCESS_TOKEN`, `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN`, `ZOHO_ACCOUNTS_URL`, `ZOHO_API_URL`
+**Env vars:** `TIKTOK_PIXEL_ID`, `TIKTOK_ACCESS_TOKEN`, `META_CAPI_ACCESS_TOKEN` (deprecated), `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN`, `ZOHO_ACCOUNTS_URL`, `ZOHO_API_URL`
 
 ### POST /api/send-reply
 
@@ -196,7 +196,7 @@ All in `dashboard/index.html` (single file):
 - `X-Frame-Options: DENY`
 - `X-Content-Type-Options: nosniff`
 - `Referrer-Policy: strict-origin-when-cross-origin`
-- Content-Security-Policy with allowances for: Facebook (Meta Pixel), Google Tag Manager, Supabase, cdn.jsdelivr.net (CDN libs), Google Fonts
+- Content-Security-Policy with allowances for: TikTok (Pixel + Events API), Facebook (legacy Meta Pixel — kept for now, inert), Google Tag Manager, Supabase, cdn.jsdelivr.net (CDN libs), Google Fonts
 
 **Deployment:** GitHub auto-deploy on `main` branch. Never run `vercel --prod` from a feature branch.
 
@@ -206,7 +206,9 @@ All in `dashboard/index.html` (single file):
 
 | Variable                 | Used by                         | Purpose                                        |
 | ------------------------ | ------------------------------- | ---------------------------------------------- |
-| `META_CAPI_ACCESS_TOKEN` | submit-lead.js                  | Meta Conversion API token                      |
+| `TIKTOK_PIXEL_ID`        | submit-lead.js                  | TikTok Pixel ID (event_source_id)              |
+| `TIKTOK_ACCESS_TOKEN`    | submit-lead.js                  | TikTok Events API access token                 |
+| `META_CAPI_ACCESS_TOKEN` | submit-lead.js                  | Meta Conversion API token (deprecated — unset to disable) |
 | `RESEND_API_KEY`         | send-reply.js, inbound-email.js | Resend email API                               |
 | `SUPABASE_URL`           | send-reply.js, inbound-email.js | Supabase project URL                           |
 | `SUPABASE_SERVICE_KEY`   | send-reply.js, inbound-email.js | Supabase service role key                      |
