@@ -3,6 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { buildMessage } from "./api/thanks.js";
+import { __test__ as phoneTest } from "./api/lead-context-by-phone.js";
 
 test("branch 1: name + venue + ref", () => {
   assert.equal(
@@ -25,16 +26,43 @@ test("branch 3: ref only", () => {
   );
 });
 
-test("branch 4: no ref (with or without other fields) -> generic", () => {
+test("branch 4a: no ref, no name -> generic", () => {
   assert.equal(
     buildMessage({ name: null, venue: null, ref: null }),
     "Hi, I just submitted the Starbot form"
   );
-  // Name/venue without ref still degrade to generic per brief.
+});
+
+test("branch 4b: no ref, name + venue from URL", () => {
+  // Race-condition fallback after phone-lookup 404: still personalise using
+  // what Meta passed in the redirect.
   assert.equal(
     buildMessage({ name: "John", venue: "The Crown", ref: null }),
-    "Hi, I just submitted the Starbot form"
+    "Hi, I'm John from The Crown. I just submitted the Starbot form"
   );
+});
+
+test("branch 4c: no ref, name only", () => {
+  assert.equal(
+    buildMessage({ name: "John", venue: null, ref: null }),
+    "Hi, I'm John. I just submitted the Starbot form"
+  );
+});
+
+test("phone normaliser (lead-context-by-phone): GB default region", () => {
+  const cases = [
+    ["07911 123456", "+447911123456"],
+    ["+44 7911 123456", "+447911123456"],
+    ["447911123456", "+447911123456"],
+    ["00447911123456", "+447911123456"],
+    ["+34694906794", "+34694906794"],
+    ["969013374", null],   // junk
+    ["", null],
+    [null, null],
+  ];
+  for (const [raw, want] of cases) {
+    assert.equal(phoneTest.normalisePhone(raw), want, `phone(${JSON.stringify(raw)})`);
+  }
 });
 
 test("URL-encoding survives the colon, spaces, parens, ampersand", () => {

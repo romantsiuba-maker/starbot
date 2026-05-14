@@ -30,8 +30,11 @@ export default async function handler(req, res) {
   const ref = refRaw && REF_RE.test(refRaw.toUpperCase()) ? refRaw.toUpperCase() : null;
   let name = trimField(firstString(req.query.name));
   let venue = trimField(firstString(req.query.venue));
+  const phone = trimField(firstString(req.query.phone));
 
-  // Fallback: if ref is valid but name/venue are missing, look the lead up.
+  // Server-side: if ref is in the URL but name/venue are missing, fill them
+  // from the existing ref-lookup endpoint. The phone-lookup path is handled
+  // client-side so the page paints instantly with a working fallback link.
   if (ref && (!name || !venue)) {
     const fetched = await fetchLeadContext(ref);
     if (fetched) {
@@ -43,7 +46,11 @@ export default async function handler(req, res) {
   const message = buildMessage({ name, venue, ref });
   const waHref = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 
-  return sendHtml(res, 200, renderPage({ waHref, message, ref, name, venue }));
+  return sendHtml(
+    res,
+    200,
+    renderPage({ waHref, message, ref, name, venue, number, phone })
+  );
 }
 
 function sendHtml(res, status, body) {
@@ -94,12 +101,18 @@ async function fetchLeadContext(ref) {
 }
 
 export function buildMessage({ name, venue, ref }) {
-  // The brief defines four branches keyed off ref. Without ref, the message
-  // is generic since the inbound webhook can't disambiguate by message text.
-  if (!ref) return "Hi, I just submitted the Starbot form";
-  if (name && venue) return `Hi, I'm ${name} from ${venue}. I just submitted the Starbot form (ref: ${ref})`;
-  if (name) return `Hi, I'm ${name}. I just submitted the Starbot form (ref: ${ref})`;
-  return `Hi, I just submitted the Starbot form (ref: ${ref})`;
+  // With ref: personalise as far as we can.
+  if (ref) {
+    if (name && venue) return `Hi, I'm ${name} from ${venue}. I just submitted the Starbot form (ref: ${ref})`;
+    if (name) return `Hi, I'm ${name}. I just submitted the Starbot form (ref: ${ref})`;
+    return `Hi, I just submitted the Starbot form (ref: ${ref})`;
+  }
+  // Without ref (race condition fallback): still personalise from query
+  // params if we have them. PR 4 inbound webhook matches by phone first,
+  // so the message body without ref is fine.
+  if (name && venue) return `Hi, I'm ${name} from ${venue}. I just submitted the Starbot form`;
+  if (name) return `Hi, I'm ${name}. I just submitted the Starbot form`;
+  return "Hi, I just submitted the Starbot form";
 }
 
 function escapeHtml(s) {
@@ -115,10 +128,20 @@ function renderError(text) {
   return `<!doctype html><meta charset="utf-8"><title>Starbot</title><body style="font-family:sans-serif;padding:24px">${escapeHtml(text)}</body>`;
 }
 
-function renderPage({ waHref, message, ref, name, venue }) {
+function renderPage({ waHref, message, ref, name, venue, number, phone }) {
   const safeHref = escapeHtml(waHref);
   const safeMessage = escapeHtml(message);
-  const refPill = ref ? `<div class="ref-pill">REF&nbsp;<span>${escapeHtml(ref)}</span></div>` : "";
+  const refPill = `<div class="ref-pill"${ref ? "" : ' hidden'} id="ref-pill">REF&nbsp;<span id="ref-pill-code">${ref ? escapeHtml(ref) : ""}</span></div>`;
+  // Payload for the client bootstrap. JSON.stringify covers all the escaping
+  // we need; embedding inside a <script type="application/json"> tag means
+  // the browser parses it as raw text, not HTML, so there's no XSS surface.
+  const bootstrap = JSON.stringify({
+    number,
+    phone: phone || null,
+    name: name || null,
+    venue: venue || null,
+    ref: ref || null,
+  });
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -236,7 +259,7 @@ function renderPage({ waHref, message, ref, name, venue }) {
 <body>
   <main class="card" role="main">
     <h1>Thanks, we got your details</h1>
-    <a class="cta" href="${safeHref}" rel="noopener">
+    <a class="cta" id="wa-cta" href="${safeHref}" rel="noopener">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor">
         <path d="M19.05 4.91A10 10 0 0 0 12 2a10 10 0 0 0-8.6 15.05L2 22l5.06-1.33A10 10 0 0 0 12 22a10 10 0 0 0 7.05-17.09ZM12 20.13a8.13 8.13 0 0 1-4.14-1.13l-.3-.18-3 .79.8-2.93-.19-.31a8.13 8.13 0 1 1 6.83 3.76Zm4.46-6.1c-.24-.12-1.44-.71-1.66-.79s-.39-.12-.55.12-.63.79-.78.95-.29.18-.53.06a6.66 6.66 0 0 1-1.97-1.22 7.45 7.45 0 0 1-1.36-1.7c-.14-.24 0-.36.1-.48s.24-.29.36-.43a1.68 1.68 0 0 0 .24-.41.45.45 0 0 0 0-.43c-.06-.12-.55-1.33-.76-1.83s-.41-.41-.55-.42-.31 0-.47 0a.91.91 0 0 0-.66.31 2.76 2.76 0 0 0-.87 2.06 4.8 4.8 0 0 0 1.01 2.56 11 11 0 0 0 4.23 3.74c.59.26 1.05.41 1.41.52a3.41 3.41 0 0 0 1.56.1 2.55 2.55 0 0 0 1.67-1.18 2.07 2.07 0 0 0 .14-1.18c-.06-.1-.22-.16-.46-.28Z"/>
       </svg>
@@ -246,6 +269,62 @@ function renderPage({ waHref, message, ref, name, venue }) {
     ${refPill}
     <noscript><p class="subtext" style="margin-top:12px">Pre-filled message: ${safeMessage}</p></noscript>
   </main>
+  <script type="application/json" id="bootstrap-data">${bootstrap}</script>
+  <script>
+  (function () {
+    var raw = document.getElementById('bootstrap-data');
+    if (!raw) return;
+    var data;
+    try { data = JSON.parse(raw.textContent); } catch (e) { return; }
+    if (!data.phone || data.ref) return; // ref already set server-side, nothing to upgrade
+
+    var REF_RE = /^[23456789ABCDEFGHJKMNPQRSTUVWXYZ]{8}$/;
+
+    function buildMessage(name, venue, ref) {
+      if (ref) {
+        if (name && venue) return "Hi, I'm " + name + " from " + venue + ". I just submitted the Starbot form (ref: " + ref + ")";
+        if (name) return "Hi, I'm " + name + ". I just submitted the Starbot form (ref: " + ref + ")";
+        return "Hi, I just submitted the Starbot form (ref: " + ref + ")";
+      }
+      if (name && venue) return "Hi, I'm " + name + " from " + venue + ". I just submitted the Starbot form";
+      if (name) return "Hi, I'm " + name + ". I just submitted the Starbot form";
+      return "Hi, I just submitted the Starbot form";
+    }
+
+    function applyResult(result) {
+      if (!result) return;
+      var ref = (result.ref_code && REF_RE.test(String(result.ref_code).toUpperCase())) ? String(result.ref_code).toUpperCase() : null;
+      if (!ref) return;
+      // Prefer server-provided name/venue (from URL params) when present, else use API values.
+      var name = data.name || result.name || null;
+      var venue = data.venue || result.venue || null;
+      var msg = buildMessage(name, venue, ref);
+      var href = 'https://wa.me/' + data.number + '?text=' + encodeURIComponent(msg);
+      var cta = document.getElementById('wa-cta');
+      if (cta) cta.setAttribute('href', href);
+      var pill = document.getElementById('ref-pill');
+      var pillCode = document.getElementById('ref-pill-code');
+      if (pill && pillCode) {
+        pillCode.textContent = ref;
+        pill.removeAttribute('hidden');
+      }
+    }
+
+    function fetchOnce() {
+      return fetch('/api/lead-context-by-phone?phone=' + encodeURIComponent(data.phone), { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; });
+    }
+
+    fetchOnce().then(function (r) {
+      if (r) return applyResult(r);
+      // 404 likely means the PR 2 webhook hasn't finished inserting yet. One retry.
+      setTimeout(function () {
+        fetchOnce().then(function (r2) { if (r2) applyResult(r2); });
+      }, 1500);
+    });
+  })();
+  </script>
 </body>
 </html>`;
 }
