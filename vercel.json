@@ -2,7 +2,9 @@
   "version": 2,
   "rewrites": [
     { "source": "/dashboard", "destination": "/dashboard/index.html" },
-    { "source": "/dashboard/", "destination": "/dashboard/index.html" }
+    { "source": "/dashboard/", "destination": "/dashboard/index.html" },
+    { "source": "/thanks", "destination": "/api/thanks" },
+    { "source": "/thanks/", "destination": "/api/thanks" }
   ],
   "headers": [
     {
