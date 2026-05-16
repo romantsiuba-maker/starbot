@@ -1179,77 +1179,310 @@
         display: none !important;
       }
 
-      /* ── PR 48: Map view + split layout ── */
-      .split-container {
-        display: flex;
-        flex-direction: column;
-        height: calc(100vh - 56px);
-        overflow: hidden;
-      }
-      .split-pane-map {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        min-height: 200px;
-        background: var(--bg-elevated);
-      }
-      .split-pane-kanban {
-        flex: 1;
-        min-height: 200px;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-      }
-      .split-pane-kanban .board {
-        flex: 1;
-        min-height: 0;
-        overflow-x: auto;
-        overflow-y: auto;
-      }
-      .split-handle {
-        height: 8px;
-        background: var(--bg-page);
-        border-top: 1px solid var(--border);
-        border-bottom: 1px solid var(--border);
-        cursor: row-resize;
-        flex-shrink: 0;
-        position: relative;
-        transition: background 120ms ease;
-      }
-      .split-handle:hover,
-      .split-handle.dragging {
-        background: var(--accent);
-        opacity: 0.6;
-      }
-      .split-handle::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 32px;
-        height: 2px;
-        background: var(--text-tertiary);
-        border-radius: 1px;
+      /* ── PR 49: command-dashboard layout (replaces PR 48 split-pane) ── */
+
+      /* Map fills the viewport. All other chrome floats on top via z-index. */
+      .map-canvas {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        background: #0d1419;
       }
 
-      .map-filters {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        padding: 8px 16px;
-        background: var(--bg-surface);
-        backdrop-filter: blur(var(--glass-blur));
-        border-bottom: 1px solid var(--glass-border);
-        flex-wrap: wrap;
-        font-size: 12px;
+      /* Pipeline view sits on top of the map when active. Opaque so the
+         map doesn't peek through; full viewport scroll container. */
+      .pipeline-view {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        background: var(--bg-page);
+        overflow: auto;
+        padding-top: 76px;
       }
-      .map-filters .filter-group {
+      .pipeline-view .board {
+        padding: 16px 24px 24px;
+      }
+
+      /* Floating top bar */
+      .cmd-topbar {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        right: 12px;
+        z-index: 1000;
+        display: grid;
+        grid-template-columns: minmax(180px, 1fr) auto minmax(180px, 1fr);
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        height: 64px;
+        background: rgba(21, 21, 21, 0.62);
+        backdrop-filter: blur(20px) saturate(140%);
+        -webkit-backdrop-filter: blur(20px) saturate(140%);
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+        color: var(--text-primary);
+      }
+      .cmd-topbar-left {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        min-width: 0;
+      }
+      .cmd-wordmark {
+        font: 600 15px var(--font-body);
+        letter-spacing: -0.005em;
+        white-space: nowrap;
+      }
+      .cmd-count {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        color: var(--text-tertiary);
+        white-space: nowrap;
+      }
+      .cmd-topbar-centre {
+        display: flex;
+        justify-content: center;
+        min-width: 0;
+      }
+      .cmd-topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+      .cmd-viewswitch {
+        display: inline-flex;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 2px;
+        font: 500 12px var(--font-body);
+      }
+      .cmd-viewswitch button {
+        background: transparent;
+        color: var(--text-secondary);
+        border: none;
+        padding: 5px 12px;
+        border-radius: 999px;
+        cursor: pointer;
+      }
+      .cmd-viewswitch button.on {
+        background: var(--accent);
+        color: #fff;
+      }
+      .cmd-signout {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+        padding: 6px 12px;
+        border-radius: var(--radius-sm);
+        font: 500 12px var(--font-body);
+        cursor: pointer;
+      }
+      .cmd-signout:hover {
+        color: var(--text-primary);
+        border-color: var(--border-hover);
+      }
+      .cmd-drawer-toggle {
+        display: none;
+        background: var(--bg-elevated);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 6px 8px;
+        cursor: pointer;
+        line-height: 0;
+      }
+
+      /* Layer toggle bar */
+      .cmd-layer-bar {
+        display: inline-flex;
+        gap: 4px;
+        background: rgba(10, 14, 20, 0.55);
+        border: 1px solid var(--glass-border);
+        border-radius: 999px;
+        padding: 3px;
+        backdrop-filter: blur(12px);
+      }
+      .cmd-layer-pill {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1px solid transparent;
+        border-radius: 999px;
+        cursor: pointer;
+        font: 500 12px var(--font-body);
+        transition: background 120ms ease, color 120ms ease;
+        white-space: nowrap;
+      }
+      .cmd-layer-pill svg {
+        width: 13px;
+        height: 13px;
+        flex-shrink: 0;
+      }
+      .cmd-layer-pill:hover {
+        color: var(--text-primary);
+      }
+      .cmd-layer-pill.on {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+      .cmd-layer-pill.on:hover {
+        background: var(--accent-hover);
+      }
+      .cmd-layer-pill[disabled] {
+        cursor: not-allowed;
+        color: var(--text-tertiary);
+      }
+      .cmd-layer-pill[disabled]:hover {
+        color: var(--text-tertiary);
+      }
+      .cmd-layer-pill .cmd-layer-tooltip {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--bg-elevated);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        padding: 4px 8px;
+        border-radius: var(--radius-sm);
+        font: 500 11px var(--font-body);
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 120ms ease;
+        z-index: 1100;
+      }
+      .cmd-layer-pill[disabled]:hover .cmd-layer-tooltip {
+        opacity: 1;
+      }
+
+      /* Floating side panels */
+      .cmd-panel {
+        position: fixed;
+        top: 88px;
+        bottom: 16px;
+        width: 320px;
+        z-index: 900;
+        background: rgba(21, 21, 21, 0.62);
+        backdrop-filter: blur(18px) saturate(140%);
+        -webkit-backdrop-filter: blur(18px) saturate(140%);
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        overflow: hidden;
+        transition: width 200ms ease, transform 200ms ease;
       }
-      .map-filters label {
+      .cmd-panel-left { left: 12px; }
+      .cmd-panel-right { right: 12px; }
+      .cmd-panel[data-collapsed="true"] {
+        width: 48px;
+      }
+      .cmd-panel[data-collapsed="true"] .cmd-panel-header,
+      .cmd-panel[data-collapsed="true"] .cmd-panel-body {
+        display: none;
+      }
+      .cmd-panel[data-collapsed="false"] .cmd-panel-rail {
+        display: none;
+      }
+      .cmd-panel-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--glass-border);
+        font-family: var(--font-mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-secondary);
+        flex-shrink: 0;
+      }
+      .cmd-panel-title {
+        flex: 1;
+      }
+      .cmd-panel-count {
+        background: var(--pill-bg);
+        border: 1px solid var(--pill-border);
+        border-radius: 10px;
+        padding: 1px 7px;
+        font-size: 10px;
+        font-weight: 400;
+        color: var(--text-tertiary);
+        margin-left: 6px;
+      }
+      .cmd-panel-collapse {
+        background: transparent;
+        color: var(--text-tertiary);
+        border: 1px solid transparent;
+        border-radius: 6px;
+        padding: 2px 5px;
+        cursor: pointer;
+        line-height: 0;
+      }
+      .cmd-panel-collapse:hover {
+        color: var(--accent);
+        background: var(--bg-elevated);
+      }
+      .cmd-panel-right .cmd-panel-header .cmd-panel-collapse {
+        margin-right: 2px;
+      }
+      .cmd-panel-body {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 12px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .cmd-panel-body-flush {
+        padding: 6px;
+        gap: 0;
+      }
+      .cmd-panel-rail {
+        flex: 1;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--text-secondary);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 12px 0;
+      }
+      .cmd-panel-rail:hover {
+        color: var(--accent);
+      }
+      .cmd-panel-rail-label {
+        font-family: var(--font-mono);
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        white-space: nowrap;
+      }
+
+      /* Filter components live inside the LEFT panel body now */
+      .cmd-panel-body .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .cmd-panel-body label {
         font-family: var(--font-mono);
         font-size: 10px;
         text-transform: uppercase;
@@ -1335,9 +1568,11 @@
         letter-spacing: 0.06em;
         color: var(--text-tertiary);
       }
-      .map-filters .multi-pop {
-        position: relative;
-      }
+      /* Multi-select component, shared by PR 49 filter panel and any
+         legacy .map-filters block that may still be in the DOM. */
+      .cmd-panel-body .multi-pop,
+      .map-filters .multi-pop { position: relative; }
+      .cmd-panel-body .multi-toggle,
       .map-filters .multi-toggle {
         background: var(--bg-elevated);
         color: var(--text-primary);
@@ -1347,11 +1582,11 @@
         font: 500 12px var(--font-body);
         cursor: pointer;
         position: relative;
-        min-width: 120px;
         text-align: left;
+        width: 100%;
       }
-      .map-filters .multi-toggle::after {
-        content: "▾";
+      .cmd-panel-body .multi-toggle::after {
+        content: "\25BE";
         position: absolute;
         right: 8px;
         top: 50%;
@@ -1359,24 +1594,22 @@
         color: var(--text-tertiary);
         font-size: 9px;
       }
-      .map-filters .multi-toggle:hover {
-        border-color: var(--border-hover);
-      }
-      .map-filters .multi-menu {
+      .cmd-panel-body .multi-toggle:hover { border-color: var(--border-hover); }
+      .cmd-panel-body .multi-menu {
         position: absolute;
         top: calc(100% + 4px);
         left: 0;
+        right: 0;
         background: var(--bg-elevated);
         border: 1px solid var(--border);
         border-radius: var(--radius-sm);
         padding: 6px;
-        min-width: 180px;
-        z-index: 600;
+        z-index: 950;
         box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
         max-height: 280px;
         overflow-y: auto;
       }
-      .map-filters .multi-menu label.opt {
+      .cmd-panel-body .multi-menu label.opt {
         display: flex;
         align-items: center;
         gap: 8px;
@@ -1388,53 +1621,77 @@
         letter-spacing: 0;
         border-radius: var(--radius-sm);
       }
-      .map-filters .multi-menu label.opt:hover {
+      .cmd-panel-body .multi-menu label.opt:hover {
         background: var(--bg-surface-solid);
       }
-      .map-filters .multi-menu input[type="checkbox"] {
+      .cmd-panel-body .multi-menu input[type="checkbox"] {
         accent-color: var(--accent);
         margin: 0;
       }
-      .map-filters select,
-      .map-filters input[type="text"] {
+      .cmd-panel-body select,
+      .cmd-panel-body input[type="text"] {
         background: var(--bg-elevated);
         color: var(--text-primary);
         border: 1px solid var(--border);
         border-radius: var(--radius-sm);
-        padding: 6px 10px;
+        padding: 7px 10px;
         font: 500 12px var(--font-body);
-        min-width: 140px;
       }
-      .map-filters input[type="text"]:focus,
-      .map-filters select:focus {
+      .cmd-panel-body input[type="text"]:focus,
+      .cmd-panel-body select:focus {
         outline: none;
         border-color: var(--accent);
       }
-      .map-filters .filter-reset {
+      .cmd-panel-body .filter-reset {
         background: transparent;
         color: var(--text-secondary);
-        border: 1px solid transparent;
-        padding: 6px 10px;
+        border: 1px solid var(--border);
+        padding: 7px 10px;
         cursor: pointer;
         font: 500 12px var(--font-body);
         border-radius: var(--radius-sm);
+        margin-top: 4px;
       }
-      .map-filters .filter-reset:hover {
+      .cmd-panel-body .filter-reset:hover {
         color: var(--text-primary);
-        background: var(--bg-elevated);
+        border-color: var(--accent);
       }
 
-      .map-and-panel {
-        flex: 1;
-        display: grid;
-        grid-template-columns: 1fr 280px;
-        min-height: 0;
+      @media (max-width: 768px) {
+        .cmd-topbar {
+          grid-template-columns: 1fr auto;
+          grid-template-rows: auto auto;
+          height: auto;
+          row-gap: 8px;
+        }
+        .cmd-topbar-centre {
+          grid-column: 1 / -1;
+          overflow-x: auto;
+          justify-content: flex-start;
+        }
+        .cmd-layer-bar {
+          flex-wrap: nowrap;
+          padding: 3px;
+        }
+        .cmd-drawer-toggle { display: inline-flex; }
+        .cmd-panel {
+          width: 88vw;
+          max-width: 360px;
+          transform: translateX(calc(-100% - 24px));
+        }
+        .cmd-panel-right { transform: translateX(calc(100% + 24px)); }
+        .cmd-panel.open { transform: translateX(0); }
+        .cmd-panel-rail { display: none !important; }
+        .cmd-panel[data-collapsed="true"] {
+          width: 88vw;
+          max-width: 360px;
+        }
+        .cmd-panel[data-collapsed="true"] .cmd-panel-header,
+        .cmd-panel[data-collapsed="true"] .cmd-panel-body {
+          display: flex;
+        }
       }
-      #leads-map {
-        height: 100%;
-        width: 100%;
-        background: #0d1419;
-      }
+
       .needs-location {
         background: var(--bg-surface);
         backdrop-filter: blur(var(--glass-blur));
@@ -1804,27 +2061,10 @@
       .modal-postcode .status.failed { color: var(--danger); }
       .modal-postcode .status.pending { color: var(--warning); }
 
-      /* Mobile: stack panel below map + collapse log-call form */
+      /* PR 47 mobile rules (log-call-form). PR 48 mobile rules for
+         .map-and-panel / .needs-location / .map-filters are inert post-PR 49
+         since those selectors no longer match anything in the DOM. */
       @media (max-width: 720px) {
-        .map-and-panel {
-          grid-template-columns: 1fr;
-          grid-template-rows: 1fr auto;
-        }
-        .needs-location {
-          border-left: none;
-          border-top: 1px solid var(--glass-border);
-          max-height: 180px;
-        }
-        .map-filters {
-          padding: 6px 10px;
-          gap: 6px;
-        }
-        .map-filters .multi-toggle,
-        .map-filters select,
-        .map-filters input[type="text"] {
-          min-width: 0;
-          flex: 1 1 auto;
-        }
         .log-call-form {
           grid-template-columns: 1fr 1fr;
           margin: 0 12px 12px;
@@ -1864,83 +2104,99 @@
 
     <!-- ── Dashboard (hidden until auth) ── -->
     <div id="dashboard" class="hidden">
-      <!-- Top Bar -->
-      <div class="topbar">
-        <span class="topbar-title">Starbot Leads</span>
-        <span class="topbar-count" id="lead-count">0 leads</span>
-        <div class="topbar-spacer"></div>
-        <select class="filter-select" id="filter-status">
-          <option value="all">All statuses</option>
-          <option value="new">New</option>
-          <option value="contacted">Contacted</option>
-          <option value="interested">Interested</option>
-          <option value="negotiating">Negotiating</option>
-          <option value="won">Won</option>
-          <option value="lost">Lost</option>
-        </select>
-        <input
-          type="text"
-          class="search-input"
-          id="search-input"
-          placeholder="Search company..."
-        />
-        <button class="logout-btn" id="logout-btn">Sign out</button>
+      <!-- PR 49: full-bleed map is the base canvas. All chrome floats above. -->
+      <div id="leads-map" class="map-canvas"></div>
+
+      <!-- Pipeline view: hidden by default, shown when the view switcher
+           is toggled to Pipeline. Sits above the map and is opaque. -->
+      <div class="pipeline-view hidden" id="pipeline-view">
+        <div id="board-loading" class="loading-wrapper">
+          <div class="spinner"></div>
+        </div>
+        <div id="board" class="board hidden"></div>
       </div>
 
-      <!-- PR 48: split container, map on top, kanban below -->
-      <div class="split-container" id="split-container">
-        <div class="split-pane-map" id="split-pane-map">
-          <div class="map-filters">
-            <div class="filter-group">
-              <label>Status</label>
-              <div class="multi-pop" id="map-filter-status">
-                <button type="button" class="multi-toggle" data-role="toggle">All statuses</button>
-              </div>
-            </div>
-            <div class="filter-group">
-              <label>Venue type</label>
-              <div class="multi-pop" id="map-filter-venue">
-                <button type="button" class="multi-toggle" data-role="toggle">Any venue</button>
-              </div>
-            </div>
-            <div class="filter-group">
-              <label>Campaign</label>
-              <select id="map-filter-campaign">
-                <option value="">Any campaign</option>
-              </select>
-            </div>
-            <div class="filter-group">
-              <label>Search</label>
-              <input
-                type="text"
-                id="map-filter-search"
-                placeholder="Name or phone"
-                autocomplete="off"
-              />
-            </div>
-            <button type="button" class="filter-reset" id="map-filter-reset">Reset</button>
+      <!-- Floating top bar -->
+      <header class="cmd-topbar">
+        <div class="cmd-topbar-left">
+          <span class="cmd-wordmark">Starbot Leads</span>
+          <span class="cmd-count" id="lead-count">0 leads</span>
+        </div>
+        <div class="cmd-topbar-centre">
+          <div class="cmd-layer-bar" id="cmd-layer-bar" role="group" aria-label="Map layers"></div>
+        </div>
+        <div class="cmd-topbar-right">
+          <div class="cmd-viewswitch" role="tablist" aria-label="View">
+            <button type="button" role="tab" data-view="map" class="on" id="view-map-btn">Map</button>
+            <button type="button" role="tab" data-view="pipeline" id="view-pipeline-btn">Pipeline</button>
           </div>
-          <div class="map-and-panel">
-            <div id="leads-map"></div>
-            <aside class="needs-location" id="needs-location">
-              <div class="needs-location-header">
-                Needs location
-                <span class="count" id="needs-location-count">0</span>
-              </div>
-              <div class="needs-location-list" id="needs-location-list">
-                <div class="needs-empty">Loading…</div>
-              </div>
-            </aside>
+          <button class="cmd-signout" id="logout-btn">Sign out</button>
+          <button type="button" class="cmd-drawer-toggle cmd-drawer-toggle-left" id="cmd-drawer-toggle-left" aria-label="Filters">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          </button>
+          <button type="button" class="cmd-drawer-toggle cmd-drawer-toggle-right" id="cmd-drawer-toggle-right" aria-label="Needs location">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Floating LEFT panel: filters -->
+      <aside class="cmd-panel cmd-panel-left" id="cmd-panel-left" data-collapsed="false">
+        <div class="cmd-panel-header">
+          <span class="cmd-panel-title">Filters</span>
+          <button type="button" class="cmd-panel-collapse" id="cmd-panel-left-collapse" aria-label="Collapse filters">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"/></svg>
+          </button>
+        </div>
+        <div class="cmd-panel-body">
+          <div class="filter-group">
+            <label>Status</label>
+            <div class="multi-pop" id="map-filter-status">
+              <button type="button" class="multi-toggle" data-role="toggle">All statuses</button>
+            </div>
+          </div>
+          <div class="filter-group">
+            <label>Venue type</label>
+            <div class="multi-pop" id="map-filter-venue">
+              <button type="button" class="multi-toggle" data-role="toggle">Any venue</button>
+            </div>
+          </div>
+          <div class="filter-group">
+            <label>Campaign</label>
+            <select id="map-filter-campaign">
+              <option value="">Any campaign</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Search</label>
+            <input type="text" id="map-filter-search" placeholder="Name or phone" autocomplete="off" />
+          </div>
+          <button type="button" class="filter-reset" id="map-filter-reset">Reset filters</button>
+        </div>
+        <button type="button" class="cmd-panel-rail" id="cmd-panel-left-rail" aria-label="Expand filters">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          <span class="cmd-panel-rail-label">Filters</span>
+        </button>
+      </aside>
+
+      <!-- Floating RIGHT panel: needs location -->
+      <aside class="cmd-panel cmd-panel-right" id="cmd-panel-right" data-collapsed="false">
+        <div class="cmd-panel-header">
+          <button type="button" class="cmd-panel-collapse" id="cmd-panel-right-collapse" aria-label="Collapse needs location">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+          </button>
+          <span class="cmd-panel-title">Needs location <span class="cmd-panel-count" id="needs-location-count">0</span></span>
+        </div>
+        <div class="cmd-panel-body cmd-panel-body-flush">
+          <div class="needs-location-list" id="needs-location-list">
+            <div class="needs-empty">Loading…</div>
           </div>
         </div>
-        <div class="split-handle" id="split-handle" role="separator" aria-orientation="horizontal" aria-label="Resize map and Kanban"></div>
-        <div class="split-pane-kanban">
-          <div id="board-loading" class="loading-wrapper">
-            <div class="spinner"></div>
-          </div>
-          <div id="board" class="board hidden"></div>
-        </div>
-      </div>
+        <button type="button" class="cmd-panel-rail" id="cmd-panel-right-rail" aria-label="Expand needs location">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 6 9 12 15 18"/></svg>
+          <span class="cmd-panel-rail-label">Needs location</span>
+        </button>
+      </aside>
     </div>
 
     <!-- ── Lead Detail Modal ── -->
@@ -2419,16 +2675,24 @@
         return card;
       }
 
-      // ── Filters ──
-      $("filter-status").addEventListener("change", (e) => {
-        filterStatus = e.target.value;
-        buildBoard();
-      });
-
-      $("search-input").addEventListener("input", (e) => {
-        searchQuery = e.target.value.trim();
-        buildBoard();
-      });
+      // ── Kanban filters ──
+      // PR 49: the old #filter-status and #search-input lived in the now-
+      // removed topbar. The Pipeline view uses the unfiltered leads array.
+      // Map filtering is handled by the floating left panel via setupFilters().
+      const _filterStatusEl = $("filter-status");
+      const _searchInputEl = $("search-input");
+      if (_filterStatusEl) {
+        _filterStatusEl.addEventListener("change", (e) => {
+          filterStatus = e.target.value;
+          buildBoard();
+        });
+      }
+      if (_searchInputEl) {
+        _searchInputEl.addEventListener("input", (e) => {
+          searchQuery = e.target.value.trim();
+          buildBoard();
+        });
+      }
 
       // ── Modal ──
       // ── Pipeline stage order ──
@@ -3370,8 +3634,12 @@
         return map[status] || v("--text-secondary");
       }
 
-      const SPLIT_KEY = "starbot_dashboard_split_v1";
-      const MAP_DEFAULT_RATIO = 0.55;
+      // PR 49: localStorage keys for the new command-dashboard layout
+      const LAYERS_KEY = "starbot_active_layers_v1";
+      const LEFT_PANEL_KEY = "starbot_filters_panel_v1";
+      const RIGHT_PANEL_KEY = "starbot_needs_location_panel_v1";
+      const VIEW_KEY = "starbot_dashboard_view_v1";
+
       const ACTIVE_STATUSES = ["new", "contacted", "interested", "negotiating"];
       const VENUE_TYPES = [
         "retail",
@@ -3398,61 +3666,176 @@
         },
       };
 
-      function applyStoredSplit() {
-        const container = $("split-container");
-        const mapPane = $("split-pane-map");
-        if (!container || !mapPane) return;
-        let ratio = parseFloat(localStorage.getItem(SPLIT_KEY));
-        if (!Number.isFinite(ratio) || ratio < 0.15 || ratio > 0.85) {
-          ratio = MAP_DEFAULT_RATIO;
+      // ── PR 49: layer toggle registry ──
+      // Each entry: { label, hint, isActive, disabled, icon (SVG path),
+      //   render() / clear() }. Click handlers flip isActive and call the
+      //   render or clear hook. Future PRs (50-53) add their own entries.
+      const layerRegistry = {
+        leads: {
+          label: "Leads",
+          hint: "",
+          isActive: true,
+          disabled: false,
+          icon: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+          render: () => renderMarkers(),
+          clear: () => {
+            if (mapState.cluster) mapState.cluster.clearLayers();
+            mapState.markers.clear();
+          },
+        },
+        deployed_starbots: {
+          label: "Deployed Starbots",
+          hint: "Coming in PR 50",
+          isActive: false,
+          disabled: true,
+          icon: '<rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="8" cy="16" r="1.5"/><circle cx="16" cy="16" r="1.5"/><path d="M12 7v4"/><circle cx="12" cy="5" r="2"/>',
+          render: () => {},
+          clear: () => {},
+        },
+        target_locations: {
+          label: "Target Locations",
+          hint: "Coming in PR 51",
+          isActive: false,
+          disabled: true,
+          icon: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>',
+          render: () => {},
+          clear: () => {},
+        },
+        population: {
+          label: "Population",
+          hint: "Coming in PR 52",
+          isActive: false,
+          disabled: true,
+          icon: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 19c0-3 3-5 6-5s6 2 6 5"/><path d="M14 19c0-2 2-4 4-4s4 2 4 4"/>',
+          render: () => {},
+          clear: () => {},
+        },
+        traffic: {
+          label: "Traffic",
+          hint: "Coming in PR 53",
+          isActive: false,
+          disabled: true,
+          icon: '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="14" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/>',
+          render: () => {},
+          clear: () => {},
+        },
+      };
+
+      function loadStoredLayers() {
+        try {
+          const raw = localStorage.getItem(LAYERS_KEY);
+          if (!raw) return;
+          const set = new Set(JSON.parse(raw));
+          for (const id of Object.keys(layerRegistry)) {
+            if (layerRegistry[id].disabled) continue;
+            layerRegistry[id].isActive = set.has(id);
+          }
+        } catch {
+          // ignore malformed payload
         }
-        const total = container.clientHeight;
-        if (total > 0) {
-          mapPane.style.height = Math.round(total * ratio) + "px";
+      }
+      function storeActiveLayers() {
+        const ids = Object.keys(layerRegistry).filter(
+          (id) => !layerRegistry[id].disabled && layerRegistry[id].isActive
+        );
+        localStorage.setItem(LAYERS_KEY, JSON.stringify(ids));
+      }
+
+      function renderLayerBar() {
+        const bar = $("cmd-layer-bar");
+        if (!bar) return;
+        bar.innerHTML = Object.entries(layerRegistry)
+          .map(([id, l]) => {
+            const onClass = l.isActive && !l.disabled ? " on" : "";
+            const dis = l.disabled ? " disabled" : "";
+            const tip = l.hint
+              ? `<span class="cmd-layer-tooltip">${esc(l.hint)}</span>`
+              : "";
+            return `<button type="button" class="cmd-layer-pill${onClass}" data-layer="${esc(id)}"${dis}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${l.icon}</svg>
+              ${esc(l.label)}
+              ${tip}
+            </button>`;
+          })
+          .join("");
+      }
+
+      function toggleLayer(id) {
+        const layer = layerRegistry[id];
+        if (!layer || layer.disabled) return;
+        layer.isActive = !layer.isActive;
+        if (layer.isActive) layer.render();
+        else layer.clear();
+        storeActiveLayers();
+        renderLayerBar();
+      }
+
+      function setupLayerBar() {
+        const bar = $("cmd-layer-bar");
+        if (!bar) return;
+        bar.addEventListener("click", (e) => {
+          const pill = e.target.closest("[data-layer]");
+          if (!pill) return;
+          const id = pill.dataset.layer;
+          if (layerRegistry[id]?.disabled) return;
+          toggleLayer(id);
+        });
+      }
+
+      // ── PR 49: floating panel collapse persistence ──
+      function setupPanel(panelId, storageKey) {
+        const panel = $(panelId);
+        if (!panel) return;
+        const stored = localStorage.getItem(storageKey);
+        if (stored === "true") panel.dataset.collapsed = "true";
+        const collapseBtn = panel.querySelector(".cmd-panel-collapse");
+        const railBtn = panel.querySelector(".cmd-panel-rail");
+        if (collapseBtn) {
+          collapseBtn.addEventListener("click", () => {
+            panel.dataset.collapsed = "true";
+            localStorage.setItem(storageKey, "true");
+            if (mapState.map) setTimeout(() => mapState.map.invalidateSize(), 220);
+          });
+        }
+        if (railBtn) {
+          railBtn.addEventListener("click", () => {
+            panel.dataset.collapsed = "false";
+            localStorage.setItem(storageKey, "false");
+            if (mapState.map) setTimeout(() => mapState.map.invalidateSize(), 220);
+          });
         }
       }
 
-      function setupSplit() {
-        const handle = $("split-handle");
-        const container = $("split-container");
-        const mapPane = $("split-pane-map");
-        if (!handle || !container || !mapPane) return;
+      // ── PR 49: Map | Pipeline view switcher ──
+      function setActiveView(view) {
+        const isPipeline = view === "pipeline";
+        $("pipeline-view").classList.toggle("hidden", !isPipeline);
+        document.querySelectorAll(".cmd-viewswitch button").forEach((b) =>
+          b.classList.toggle("on", b.dataset.view === view)
+        );
+        localStorage.setItem(VIEW_KEY, view);
+        // When returning to the map, Leaflet may need a size recompute
+        // because the container was display:none-adjacent for the duration.
+        if (!isPipeline && mapState.map) {
+          setTimeout(() => mapState.map.invalidateSize(), 50);
+        }
+      }
+      function setupViewSwitch() {
+        document.querySelectorAll(".cmd-viewswitch button").forEach((b) =>
+          b.addEventListener("click", () => setActiveView(b.dataset.view))
+        );
+        const stored = localStorage.getItem(VIEW_KEY);
+        setActiveView(stored === "pipeline" ? "pipeline" : "map");
+      }
 
-        let dragging = false;
-        const onMove = (clientY) => {
-          if (!dragging) return;
-          const rect = container.getBoundingClientRect();
-          const y = clientY - rect.top;
-          const min = 200;
-          const max = rect.height - 200;
-          const clamped = Math.max(min, Math.min(max, y));
-          mapPane.style.height = clamped + "px";
-          if (mapState.map) mapState.map.invalidateSize();
-        };
-        const onUp = () => {
-          if (!dragging) return;
-          dragging = false;
-          handle.classList.remove("dragging");
-          const ratio = mapPane.clientHeight / container.clientHeight;
-          if (Number.isFinite(ratio)) {
-            localStorage.setItem(SPLIT_KEY, ratio.toFixed(4));
-          }
-          window.removeEventListener("pointermove", pointerMove);
-          window.removeEventListener("pointerup", onUp);
-        };
-        const pointerMove = (e) => onMove(e.clientY);
-
-        handle.addEventListener("pointerdown", (e) => {
-          dragging = true;
-          handle.classList.add("dragging");
-          e.preventDefault();
-          window.addEventListener("pointermove", pointerMove);
-          window.addEventListener("pointerup", onUp, { once: false });
-        });
-
-        window.addEventListener("resize", () => {
-          if (mapState.map) mapState.map.invalidateSize();
-        });
+      // Mobile drawer buttons (top bar)
+      function setupDrawerToggles() {
+        const left = $("cmd-panel-left");
+        const right = $("cmd-panel-right");
+        const lt = $("cmd-drawer-toggle-left");
+        const rt = $("cmd-drawer-toggle-right");
+        if (lt && left) lt.addEventListener("click", () => left.classList.toggle("open"));
+        if (rt && right) rt.addEventListener("click", () => right.classList.toggle("open"));
       }
 
       function setupMap() {
@@ -3462,7 +3845,12 @@
         const map = L.map(el, {
           zoomControl: true,
           attributionControl: true,
-          worldCopyJump: false,
+          inertia: true,
+          inertiaDeceleration: 3000,
+          worldCopyJump: true,
+          zoomSnap: 0.25,
+          zoomDelta: 0.5,
+          scrollWheelZoom: true,
           maxBounds: [
             [49.5, -8.5],
             [61, 2],
@@ -3566,6 +3954,8 @@
         if (!mapState.cluster) return;
         mapState.cluster.clearLayers();
         mapState.markers.clear();
+        // Skip painting if the Leads layer is toggled off
+        if (!layerRegistry.leads.isActive) return;
         for (const lead of mapState.geoLeads) {
           if (!leadMatchesFilters(lead)) continue;
           const m = buildMarker(lead);
@@ -3812,12 +4202,27 @@
       };
 
       async function initMapView() {
-        applyStoredSplit();
-        setupSplit();
+        // PR 49: command-dashboard layout setup. Map is full-bleed so we
+        // don't need the old split-pane height calc; we just init Leaflet
+        // and let CSS position:fixed do the work.
+        loadStoredLayers();
+        renderLayerBar();
+        setupLayerBar();
+        setupPanel("cmd-panel-left", LEFT_PANEL_KEY);
+        setupPanel("cmd-panel-right", RIGHT_PANEL_KEY);
+        setupViewSwitch();
+        setupDrawerToggles();
         setupMap();
         setupFilters();
         setupPostcodeForm();
         await refreshMapData();
+        // Apply stored layer activation in case any non-default state landed
+        for (const id of Object.keys(layerRegistry)) {
+          const l = layerRegistry[id];
+          if (l.disabled) continue;
+          if (l.isActive) l.render();
+          else l.clear();
+        }
       }
 
       // ── Boot ──
