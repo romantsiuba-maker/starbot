@@ -1256,6 +1256,85 @@
         letter-spacing: 0.06em;
         color: var(--text-tertiary);
       }
+
+      /* ── PR 47: phone row icons + log-call form + activity timeline ── */
+      .modal-contact-row .phone-actions {
+        display: inline-flex;
+        gap: 4px;
+        align-items: center;
+        margin-left: 4px;
+      }
+      .modal-contact-row .phone-actions button {
+        background: transparent;
+        color: var(--text-tertiary);
+        border: 1px solid transparent;
+        border-radius: 6px;
+        padding: 2px 5px;
+        cursor: pointer;
+        line-height: 0;
+      }
+      .modal-contact-row .phone-actions button:hover {
+        color: var(--accent);
+        background: var(--bg-elevated);
+        border-color: var(--border);
+      }
+      .modal-contact-row .phone-actions svg {
+        width: 12px;
+        height: 12px;
+      }
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--bg-elevated);
+        color: var(--text-primary);
+        border: 1px solid var(--accent);
+        padding: 8px 14px;
+        border-radius: var(--radius-sm);
+        font: 500 12px var(--font-body);
+        z-index: 4000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 160ms ease;
+      }
+      .toast.show {
+        opacity: 1;
+      }
+
+      .log-call-form {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin: 0 16px 12px;
+        padding: 12px;
+        display: grid;
+        grid-template-columns: auto 1fr 1fr;
+        gap: 10px;
+        align-items: end;
+      }
+      .log-call-form .lc-row {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+      }
+      .log-call-form .lc-row.full {
+        grid-column: 1 / -1;
+      }
+      .log-call-form .lc-row.btns {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+      .log-call-form label {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-tertiary);
+      }
       .map-filters .multi-pop {
         position: relative;
       }
@@ -1536,6 +1615,182 @@
         cursor: pointer;
         flex-shrink: 0;
       }
+
+      .log-call-form select,
+      .log-call-form input[type="text"],
+      .log-call-form textarea {
+        background: var(--bg-surface-solid);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 6px 9px;
+        font: 500 12px var(--font-body);
+        min-width: 0;
+      }
+      .log-call-form textarea {
+        resize: vertical;
+        min-height: 56px;
+      }
+      .log-call-form .seg {
+        display: inline-flex;
+        background: var(--bg-surface-solid);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+      }
+      .log-call-form .seg button {
+        background: transparent;
+        color: var(--text-secondary);
+        border: none;
+        padding: 6px 10px;
+        font: 500 12px var(--font-body);
+        cursor: pointer;
+      }
+      .log-call-form .seg button.on {
+        background: var(--accent);
+        color: #fff;
+      }
+      .log-call-form .lc-save {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius-sm);
+        padding: 6px 12px;
+        font: 600 12px var(--font-body);
+        cursor: pointer;
+      }
+      .log-call-form .lc-save:hover { background: var(--accent-hover); }
+      .log-call-form .lc-save:disabled { opacity: 0.5; cursor: not-allowed; }
+      .log-call-form .lc-cancel {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 6px 12px;
+        font: 500 12px var(--font-body);
+        cursor: pointer;
+      }
+      .log-call-form .lc-cancel:hover { color: var(--text-primary); border-color: var(--border-hover); }
+      .action-log-call {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 6px 12px;
+        font: 500 12px var(--font-body);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .action-log-call:hover {
+        color: var(--text-primary);
+        border-color: var(--accent);
+      }
+
+      /* Activity timeline chips */
+      .timeline-filters {
+        display: flex;
+        gap: 6px;
+        padding: 0 16px 8px;
+        flex-wrap: wrap;
+      }
+      .timeline-chip {
+        background: var(--pill-bg);
+        color: var(--text-secondary);
+        border: 1px solid var(--pill-border);
+        border-radius: 999px;
+        padding: 3px 10px;
+        font: 500 11px var(--font-body);
+        cursor: pointer;
+      }
+      .timeline-chip:hover {
+        color: var(--text-primary);
+        border-color: var(--border-hover);
+      }
+      .timeline-chip.on {
+        background: rgba(45, 182, 183, 0.15);
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .timeline-item {
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        gap: 10px;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+      }
+      .timeline-item:last-child { border-bottom: none; }
+      .timeline-item:hover { background: var(--bg-elevated); }
+      .timeline-icon {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+      }
+      .timeline-icon svg { width: 12px; height: 12px; }
+      .timeline-item.t-status_change .timeline-icon { color: var(--info); }
+      .timeline-item.t-email_outbound .timeline-icon,
+      .timeline-item.t-email_inbound .timeline-icon { color: var(--accent); }
+      .timeline-item.t-call .timeline-icon { color: var(--success); }
+      .timeline-item.t-note .timeline-icon { color: var(--warning); }
+      .timeline-item.t-file .timeline-icon { color: var(--text-secondary); }
+      .timeline-item.t-form_submission .timeline-icon { color: var(--accent); }
+      .timeline-item.t-whatsapp_inbound .timeline-icon,
+      .timeline-item.t-whatsapp_outbound .timeline-icon { color: #25d366; }
+      .timeline-main {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .timeline-summary {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font: 500 13px var(--font-body);
+        color: var(--text-primary);
+      }
+      .timeline-summary .subj {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .timeline-summary .when {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        color: var(--text-tertiary);
+        flex-shrink: 0;
+        margin-left: auto;
+      }
+      .timeline-detail {
+        font-size: 12px;
+        color: var(--text-secondary);
+        white-space: pre-wrap;
+        background: var(--bg-elevated);
+        border-radius: var(--radius-sm);
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+      }
+      .timeline-detail .subj {
+        color: var(--text-primary);
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+      .timeline-detail a { color: var(--accent); text-decoration: none; }
+      .timeline-empty {
+        padding: 24px 16px;
+        text-align: center;
+        color: var(--text-tertiary);
+        font-size: 12px;
+      }
+
       .modal-postcode button:hover { background: var(--accent-hover); }
       .modal-postcode button:disabled { opacity: 0.5; cursor: not-allowed; }
       .modal-postcode .status {
@@ -1549,7 +1804,7 @@
       .modal-postcode .status.failed { color: var(--danger); }
       .modal-postcode .status.pending { color: var(--warning); }
 
-      /* Mobile: stack panel below map */
+      /* Mobile: stack panel below map + collapse log-call form */
       @media (max-width: 720px) {
         .map-and-panel {
           grid-template-columns: 1fr;
@@ -1570,6 +1825,11 @@
           min-width: 0;
           flex: 1 1 auto;
         }
+        .log-call-form {
+          grid-template-columns: 1fr 1fr;
+          margin: 0 12px 12px;
+        }
+        .log-call-form .lc-row.full { grid-column: 1 / -1; }
       }
     </style>
   </head>
@@ -1737,10 +1997,50 @@
             </div>
           </div>
 
-          <!-- Conversation Thread -->
+          <!-- PR 47: Log-call form (collapsed by default) -->
+          <div class="log-call-form" id="log-call-form" hidden>
+            <div class="lc-row">
+              <label>Direction</label>
+              <div class="seg" id="lc-direction">
+                <button type="button" data-value="outbound" class="on">Outbound</button>
+                <button type="button" data-value="inbound">Inbound</button>
+              </div>
+            </div>
+            <div class="lc-row">
+              <label for="lc-outcome">Outcome</label>
+              <select id="lc-outcome">
+                <option value="answered">Answered</option>
+                <option value="voicemail">Voicemail</option>
+                <option value="no_answer">No answer</option>
+                <option value="rejected">Rejected</option>
+                <option value="wrong_number">Wrong number</option>
+              </select>
+            </div>
+            <div class="lc-row" id="lc-duration-row">
+              <label for="lc-duration">Duration (mm:ss)</label>
+              <input type="text" id="lc-duration" placeholder="03:42" inputmode="numeric" />
+            </div>
+            <div class="lc-row full">
+              <label for="lc-notes">Notes</label>
+              <textarea id="lc-notes" placeholder="What happened on the call"></textarea>
+            </div>
+            <div class="lc-row btns">
+              <button type="button" class="lc-cancel" id="lc-cancel">Cancel</button>
+              <button type="button" class="lc-save" id="lc-save">Save call</button>
+            </div>
+          </div>
+
+          <!-- Activity timeline (replaces conversation thread renderer) -->
           <div class="modal-section">
             <div class="modal-section-title">
-              Conversation <span class="convo-count" id="convo-count">0</span>
+              Activity <span class="convo-count" id="convo-count">0</span>
+            </div>
+            <div class="timeline-filters" id="timeline-filters">
+              <button type="button" class="timeline-chip on" data-filter="all">All</button>
+              <button type="button" class="timeline-chip" data-filter="calls">Calls</button>
+              <button type="button" class="timeline-chip" data-filter="emails">Emails</button>
+              <button type="button" class="timeline-chip" data-filter="notes">Notes</button>
+              <button type="button" class="timeline-chip" data-filter="status">Status</button>
             </div>
             <div class="convo-entries" id="convo-entries"></div>
 
@@ -1823,6 +2123,10 @@
             id="modal-created"
           ></span>
           <button class="action-delete" id="action-delete">Delete</button>
+          <button type="button" class="action-log-call" id="action-log-call" title="Log a phone call">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Log call
+          </button>
           <button class="action-email hidden" id="action-email">
             <svg
               width="12"
@@ -2187,9 +2491,16 @@
         if (lead.phone) {
           if (lead.email)
             contactParts.push('<span class="sep">&middot;</span>');
+          // PR 47: formatted display + icon buttons (tel: + copy)
+          const display = formatPhoneIntl(lead.phone_e164 || lead.phone);
+          const telTarget = lead.phone_e164 || lead.phone;
           contactParts.push(
             `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>` +
-              `<a href="tel:${esc(lead.phone)}">${esc(lead.phone)}</a>`,
+              `<a href="tel:${esc(telTarget)}">${esc(display)}</a>` +
+              `<span class="phone-actions">` +
+                `<button type="button" data-phone-tel="${esc(telTarget)}" title="Call"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></button>` +
+                `<button type="button" data-phone-copy="${esc(telTarget)}" title="Copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>` +
+              `</span>`,
           );
         }
         if (lead.source) {
@@ -2516,8 +2827,372 @@
         }
       });
 
-      // ── Conversation log ──
-      function renderConvoLog() {
+      // ──────────────────────────────────────────────────────────────
+      // PR 47: phone format, log-call form, activity timeline
+      // ──────────────────────────────────────────────────────────────
+
+      // Small UK-aware international phone formatter. Accepts E.164 or raw
+      // input; returns spaced form like '+44 7970 394918' for display only.
+      // Lookups + comparisons should always use the canonical phone_e164.
+      function formatPhoneIntl(raw) {
+        if (!raw) return "";
+        const cleaned = String(raw).replace(/[^\d+]/g, "");
+        const e164 = cleaned.startsWith("+") ? cleaned : "+" + cleaned;
+        if (!/^\+\d{6,15}$/.test(e164)) return raw;
+        if (e164.startsWith("+44")) {
+          const rest = e164.slice(3);
+          if (rest.length === 10 && rest.startsWith("7")) {
+            return `+44 ${rest.slice(0, 4)} ${rest.slice(4, 7)} ${rest.slice(7)}`;
+          }
+          if (rest.length === 10 && rest.startsWith("20")) {
+            return `+44 20 ${rest.slice(2, 6)} ${rest.slice(6)}`;
+          }
+          return `+44 ${rest.replace(/(\d{3})(?=\d)/g, "$1 ")}`;
+        }
+        return e164.replace(/^(\+\d{1,3})(\d+)/, (_, cc, rest) =>
+          `${cc} ${rest.replace(/(\d{3})(?=\d)/g, "$1 ")}`
+        );
+      }
+
+      // Click handlers for phone-actions inside the modal contact row.
+      // Delegated to the modal body so re-rendering doesn't lose bindings.
+      $("modal").addEventListener("click", (e) => {
+        const tel = e.target.closest && e.target.closest("[data-phone-tel]");
+        if (tel) {
+          const num = tel.getAttribute("data-phone-tel");
+          if (num) window.location.href = `tel:${num}`;
+          return;
+        }
+        const cp = e.target.closest && e.target.closest("[data-phone-copy]");
+        if (cp) {
+          const num = cp.getAttribute("data-phone-copy");
+          if (num && navigator.clipboard) {
+            navigator.clipboard.writeText(num).then(
+              () => showToast(`Copied ${num}`),
+              () => showToast("Copy failed")
+            );
+          } else if (num) {
+            // Fallback for older browsers
+            const ta = document.createElement("textarea");
+            ta.value = num;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand("copy"); showToast(`Copied ${num}`); }
+            catch { showToast("Copy failed"); }
+            ta.remove();
+          }
+        }
+      });
+
+      function showToast(text) {
+        let el = document.getElementById("starbot-toast");
+        if (!el) {
+          el = document.createElement("div");
+          el.id = "starbot-toast";
+          el.className = "toast";
+          document.body.appendChild(el);
+        }
+        el.textContent = text;
+        el.classList.add("show");
+        clearTimeout(showToast._t);
+        showToast._t = setTimeout(() => el.classList.remove("show"), 1600);
+      }
+
+      // ── Log-call form ──
+      const lcForm = $("log-call-form");
+      const lcDir = $("lc-direction");
+      const lcOutcome = $("lc-outcome");
+      const lcDurationRow = $("lc-duration-row");
+      const lcDuration = $("lc-duration");
+      const lcNotes = $("lc-notes");
+      const lcSave = $("lc-save");
+      const lcCancel = $("lc-cancel");
+
+      function lcReset() {
+        lcDir.querySelectorAll("button").forEach((b) =>
+          b.classList.toggle("on", b.dataset.value === "outbound")
+        );
+        lcOutcome.value = "answered";
+        lcDuration.value = "";
+        lcNotes.value = "";
+        lcUpdateDurationVisibility();
+      }
+      function lcOpen() {
+        lcReset();
+        lcForm.hidden = false;
+        setTimeout(() => lcOutcome.focus(), 0);
+      }
+      function lcClose() {
+        lcForm.hidden = true;
+      }
+      function lcDirectionValue() {
+        const on = lcDir.querySelector("button.on");
+        return on ? on.dataset.value : "outbound";
+      }
+      function lcUpdateDurationVisibility() {
+        lcDurationRow.style.display = lcOutcome.value === "answered" ? "" : "none";
+      }
+      function parseDurationToSeconds(s) {
+        if (!s) return null;
+        const t = String(s).trim();
+        if (!t) return null;
+        if (/^\d+$/.test(t)) {
+          const n = Number(t);
+          return Number.isInteger(n) && n >= 0 ? n : NaN;
+        }
+        const m = t.match(/^(\d{1,2}):([0-5]?\d)$/);
+        if (!m) return NaN;
+        return Number(m[1]) * 60 + Number(m[2]);
+      }
+      lcDir.addEventListener("click", (e) => {
+        const b = e.target.closest("button[data-value]");
+        if (!b) return;
+        lcDir.querySelectorAll("button").forEach((x) => x.classList.remove("on"));
+        b.classList.add("on");
+      });
+      lcOutcome.addEventListener("change", lcUpdateDurationVisibility);
+      lcCancel.addEventListener("click", lcClose);
+      $("action-log-call").addEventListener("click", () => {
+        if (!currentLead) return;
+        if (lcForm.hidden) lcOpen();
+        else lcClose();
+      });
+      lcSave.addEventListener("click", async () => {
+        if (!currentLead) return;
+        const direction = lcDirectionValue();
+        const outcome = lcOutcome.value;
+        let duration_seconds = null;
+        if (outcome === "answered" && lcDuration.value.trim()) {
+          const parsed = parseDurationToSeconds(lcDuration.value);
+          if (parsed === null || Number.isNaN(parsed)) {
+            showToast("Invalid duration");
+            return;
+          }
+          duration_seconds = parsed;
+        }
+        const notes = lcNotes.value.trim() || null;
+        lcSave.disabled = true;
+        try {
+          const { data: { session } } = await sb.auth.getSession();
+          const r = await fetch(`/api/leads/${encodeURIComponent(currentLead.id)}/call-log`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(session?.access_token
+                ? { Authorization: `Bearer ${session.access_token}` }
+                : {}),
+            },
+            body: JSON.stringify({ direction, outcome, duration_seconds, notes }),
+          });
+          if (!r.ok) {
+            const body = await r.json().catch(() => ({}));
+            showToast(body.error || `Failed (${r.status})`);
+            return;
+          }
+          lcClose();
+          await refreshActivityTimeline();
+        } catch (err) {
+          console.error("log-call save", err);
+          showToast("Network error");
+        } finally {
+          lcSave.disabled = false;
+        }
+      });
+
+      // ── Activity timeline ──
+      let timelineFilter = "all";
+
+      $("timeline-filters").addEventListener("click", (e) => {
+        const chip = e.target.closest("button[data-filter]");
+        if (!chip) return;
+        timelineFilter = chip.dataset.filter;
+        $("timeline-filters")
+          .querySelectorAll(".timeline-chip")
+          .forEach((c) => c.classList.toggle("on", c === chip));
+        renderTimelineFromState();
+      });
+
+      let timelineCache = []; // last fetched feed; filter is client-side
+      async function refreshActivityTimeline() {
+        if (!currentLead) return;
+        const container = $("convo-entries");
+        const id = currentLead.id;
+        try {
+          const r = await fetch(`/api/leads/${encodeURIComponent(id)}/activity`, {
+            cache: "no-store",
+          });
+          if (!r.ok) {
+            console.error("activity fetch failed", r.status);
+            // Fall through to the legacy conversation_log renderer so the
+            // modal still shows something on a transient API blip.
+            return legacyRenderConvoLog();
+          }
+          const body = await r.json();
+          timelineCache = Array.isArray(body.activity) ? body.activity : [];
+          renderTimelineFromState();
+        } catch (err) {
+          console.error("activity fetch threw", err);
+          legacyRenderConvoLog();
+        }
+      }
+
+      function renderTimelineFromState() {
+        const container = $("convo-entries");
+        const items = timelineCache.filter(matchTimelineFilter);
+        $("convo-count").textContent = items.length;
+        if (items.length === 0) {
+          container.innerHTML = '<div class="timeline-empty">No activity yet</div>';
+          return;
+        }
+        container.innerHTML = items.map(renderTimelineItem).join("");
+        container.scrollTop = 0;
+        // Click-to-expand
+        container.querySelectorAll(".timeline-item").forEach((row) => {
+          row.addEventListener("click", () => {
+            const det = row.querySelector(".timeline-detail");
+            if (det) det.style.display = det.style.display === "none" ? "" : "none";
+          });
+        });
+      }
+
+      function matchTimelineFilter(item) {
+        if (timelineFilter === "all") return true;
+        if (timelineFilter === "calls") return item.type === "call";
+        if (timelineFilter === "emails")
+          return item.type === "email_outbound" || item.type === "email_inbound";
+        if (timelineFilter === "notes")
+          return item.type === "note" || item.type === "file";
+        if (timelineFilter === "status")
+          return item.type === "status_change" || item.type === "form_submission";
+        return true;
+      }
+
+      function renderTimelineItem(item) {
+        const { type, timestamp, payload = {} } = item;
+        const ts = timestamp ? new Date(timestamp) : null;
+        const when = ts ? formatTimelineTime(ts) : "";
+        const icon = timelineIconFor(type);
+        const { summary, detail } = timelineCopyFor(type, payload);
+        const detailHidden = detail ? "" : " hidden";
+        return `<div class="timeline-item t-${type}" data-id="${esc(item.id || "")}">
+          <span class="timeline-icon">${icon}</span>
+          <div class="timeline-main">
+            <div class="timeline-summary">
+              <span class="subj">${summary}</span>
+              <span class="when" title="${ts ? ts.toISOString() : ""}">${esc(when)}</span>
+            </div>
+            <div class="timeline-detail" style="display:none"${detailHidden}>${detail || ""}</div>
+          </div>
+        </div>`;
+      }
+
+      function formatTimelineTime(d) {
+        const diffMs = Date.now() - d.getTime();
+        const m = Math.floor(diffMs / 60000);
+        if (m < 1) return "just now";
+        if (m < 60) return `${m}m ago`;
+        const h = Math.floor(m / 60);
+        if (h < 24) return `${h}h ago`;
+        return formatShort(d.toISOString());
+      }
+
+      function timelineIconFor(type) {
+        const svg = (path) =>
+          `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
+        switch (type) {
+          case "call":
+            return svg('<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>');
+          case "email_outbound":
+          case "email_inbound":
+            return svg('<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>');
+          case "note":
+            return svg('<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>');
+          case "file":
+            return svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>');
+          case "form_submission":
+            return svg('<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/>');
+          case "status_change":
+            return svg('<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>');
+          case "whatsapp_inbound":
+          case "whatsapp_outbound":
+            return svg('<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>');
+          default:
+            return svg('<circle cx="12" cy="12" r="9"/>');
+        }
+      }
+
+      function timelineCopyFor(type, payload) {
+        switch (type) {
+          case "form_submission": {
+            const src = payload.source || "landing_page";
+            return {
+              summary: `Form submitted via ${esc(src)}`,
+              detail: payload.utm_campaign
+                ? `<div>Campaign: ${esc(payload.utm_campaign)}</div>`
+                : "",
+            };
+          }
+          case "status_change": {
+            const from = payload.from_status || "new";
+            const to = payload.to_status || "";
+            return {
+              summary: `${esc(from)} → ${esc(to)}`,
+              detail: "",
+            };
+          }
+          case "email_outbound":
+          case "email_inbound": {
+            const subject = payload.subject || "(no subject)";
+            const text = payload.text || "";
+            const subj = `${type === "email_inbound" ? "← " : "→ "}${esc(subject)}`;
+            const body = linkify(text);
+            return {
+              summary: subj,
+              detail: `<div class="subj">${esc(subject)}</div>${body}`,
+            };
+          }
+          case "note": {
+            const text = payload.text || "";
+            const firstLine = text.split(/\r?\n/, 1)[0] || "(empty note)";
+            return {
+              summary: esc(firstLine),
+              detail: linkify(text),
+            };
+          }
+          case "file": {
+            const fileText = payload.text || "(file)";
+            return { summary: esc(fileText), detail: "" };
+          }
+          case "call": {
+            const dir = payload.direction === "inbound" ? "Inbound" : "Outbound";
+            const outcome = (payload.outcome || "").replace(/_/g, " ");
+            const dur =
+              typeof payload.duration_seconds === "number"
+                ? `, ${Math.floor(payload.duration_seconds / 60)}m ${payload.duration_seconds % 60}s`
+                : "";
+            return {
+              summary: `${dir} call, ${esc(outcome)}${esc(dur)}`,
+              detail: payload.notes ? linkify(payload.notes) : "",
+            };
+          }
+          case "whatsapp_inbound":
+          case "whatsapp_outbound": {
+            const body = payload.body || "";
+            const arrow = type === "whatsapp_inbound" ? "← " : "→ ";
+            return {
+              summary: arrow + esc(body.slice(0, 60)),
+              detail: linkify(body),
+            };
+          }
+          default:
+            return { summary: esc(type), detail: "" };
+        }
+      }
+
+      // Legacy fallback: kept verbatim from earlier so a transient activity
+      // endpoint failure still renders something. The body of the original
+      // renderConvoLog is moved here.
+      function legacyRenderConvoLog() {
         const container = $("convo-entries");
         const log = currentLead?.conversation_log || [];
         const displayName = currentLead
@@ -2609,6 +3284,14 @@
           })
           .join("");
         container.scrollTop = container.scrollHeight;
+      }
+
+      // Public name kept for the existing call sites (openModal, send-email
+      // success, note save, file upload, etc.). All of them now drive the
+      // unified timeline; the legacy renderer above is only used as a
+      // transient-failure fallback inside refreshActivityTimeline.
+      function renderConvoLog() {
+        refreshActivityTimeline();
       }
 
       // ── Helpers ──
