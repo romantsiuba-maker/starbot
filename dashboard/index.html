@@ -14,6 +14,17 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <!-- PR 48: Leaflet + Leaflet.markercluster (map view) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+    />
 
     <style>
       /* ── Reset ── */
@@ -1167,6 +1178,399 @@
       .hidden {
         display: none !important;
       }
+
+      /* ── PR 48: Map view + split layout ── */
+      .split-container {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 56px);
+        overflow: hidden;
+      }
+      .split-pane-map {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-height: 200px;
+        background: var(--bg-elevated);
+      }
+      .split-pane-kanban {
+        flex: 1;
+        min-height: 200px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .split-pane-kanban .board {
+        flex: 1;
+        min-height: 0;
+        overflow-x: auto;
+        overflow-y: auto;
+      }
+      .split-handle {
+        height: 8px;
+        background: var(--bg-page);
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        cursor: row-resize;
+        flex-shrink: 0;
+        position: relative;
+        transition: background 120ms ease;
+      }
+      .split-handle:hover,
+      .split-handle.dragging {
+        background: var(--accent);
+        opacity: 0.6;
+      }
+      .split-handle::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 32px;
+        height: 2px;
+        background: var(--text-tertiary);
+        border-radius: 1px;
+      }
+
+      .map-filters {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        padding: 8px 16px;
+        background: var(--bg-surface);
+        backdrop-filter: blur(var(--glass-blur));
+        border-bottom: 1px solid var(--glass-border);
+        flex-wrap: wrap;
+        font-size: 12px;
+      }
+      .map-filters .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .map-filters label {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-tertiary);
+      }
+      .map-filters .multi-pop {
+        position: relative;
+      }
+      .map-filters .multi-toggle {
+        background: var(--bg-elevated);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 6px 28px 6px 10px;
+        font: 500 12px var(--font-body);
+        cursor: pointer;
+        position: relative;
+        min-width: 120px;
+        text-align: left;
+      }
+      .map-filters .multi-toggle::after {
+        content: "▾";
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-tertiary);
+        font-size: 9px;
+      }
+      .map-filters .multi-toggle:hover {
+        border-color: var(--border-hover);
+      }
+      .map-filters .multi-menu {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 6px;
+        min-width: 180px;
+        z-index: 600;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+        max-height: 280px;
+        overflow-y: auto;
+      }
+      .map-filters .multi-menu label.opt {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 6px;
+        cursor: pointer;
+        color: var(--text-primary);
+        font: 400 12px var(--font-body);
+        text-transform: none;
+        letter-spacing: 0;
+        border-radius: var(--radius-sm);
+      }
+      .map-filters .multi-menu label.opt:hover {
+        background: var(--bg-surface-solid);
+      }
+      .map-filters .multi-menu input[type="checkbox"] {
+        accent-color: var(--accent);
+        margin: 0;
+      }
+      .map-filters select,
+      .map-filters input[type="text"] {
+        background: var(--bg-elevated);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 6px 10px;
+        font: 500 12px var(--font-body);
+        min-width: 140px;
+      }
+      .map-filters input[type="text"]:focus,
+      .map-filters select:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .map-filters .filter-reset {
+        background: transparent;
+        color: var(--text-secondary);
+        border: 1px solid transparent;
+        padding: 6px 10px;
+        cursor: pointer;
+        font: 500 12px var(--font-body);
+        border-radius: var(--radius-sm);
+      }
+      .map-filters .filter-reset:hover {
+        color: var(--text-primary);
+        background: var(--bg-elevated);
+      }
+
+      .map-and-panel {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 280px;
+        min-height: 0;
+      }
+      #leads-map {
+        height: 100%;
+        width: 100%;
+        background: #0d1419;
+      }
+      .needs-location {
+        background: var(--bg-surface);
+        backdrop-filter: blur(var(--glass-blur));
+        border-left: 1px solid var(--glass-border);
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+      .needs-location-header {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--glass-border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-secondary);
+        flex-shrink: 0;
+      }
+      .needs-location-header .count {
+        background: var(--pill-bg);
+        border: 1px solid var(--pill-border);
+        border-radius: 10px;
+        padding: 1px 7px;
+        font-size: 10px;
+        font-weight: 400;
+        color: var(--text-tertiary);
+      }
+      .needs-location-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 6px;
+      }
+      .needs-row {
+        padding: 8px 10px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        border: 1px solid transparent;
+        transition: background 0.12s, border-color 0.12s;
+      }
+      .needs-row:hover {
+        background: var(--bg-elevated);
+        border-color: var(--border-hover);
+      }
+      .needs-row .name {
+        font-size: 13px;
+        color: var(--text-primary);
+        font-weight: 500;
+      }
+      .needs-row .meta {
+        font-size: 11px;
+        color: var(--text-tertiary);
+      }
+      .needs-empty {
+        padding: 16px;
+        color: var(--text-tertiary);
+        font-size: 12px;
+        text-align: center;
+      }
+      .needs-status-pill {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 9px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 1px 6px;
+        border-radius: 8px;
+        margin-left: 6px;
+      }
+      .needs-status-failed {
+        background: rgba(248, 113, 113, 0.12);
+        color: var(--danger);
+        border: 1px solid rgba(248, 113, 113, 0.25);
+      }
+      .needs-status-no_postcode {
+        background: rgba(136, 136, 136, 0.12);
+        color: var(--text-secondary);
+        border: 1px solid var(--border);
+      }
+      .needs-status-pending {
+        background: rgba(251, 191, 36, 0.12);
+        color: var(--warning);
+        border: 1px solid rgba(251, 191, 36, 0.25);
+      }
+
+      /* Leaflet dark-theme polish */
+      .leaflet-container {
+        background: #0d1419;
+        font-family: var(--font-body);
+      }
+      .leaflet-tile-pane { filter: brightness(0.7) saturate(0.85); }
+      .leaflet-bar {
+        background: var(--bg-surface) !important;
+        backdrop-filter: blur(var(--glass-blur));
+        border: 1px solid var(--glass-border) !important;
+      }
+      .leaflet-bar a {
+        background: transparent !important;
+        color: var(--text-primary) !important;
+        border-bottom-color: var(--glass-border) !important;
+      }
+      .leaflet-bar a:hover {
+        background: var(--bg-elevated) !important;
+      }
+      .leaflet-control-attribution {
+        background: rgba(10, 14, 20, 0.75) !important;
+        color: var(--text-tertiary) !important;
+      }
+      .leaflet-control-attribution a {
+        color: var(--accent) !important;
+      }
+      .marker-cluster {
+        background: rgba(45, 182, 183, 0.25);
+        border: 1px solid var(--accent);
+        border-radius: 50%;
+      }
+      .marker-cluster div {
+        background: var(--accent);
+        color: #fff;
+        font: 600 12px var(--font-body);
+        border-radius: 50%;
+        margin: 3px;
+        width: calc(100% - 6px);
+        height: calc(100% - 6px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .leaflet-popup-content-wrapper {
+        background: var(--bg-surface);
+        backdrop-filter: blur(var(--glass-blur));
+        color: var(--text-primary);
+        border: 1px solid var(--glass-border);
+      }
+      .leaflet-popup-tip {
+        background: var(--bg-surface-solid);
+      }
+      .leaflet-popup-content { font: 500 12px var(--font-body); margin: 10px 14px; }
+      .leaflet-popup-content .pop-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+      .leaflet-popup-content .pop-meta { color: var(--text-secondary); font-size: 11px; }
+
+      /* Postcode section in modal */
+      .modal-postcode {
+        display: flex;
+        gap: 8px;
+        align-items: stretch;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--glass-border);
+        background: var(--bg-elevated);
+      }
+      .modal-postcode input {
+        flex: 1;
+        background: var(--bg-surface-solid);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 8px 10px;
+        font: 500 13px var(--font-body);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .modal-postcode input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .modal-postcode button {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: var(--radius-sm);
+        padding: 0 14px;
+        font: 600 12px var(--font-body);
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .modal-postcode button:hover { background: var(--accent-hover); }
+      .modal-postcode button:disabled { opacity: 0.5; cursor: not-allowed; }
+      .modal-postcode .status {
+        font: 500 11px var(--font-mono);
+        align-self: center;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .modal-postcode .status.success { color: var(--success); }
+      .modal-postcode .status.failed { color: var(--danger); }
+      .modal-postcode .status.pending { color: var(--warning); }
+
+      /* Mobile: stack panel below map */
+      @media (max-width: 720px) {
+        .map-and-panel {
+          grid-template-columns: 1fr;
+          grid-template-rows: 1fr auto;
+        }
+        .needs-location {
+          border-left: none;
+          border-top: 1px solid var(--glass-border);
+          max-height: 180px;
+        }
+        .map-filters {
+          padding: 6px 10px;
+          gap: 6px;
+        }
+        .map-filters .multi-toggle,
+        .map-filters select,
+        .map-filters input[type="text"] {
+          min-width: 0;
+          flex: 1 1 auto;
+        }
+      }
     </style>
   </head>
   <body>
@@ -1223,13 +1627,60 @@
         <button class="logout-btn" id="logout-btn">Sign out</button>
       </div>
 
-      <!-- Loading -->
-      <div id="board-loading" class="loading-wrapper">
-        <div class="spinner"></div>
+      <!-- PR 48: split container, map on top, kanban below -->
+      <div class="split-container" id="split-container">
+        <div class="split-pane-map" id="split-pane-map">
+          <div class="map-filters">
+            <div class="filter-group">
+              <label>Status</label>
+              <div class="multi-pop" id="map-filter-status">
+                <button type="button" class="multi-toggle" data-role="toggle">All statuses</button>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label>Venue type</label>
+              <div class="multi-pop" id="map-filter-venue">
+                <button type="button" class="multi-toggle" data-role="toggle">Any venue</button>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label>Campaign</label>
+              <select id="map-filter-campaign">
+                <option value="">Any campaign</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Search</label>
+              <input
+                type="text"
+                id="map-filter-search"
+                placeholder="Name or phone"
+                autocomplete="off"
+              />
+            </div>
+            <button type="button" class="filter-reset" id="map-filter-reset">Reset</button>
+          </div>
+          <div class="map-and-panel">
+            <div id="leads-map"></div>
+            <aside class="needs-location" id="needs-location">
+              <div class="needs-location-header">
+                Needs location
+                <span class="count" id="needs-location-count">0</span>
+              </div>
+              <div class="needs-location-list" id="needs-location-list">
+                <div class="needs-empty">Loading…</div>
+              </div>
+            </aside>
+          </div>
+        </div>
+        <div class="split-handle" id="split-handle" role="separator" aria-orientation="horizontal" aria-label="Resize map and Kanban"></div>
+        <div class="split-pane-kanban">
+          <div id="board-loading" class="loading-wrapper">
+            <div class="spinner"></div>
+          </div>
+          <div id="board" class="board hidden"></div>
+        </div>
       </div>
-
-      <!-- Kanban Board -->
-      <div id="board" class="board hidden"></div>
     </div>
 
     <!-- ── Lead Detail Modal ── -->
@@ -1248,6 +1699,19 @@
 
         <!-- Compact contact row -->
         <div class="modal-contact-row" id="modal-contact-row"></div>
+
+        <!-- PR 48: Venue postcode input for manual backfill -->
+        <div class="modal-postcode" id="modal-postcode" hidden>
+          <input
+            type="text"
+            id="modal-postcode-input"
+            placeholder="Venue postcode"
+            maxlength="10"
+            autocomplete="off"
+          />
+          <button type="button" id="modal-postcode-save">Save and locate</button>
+          <span class="status" id="modal-postcode-status"></span>
+        </div>
 
         <div class="modal-body">
           <!-- Qualification (hidden when all 3 values empty) -->
@@ -1384,6 +1848,13 @@
     <!-- ── Scripts ── -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+    <!-- PR 48: Leaflet + Leaflet.markercluster (map view) -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
     <script>
       // ── Config ──
@@ -2195,8 +2666,491 @@
         return `${day} ${mon} ${h}:${m}`;
       }
 
+      // ──────────────────────────────────────────────────────────────
+      // PR 48: Map view
+      // ──────────────────────────────────────────────────────────────
+
+      // Pulls each status colour from the existing CSS variables so the map
+      // dots stay in sync with the Kanban column dots if the palette ever
+      // changes. Falls back to a neutral grey if a status is unknown.
+      function statusColour(status) {
+        const css = getComputedStyle(document.documentElement);
+        const v = (name) => css.getPropertyValue(name).trim() || "#888";
+        const map = {
+          new: v("--accent"),
+          contacted: v("--info"),
+          interested: v("--warning"),
+          negotiating: v("--warning"),
+          won: v("--success"),
+          lost: v("--danger"),
+        };
+        return map[status] || v("--text-secondary");
+      }
+
+      const SPLIT_KEY = "starbot_dashboard_split_v1";
+      const MAP_DEFAULT_RATIO = 0.55;
+      const ACTIVE_STATUSES = ["new", "contacted", "interested", "negotiating"];
+      const VENUE_TYPES = [
+        "retail",
+        "office",
+        "hospitality",
+        "shopping_centre",
+        "gym",
+        "transport_hub",
+        "education",
+        "other",
+      ];
+
+      const mapState = {
+        map: null,
+        cluster: null,
+        markers: new Map(), // lead id -> marker
+        geoLeads: [],
+        noLocationLeads: [],
+        filters: {
+          status: new Set(ACTIVE_STATUSES),
+          venueType: new Set(VENUE_TYPES),
+          campaign: "",
+          search: "",
+        },
+      };
+
+      function applyStoredSplit() {
+        const container = $("split-container");
+        const mapPane = $("split-pane-map");
+        if (!container || !mapPane) return;
+        let ratio = parseFloat(localStorage.getItem(SPLIT_KEY));
+        if (!Number.isFinite(ratio) || ratio < 0.15 || ratio > 0.85) {
+          ratio = MAP_DEFAULT_RATIO;
+        }
+        const total = container.clientHeight;
+        if (total > 0) {
+          mapPane.style.height = Math.round(total * ratio) + "px";
+        }
+      }
+
+      function setupSplit() {
+        const handle = $("split-handle");
+        const container = $("split-container");
+        const mapPane = $("split-pane-map");
+        if (!handle || !container || !mapPane) return;
+
+        let dragging = false;
+        const onMove = (clientY) => {
+          if (!dragging) return;
+          const rect = container.getBoundingClientRect();
+          const y = clientY - rect.top;
+          const min = 200;
+          const max = rect.height - 200;
+          const clamped = Math.max(min, Math.min(max, y));
+          mapPane.style.height = clamped + "px";
+          if (mapState.map) mapState.map.invalidateSize();
+        };
+        const onUp = () => {
+          if (!dragging) return;
+          dragging = false;
+          handle.classList.remove("dragging");
+          const ratio = mapPane.clientHeight / container.clientHeight;
+          if (Number.isFinite(ratio)) {
+            localStorage.setItem(SPLIT_KEY, ratio.toFixed(4));
+          }
+          window.removeEventListener("pointermove", pointerMove);
+          window.removeEventListener("pointerup", onUp);
+        };
+        const pointerMove = (e) => onMove(e.clientY);
+
+        handle.addEventListener("pointerdown", (e) => {
+          dragging = true;
+          handle.classList.add("dragging");
+          e.preventDefault();
+          window.addEventListener("pointermove", pointerMove);
+          window.addEventListener("pointerup", onUp, { once: false });
+        });
+
+        window.addEventListener("resize", () => {
+          if (mapState.map) mapState.map.invalidateSize();
+        });
+      }
+
+      function setupMap() {
+        if (mapState.map || !window.L) return;
+        const el = $("leads-map");
+        if (!el) return;
+        const map = L.map(el, {
+          zoomControl: true,
+          attributionControl: true,
+          worldCopyJump: false,
+          maxBounds: [
+            [49.5, -8.5],
+            [61, 2],
+          ],
+          maxBoundsViscosity: 0.7,
+        }).setView([54.5, -3.0], 6);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19,
+          attribution: "© OpenStreetMap contributors",
+          crossOrigin: true,
+        }).addTo(map);
+
+        const cluster = L.markerClusterGroup({
+          showCoverageOnHover: false,
+          spiderfyOnMaxZoom: true,
+          maxClusterRadius: 40,
+        });
+        map.addLayer(cluster);
+
+        mapState.map = map;
+        mapState.cluster = cluster;
+
+        // Initial sizing pass once the pane has dimensions
+        setTimeout(() => map.invalidateSize(), 50);
+      }
+
+      function buildMarker(lead) {
+        const color = statusColour(lead.status || "new");
+        const marker = L.circleMarker([lead.venue_lat, lead.venue_lng], {
+          radius: 8,
+          weight: 1,
+          color: "#0a0e14",
+          fillColor: color,
+          fillOpacity: 0.85,
+        });
+        const meta = [
+          lead.status,
+          lead.venue_type ? lead.venue_type.replace(/_/g, " ") : null,
+          lead.venue_postcode || null,
+        ]
+          .filter(Boolean)
+          .join(" · ");
+        marker.bindPopup(
+          `<div class="pop-name">${escapeHtmlAttr(lead.name || "(no name)")}</div>` +
+            (meta ? `<div class="pop-meta">${escapeHtmlAttr(meta)}</div>` : "")
+        );
+        marker.on("click", () => {
+          openLeadModalById(lead.id);
+        });
+        return marker;
+      }
+
+      function escapeHtmlAttr(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      async function openLeadModalById(id) {
+        let lead = leads.find((l) => l.id === id);
+        if (!lead) {
+          // Map data can include leads not yet in the kanban cache (e.g. a
+          // recently inserted lead). Fall through to a one-row fetch.
+          const { data } = await sb
+            .from("starbot_leads")
+            .select("*")
+            .eq("id", id)
+            .maybeSingle();
+          if (!data) return;
+          lead = data;
+          leads.unshift(data);
+        }
+        openModal(lead);
+      }
+
+      function leadMatchesFilters(lead) {
+        const s = mapState.filters.status;
+        if (s.size > 0 && !s.has(lead.status || "new")) return false;
+        const v = mapState.filters.venueType;
+        if (lead.venue_type && v.size > 0 && !v.has(lead.venue_type)) return false;
+        if (mapState.filters.campaign && lead.utm_campaign !== mapState.filters.campaign) {
+          return false;
+        }
+        const q = mapState.filters.search.trim().toLowerCase();
+        if (q) {
+          const hay = `${lead.name || ""} ${lead.phone || ""}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      }
+
+      function renderMarkers() {
+        if (!mapState.cluster) return;
+        mapState.cluster.clearLayers();
+        mapState.markers.clear();
+        for (const lead of mapState.geoLeads) {
+          if (!leadMatchesFilters(lead)) continue;
+          const m = buildMarker(lead);
+          mapState.markers.set(lead.id, m);
+          mapState.cluster.addLayer(m);
+        }
+      }
+
+      function renderNoLocation() {
+        const list = $("needs-location-list");
+        const count = $("needs-location-count");
+        if (!list || !count) return;
+        const filtered = mapState.noLocationLeads.filter((l) => leadMatchesFilters(l));
+        count.textContent = filtered.length;
+        if (filtered.length === 0) {
+          list.innerHTML =
+            '<div class="needs-empty">All located. New leads without a postcode will appear here.</div>';
+          return;
+        }
+        list.innerHTML = filtered
+          .map((l) => {
+            const status = l.venue_geocode_status || "no_postcode";
+            return `<div class="needs-row" data-id="${escapeHtmlAttr(l.id)}">
+              <div class="name">${escapeHtmlAttr(l.name || "(no name)")}
+                <span class="needs-status-pill needs-status-${status}">${status.replace("_", " ")}</span>
+              </div>
+              <div class="meta">${escapeHtmlAttr([l.venue_type ? l.venue_type.replace(/_/g, " ") : null, l.status, l.venue_postcode || null].filter(Boolean).join(" · "))}</div>
+            </div>`;
+          })
+          .join("");
+        list.querySelectorAll(".needs-row").forEach((row) => {
+          row.addEventListener("click", () => openLeadModalById(row.dataset.id));
+        });
+      }
+
+      async function fetchGeoLeads() {
+        try {
+          const r = await fetch("/api/leads/geo", { cache: "no-store" });
+          if (!r.ok) throw new Error(`geo ${r.status}`);
+          const body = await r.json();
+          mapState.geoLeads = body.leads || [];
+        } catch (err) {
+          console.error("fetchGeoLeads", err);
+          mapState.geoLeads = [];
+        }
+      }
+
+      async function fetchNoLocationLeads() {
+        try {
+          const r = await fetch("/api/leads/no-location", { cache: "no-store" });
+          if (!r.ok) throw new Error(`no-location ${r.status}`);
+          const body = await r.json();
+          mapState.noLocationLeads = body.leads || [];
+        } catch (err) {
+          console.error("fetchNoLocationLeads", err);
+          mapState.noLocationLeads = [];
+        }
+      }
+
+      async function refreshMapData() {
+        await Promise.all([fetchGeoLeads(), fetchNoLocationLeads()]);
+        rebuildCampaignOptions();
+        renderMarkers();
+        renderNoLocation();
+      }
+
+      function rebuildCampaignOptions() {
+        const sel = $("map-filter-campaign");
+        if (!sel) return;
+        const current = sel.value;
+        const seen = new Set();
+        for (const l of [...mapState.geoLeads, ...mapState.noLocationLeads]) {
+          if (l.utm_campaign) seen.add(l.utm_campaign);
+        }
+        const sorted = [...seen].sort((a, b) => a.localeCompare(b));
+        sel.innerHTML = '<option value="">Any campaign</option>' +
+          sorted.map((c) => `<option value="${escapeHtmlAttr(c)}">${escapeHtmlAttr(c)}</option>`).join("");
+        if (current && sorted.includes(current)) sel.value = current;
+      }
+
+      // Generic multi-select popover wired by id. Calls onChange after each tick.
+      function setupMulti(rootId, label, allValues, selectedSet, onChange) {
+        const root = $(rootId);
+        if (!root) return;
+        const toggle = root.querySelector(".multi-toggle");
+        let menu = null;
+        const updateLabel = () => {
+          if (selectedSet.size === 0 || selectedSet.size === allValues.length) {
+            toggle.textContent = `All ${label}`;
+          } else if (selectedSet.size === 1) {
+            toggle.textContent = [...selectedSet][0].replace(/_/g, " ");
+          } else {
+            toggle.textContent = `${selectedSet.size} ${label}`;
+          }
+        };
+        updateLabel();
+
+        const closeMenu = () => {
+          if (menu) {
+            menu.remove();
+            menu = null;
+            document.removeEventListener("click", outsideClick, true);
+          }
+        };
+        const outsideClick = (e) => {
+          if (menu && !menu.contains(e.target) && e.target !== toggle) closeMenu();
+        };
+        toggle.addEventListener("click", () => {
+          if (menu) { closeMenu(); return; }
+          menu = document.createElement("div");
+          menu.className = "multi-menu";
+          menu.innerHTML = allValues
+            .map((v) => `<label class="opt"><input type="checkbox" value="${escapeHtmlAttr(v)}"${selectedSet.has(v) ? " checked" : ""}/><span>${escapeHtmlAttr(v.replace(/_/g, " "))}</span></label>`)
+            .join("");
+          menu.addEventListener("change", (e) => {
+            const cb = e.target;
+            if (cb && cb.matches('input[type="checkbox"]')) {
+              if (cb.checked) selectedSet.add(cb.value);
+              else selectedSet.delete(cb.value);
+              updateLabel();
+              onChange();
+            }
+          });
+          root.appendChild(menu);
+          setTimeout(() => document.addEventListener("click", outsideClick, true), 0);
+        });
+      }
+
+      function setupFilters() {
+        const refresh = () => {
+          renderMarkers();
+          renderNoLocation();
+        };
+        setupMulti("map-filter-status", "statuses",
+          ["new", "contacted", "interested", "negotiating", "won", "lost"],
+          mapState.filters.status, refresh);
+        setupMulti("map-filter-venue", "venue",
+          VENUE_TYPES, mapState.filters.venueType, refresh);
+        const camp = $("map-filter-campaign");
+        if (camp) camp.addEventListener("change", () => {
+          mapState.filters.campaign = camp.value;
+          refresh();
+        });
+        const search = $("map-filter-search");
+        if (search) search.addEventListener("input", () => {
+          mapState.filters.search = search.value || "";
+          refresh();
+        });
+        const reset = $("map-filter-reset");
+        if (reset) reset.addEventListener("click", () => {
+          mapState.filters.status = new Set(ACTIVE_STATUSES);
+          mapState.filters.venueType = new Set(VENUE_TYPES);
+          mapState.filters.campaign = "";
+          mapState.filters.search = "";
+          if (camp) camp.value = "";
+          if (search) search.value = "";
+          // Re-paint the multi-toggle labels
+          document.querySelectorAll(".multi-pop .multi-toggle").forEach((t) => {
+            const root = t.parentElement;
+            if (root.id === "map-filter-status") t.textContent = "All statuses";
+            if (root.id === "map-filter-venue") t.textContent = "All venue";
+          });
+          refresh();
+        });
+      }
+
+      function setupPostcodeForm() {
+        const wrap = $("modal-postcode");
+        const input = $("modal-postcode-input");
+        const btn = $("modal-postcode-save");
+        const status = $("modal-postcode-status");
+        if (!wrap || !input || !btn) return;
+
+        const setStatus = (kind, text) => {
+          status.className = "status" + (kind ? " " + kind : "");
+          status.textContent = text || "";
+        };
+
+        btn.addEventListener("click", async () => {
+          if (!currentLead) return;
+          const postcode = (input.value || "").trim();
+          if (!postcode) {
+            setStatus("failed", "Enter a postcode");
+            return;
+          }
+          btn.disabled = true;
+          setStatus("pending", "Locating…");
+          try {
+            const r = await fetch(`/api/leads/${encodeURIComponent(currentLead.id)}/postcode`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ postcode }),
+            });
+            if (!r.ok) {
+              const body = await r.json().catch(() => ({}));
+              if (r.status === 502) setStatus("failed", "Geocoder unavailable");
+              else setStatus("failed", body.error || "Failed");
+              return;
+            }
+            const result = await r.json();
+            const ok = result.venue_geocode_status === "success";
+            setStatus(ok ? "success" : "failed",
+              ok ? "Located" : "Not found");
+            Object.assign(currentLead, result);
+            await refreshMapData();
+            updatePostcodeFormForLead(currentLead);
+          } catch (err) {
+            console.error("postcode save", err);
+            setStatus("failed", "Network error");
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      }
+
+      // The modal calls this whenever it shows a lead, so the postcode input
+      // reflects whatever state that lead is in (success / failed / pending /
+      // no_postcode). Wraps the existing openModal call site without forking it.
+      function updatePostcodeFormForLead(lead) {
+        const wrap = $("modal-postcode");
+        const input = $("modal-postcode-input");
+        const status = $("modal-postcode-status");
+        if (!wrap || !input || !status) return;
+        // Always visible — manager may want to correct an existing postcode.
+        wrap.hidden = false;
+        input.value = lead.venue_postcode || "";
+        const s = lead.venue_geocode_status || "no_postcode";
+        status.className = "status " + (s === "success" ? "success" : s === "failed" ? "failed" : s === "pending" ? "pending" : "");
+        status.textContent = s === "success"
+          ? "Located"
+          : s === "failed"
+          ? "Not found"
+          : s === "pending"
+          ? "Pending"
+          : "";
+      }
+
+      // Hook into the existing openModal so the postcode form follows the
+      // currently shown lead. We wrap rather than edit to keep diff small.
+      const _origOpenModal = openModal;
+      openModal = function (lead) {
+        _origOpenModal(lead);
+        updatePostcodeFormForLead(lead);
+      };
+
+      async function initMapView() {
+        applyStoredSplit();
+        setupSplit();
+        setupMap();
+        setupFilters();
+        setupPostcodeForm();
+        await refreshMapData();
+      }
+
       // ── Boot ──
-      init();
+      (async () => {
+        await init();
+        // Map view requires the dashboard to be visible (post-auth). Wait
+        // until #dashboard loses .hidden before initialising Leaflet so the
+        // map container has real dimensions.
+        const dash = $("dashboard");
+        if (dash && dash.classList.contains("hidden")) {
+          const obs = new MutationObserver(() => {
+            if (!dash.classList.contains("hidden")) {
+              obs.disconnect();
+              initMapView();
+            }
+          });
+          obs.observe(dash, { attributes: true, attributeFilter: ["class"] });
+        } else {
+          initMapView();
+        }
+      })();
     </script>
   </body>
 </html>

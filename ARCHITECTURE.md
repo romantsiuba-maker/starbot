@@ -26,6 +26,8 @@ No frameworks. No build step. No AI agents.
 - Google Tag Manager (`GTM-KLD4PZGM`)
 - SortableJS (CDN) for drag-and-drop
 - Supabase JS v2 (CDN) for frontend auth + queries
+- Leaflet 1.9.4 + Leaflet.markercluster 1.5.3 (CDN) for the map view (PR 48)
+- postcodes.io for UK postcode → lat/lng geocoding (no key)
 
 ---
 
