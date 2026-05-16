@@ -12,6 +12,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { createHmac, randomBytes, timingSafeEqual } from "crypto";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
+import { geocodePostcode, geocodeColumns } from "../../lib/postcodes.js";
 
 export const config = { api: { bodyParser: false } };
 
@@ -50,6 +51,7 @@ const FIELD_KEYS = {
     "foot_traffic",
     "headcount",
   ],
+  venuePostcode: ["venue_postcode", "postcode", "venue_post_code"],
 };
 
 export default async function handler(req, res) {
@@ -210,6 +212,21 @@ async function buildRow({ leadgenId, value, fields, sb }) {
   const company = pickField(fieldMap, FIELD_KEYS.companyName);
   const city = pickField(fieldMap, FIELD_KEYS.city);
   const footTraffic = pickField(fieldMap, FIELD_KEYS.footTraffic);
+  const rawPostcode = pickField(fieldMap, FIELD_KEYS.venuePostcode);
+
+  // Geocode in-line. The helper handles timeout (4s) and maps every error
+  // path onto a non-throwing result, so lead insertion is never blocked
+  // by a postcodes.io blip — at worst we fall through to venue_geocode_status
+  // = 'pending' and the lead surfaces in the manual-backfill side panel.
+  const geocode = rawPostcode
+    ? await geocodePostcode(rawPostcode)
+    : { status: "no_postcode" };
+  if (geocode.status === "pending") {
+    console.error(
+      `meta-lead-ads: postcode geocode pending for leadgen ${leadgenId}: ${geocode.error}`
+    );
+  }
+  const geocodePatch = geocodeColumns(geocode);
 
   const refCode = await reserveRefCode(sb);
 
@@ -243,6 +260,7 @@ async function buildRow({ leadgenId, value, fields, sb }) {
     status: "new",
     stage_entered_at: nowIso,
     last_activity_at: nowIso,
+    ...geocodePatch,
   };
 }
 

@@ -20,7 +20,7 @@ Never guess the cause of a bug. Read the code, verify step by step.
 
 All dashboard code lives in `dashboard/index.html` — HTML, CSS, and JS in one file. Do not split it into separate files. Do not add a build step. Do not add npm scripts for the frontend.
 
-CDN libraries only: Supabase JS, SortableJS. No other dependencies in the frontend.
+CDN libraries only: Supabase JS, SortableJS, Leaflet, Leaflet.markercluster. No other dependencies in the frontend.
 
 ---
 
