@@ -3617,21 +3617,23 @@
       // PR 48: Map view
       // ──────────────────────────────────────────────────────────────
 
-      // Pulls each status colour from the existing CSS variables so the map
-      // dots stay in sync with the Kanban column dots if the palette ever
-      // changes. Falls back to a neutral grey if a status is unknown.
+      // PR 50: 3-colour traffic-light scheme for map dots.
+      //   green  = won
+      //   amber  = new / contacted / interested / negotiating (any active stage)
+      //   red    = lost / dead / cold
+      // Colours pull from the brand CSS variables (--success #22c55e,
+      // --warning #fbbf24, --danger #f87171) so the map stays in sync if the
+      // palette ever shifts. Kanban status pills keep their per-stage colours
+      // — only the map collapses the 6 stages into the 3-colour traffic light.
       function statusColour(status) {
         const css = getComputedStyle(document.documentElement);
         const v = (name) => css.getPropertyValue(name).trim() || "#888";
-        const map = {
-          new: v("--accent"),
-          contacted: v("--info"),
-          interested: v("--warning"),
-          negotiating: v("--warning"),
-          won: v("--success"),
-          lost: v("--danger"),
-        };
-        return map[status] || v("--text-secondary");
+        if (status === "won") return v("--success");
+        if (status === "lost" || status === "dead" || status === "cold") {
+          return v("--danger");
+        }
+        // Any other status (including unknown / null) is treated as in-play.
+        return v("--warning");
       }
 
       // PR 49: localStorage keys for the new command-dashboard layout

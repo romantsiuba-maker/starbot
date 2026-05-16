@@ -21,11 +21,12 @@ export default async function handler(req, res) {
 
   try {
     const sb = createClient(url, key);
+    // PR 50: don't exclude won/lost/dead — the 3-colour traffic light on
+    // the map needs green dots for won leads and red dots for lost/dead.
     const { data, error } = await sb
       .from("starbot_leads")
       .select(SELECT_COLS)
       .eq("venue_geocode_status", "success")
-      .not("status", "in", "(won,lost,dead)")
       .not("venue_lat", "is", null)
       .not("venue_lng", "is", null);
 
