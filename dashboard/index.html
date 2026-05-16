@@ -2787,9 +2787,14 @@
           maxBoundsViscosity: 0.7,
         }).setView([54.5, -3.0], 6);
 
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        // CartoDB Positron greyscale tiles — quieter base map that lets the
+        // status-coloured dots carry the visual weight. {r} resolves to '@2x'
+        // on hi-DPI screens.
+        L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
           maxZoom: 19,
-          attribution: "© OpenStreetMap contributors",
+          attribution:
+            '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: "abcd",
           crossOrigin: true,
         }).addTo(map);
 
