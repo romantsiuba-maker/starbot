@@ -1,8 +1,18 @@
 {
   "version": 2,
+  "redirects": [
+    {
+      "source": "/dashboard",
+      "destination": "https://crm.starbot.co.uk/dashboard",
+      "permanent": true
+    },
+    {
+      "source": "/dashboard/:path*",
+      "destination": "https://crm.starbot.co.uk/dashboard/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
-    { "source": "/dashboard", "destination": "/dashboard/index.html" },
-    { "source": "/dashboard/", "destination": "/dashboard/index.html" },
     { "source": "/thanks", "destination": "/api/thanks" },
     { "source": "/thanks/", "destination": "/api/thanks" }
   ],
