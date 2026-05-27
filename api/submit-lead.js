@@ -1,4 +1,5 @@
 import { createHash } from "crypto";
+import { pushToZoho } from "../lib/zoho-client.js";
 
 const META_PIXEL_ID = "831360616646272";
 const TIKTOK_EVENTS_API_URL =
@@ -141,133 +142,6 @@ function sendTikTokEvent({
     .catch((err) => console.error("TikTok Events API error:", err));
 }
 
-function buildZohoDescription(message, quiz, utm) {
-  const utmBlock =
-    `UTM Source: ${utm.source || "-"}\n` +
-    `UTM Medium: ${utm.medium || "-"}\n` +
-    `UTM Campaign: ${utm.campaign || "-"}\n` +
-    `UTM Content: ${utm.content || "-"}`;
-  const quizBlock =
-    `Location type: ${quiz.locationType || "-"}\n` +
-    `Coffee timeline: ${quiz.coffeeTimeline || "-"}\n` +
-    `London zone: ${quiz.londonZone || "-"}`;
-
-  const sections = [];
-  if (message && message.trim()) sections.push(message.trim());
-  sections.push(quizBlock);
-  sections.push(utmBlock);
-  return sections.join("\n\n---\n");
-}
-
-function pushToZoho({
-  firstName,
-  lastName,
-  email,
-  phone,
-  company,
-  role,
-  message,
-  locationType,
-  coffeeTimeline,
-  londonZone,
-  utmSource,
-  utmMedium,
-  utmCampaign,
-  utmContent,
-}) {
-  const clientId = process.env.ZOHO_CLIENT_ID;
-  const clientSecret = process.env.ZOHO_CLIENT_SECRET;
-  const refreshToken = process.env.ZOHO_REFRESH_TOKEN;
-  const accountsUrl = process.env.ZOHO_ACCOUNTS_URL;
-  const apiUrl = process.env.ZOHO_API_URL;
-
-  if (!clientId || !clientSecret || !refreshToken || !accountsUrl || !apiUrl) {
-    console.warn("Zoho env vars not all set, skipping Zoho push");
-    return;
-  }
-
-  (async () => {
-    const tokenParams = new URLSearchParams({
-      grant_type: "refresh_token",
-      client_id: clientId,
-      client_secret: clientSecret,
-      refresh_token: refreshToken,
-    });
-
-    const tokenRes = await fetch(`${accountsUrl}/oauth/v2/token`, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: tokenParams.toString(),
-    });
-
-    if (!tokenRes.ok) {
-      const errText = await tokenRes.text().catch(() => "");
-      console.error("Zoho OAuth failed:", tokenRes.status, errText);
-      return;
-    }
-
-    const tokenJson = await tokenRes.json().catch(() => ({}));
-    const accessToken = tokenJson.access_token;
-    if (!accessToken) {
-      console.error(
-        "Zoho OAuth failed: no access_token in response",
-        tokenJson,
-      );
-      return;
-    }
-
-    const leadRecord = {
-      Last_Name: lastName && lastName.trim() ? lastName : "-",
-      First_Name: firstName,
-      Company: company || "-",
-      Lead_Source: "Starbot Landing Page",
-      Description: buildZohoDescription(
-        message,
-        {
-          locationType,
-          coffeeTimeline,
-          londonZone,
-        },
-        {
-          source: utmSource,
-          medium: utmMedium,
-          campaign: utmCampaign,
-          content: utmContent,
-        },
-      ),
-    };
-    if (email) leadRecord.Email = email;
-    if (phone) leadRecord.Phone = phone;
-    if (role) leadRecord.Title = role;
-
-    const leadRes = await fetch(`${apiUrl}/crm/v2/Leads`, {
-      method: "POST",
-      headers: {
-        Authorization: `Zoho-oauthtoken ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        data: [leadRecord],
-        trigger: ["workflow"],
-      }),
-    });
-
-    const leadBody = await leadRes.json().catch(() => ({}));
-    const record = leadBody?.data?.[0];
-
-    if (!leadRes.ok || record?.code !== "SUCCESS") {
-      console.error(
-        "Zoho lead push failed:",
-        leadRes.status,
-        JSON.stringify(leadBody),
-      );
-      return;
-    }
-
-    console.log("Zoho lead created:", record?.details?.id);
-  })().catch((err) => console.error("Zoho lead push error:", err));
-}
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -293,6 +167,9 @@ export default async function handler(req, res) {
       utm_campaign,
       utm_content,
       source_url,
+      venue_postcode,
+      lead_source,
+      lead_ref_code,
     } = body;
 
     // Basic validation
@@ -315,6 +192,9 @@ export default async function handler(req, res) {
     const trimmedLastName = last_name?.trim() || undefined;
     const trimmedEmail = email?.trim() || undefined;
     const trimmedPhone = phone?.trim() || undefined;
+    const trimmedPostcode = venue_postcode?.trim() || undefined;
+    const trimmedLeadSource = lead_source?.trim() || undefined;
+    const trimmedLeadRefCode = lead_ref_code?.trim() || undefined;
 
     // Fire Meta CAPI event (fire-and-forget; no-ops if META_CAPI_ACCESS_TOKEN unset)
     sendCapiEvent({
@@ -346,9 +226,12 @@ export default async function handler(req, res) {
       lastName: trimmedLastName,
       email: trimmedEmail,
       phone: trimmedPhone,
+      postcode: trimmedPostcode,
       company: company?.trim() || undefined,
       role: role?.trim() || undefined,
       message: message?.trim() || undefined,
+      leadSource: trimmedLeadSource,
+      leadRefCode: trimmedLeadRefCode,
       locationType: location_type || undefined,
       coffeeTimeline: coffee_timeline || undefined,
       londonZone: london_zone || undefined,
@@ -362,6 +245,19 @@ export default async function handler(req, res) {
     const combinedName = trimmedLastName
       ? `${trimmedFirstName} ${trimmedLastName}`
       : trimmedFirstName;
+    // /quiz collects postcode; the existing landing form does not. We
+    // forward venue_postcode + lead_ref_code to the edge function and
+    // also append them to message so an operator can pull the postcode
+    // from the lead card if the edge function ignores the new fields.
+    // Geocoding happens server-side on the v2 side per Phase 3e flow.
+    const messageWithPaperTrail = (() => {
+      const base = message?.trim() || "";
+      const annotations = [];
+      if (trimmedPostcode) annotations.push(`Postcode: ${trimmedPostcode}`);
+      if (trimmedLeadRefCode) annotations.push(`Ref: ${trimmedLeadRefCode}`);
+      if (annotations.length === 0) return base || null;
+      return [base, annotations.join(" · ")].filter(Boolean).join("\n\n");
+    })();
     const edgePayload = {
       name: combinedName,
       first_name: trimmedFirstName,
@@ -370,7 +266,7 @@ export default async function handler(req, res) {
       role: role || null,
       email: trimmedEmail || null,
       phone: trimmedPhone || null,
-      message: message?.trim() || null,
+      message: messageWithPaperTrail,
       website: website || "",
       source: source || "landing_page",
       location_type: location_type || null,
@@ -380,6 +276,8 @@ export default async function handler(req, res) {
       utm_medium: utm_medium || null,
       utm_campaign: utm_campaign || null,
       utm_content: utm_content || null,
+      venue_postcode: trimmedPostcode || null,
+      lead_ref_code: trimmedLeadRefCode || null,
     };
 
     const edgeRes = await fetch(EDGE_FUNCTION_URL, {

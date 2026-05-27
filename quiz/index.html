@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Starbot Quiz — Check If Your Location Qualifies</title>
+<meta name="description" content="Three-question quiz to check if your location qualifies for a Starbot robot barista. Zero investment, zero staff, passive revenue.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#00BFB3;--teal-d:#009E94;
+  --bg:#0a0a0a;--bg2:#111;--bg3:#181818;
+  --text:#fff;--muted:rgba(255,255,255,.55);--border:rgba(255,255,255,.1)
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+.container{width:100%;max-width:1100px;margin:0 auto;padding:0 24px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 28px;background:var(--teal);color:#fff;
+  font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1.5px;
+  border-radius:7px;border:none;cursor:pointer;text-decoration:none;
+  transition:background .15s,transform .1s;white-space:nowrap
+}
+.btn:hover{background:var(--teal-d)}
+.btn:active{transform:scale(.97)}
+.btn-lg{padding:16px 40px;font-size:20px}
+
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:999;
+  background:rgba(10,10,10,.93);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  padding:12px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px
+}
+.nav-logo img{height:34px;display:block}
+.nav-right{display:flex;align-items:center;gap:14px}
+.nav-cta{font-size:14px;padding:10px 20px}
+
+.quiz-section{
+  min-height:100dvh;
+  display:flex;align-items:center;justify-content:center;
+  padding:90px 32px 60px;
+  background:linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.65)),url('/images/starbot-lobby.jpg') center/cover no-repeat
+}
+
+.quiz-layout{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:80px;
+  align-items:center;
+  width:100%;
+  max-width:1060px
+}
+
+.quiz-hl{}
+.quiz-hl-tag{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(0,191,179,.12);border:1px solid rgba(0,191,179,.3);
+  color:var(--teal);font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  padding:5px 12px;border-radius:4px;margin-bottom:22px
+}
+.quiz-hl-tag span{width:6px;height:6px;background:var(--teal);border-radius:50%;animation:bdot 1.5s ease-in-out infinite;flex-shrink:0}
+@keyframes bdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.5)}}
+.quiz-hl h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(42px,5.5vw,70px);
+  line-height:.95;letter-spacing:.5px;
+  margin-bottom:22px
+}
+.quiz-hl h2 em{color:var(--teal);font-style:normal}
+.quiz-hl p{
+  font-size:15px;color:rgba(255,255,255,.62);
+  line-height:1.78;max-width:420px
+}
+
+.quiz-wrap{width:100%}
+.quiz-prog-track{height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin-bottom:8px;overflow:hidden}
+.quiz-prog-fill{height:100%;background:var(--teal);border-radius:2px;width:33%;transition:width .4s ease}
+.quiz-step-lbl{font-size:12px;color:rgba(255,255,255,.35);text-align:right;margin-bottom:28px;letter-spacing:.3px}
+
+.step{display:none}
+.step.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.step-q{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(24px,4vw,34px);
+  text-align:center;margin-bottom:6px;line-height:1.05
+}
+.step-hint{text-align:center;font-size:13px;color:var(--muted);margin-bottom:22px}
+.quiz-summary{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:16px;min-height:0}
+.quiz-tag{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(0,191,179,.13);border:1px solid rgba(0,191,179,.3);
+  color:var(--teal);font-size:12px;font-weight:600;letter-spacing:.2px;
+  padding:4px 11px;border-radius:20px;line-height:1.4
+}
+
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:26px}
+.opt{
+  padding:16px 10px;background:var(--bg3);border:2px solid var(--border);
+  border-radius:10px;color:var(--text);cursor:pointer;text-align:center;
+  transition:border-color .15s,background .15s;
+  display:flex;flex-direction:column;align-items:center;gap:5px
+}
+.opt:hover{border-color:rgba(0,191,179,.4);background:rgba(0,191,179,.07)}
+.opt.sel{border-color:var(--teal);background:rgba(0,191,179,.12)}
+.opt-ico{font-size:20px;line-height:1}
+.opt-lbl{font-size:12px;font-weight:600;line-height:1.3}
+.opts .opt:nth-child(7){grid-column:2}
+@media(max-width:440px){
+  .opts{grid-template-columns:1fr 1fr}
+  .opts .opt:nth-child(7){grid-column:auto}
+}
+
+.loc-input-wrap{margin-bottom:26px}
+.loc-input{
+  width:100%;padding:16px 18px;
+  background:var(--bg3);border:2px solid var(--border);
+  border-radius:10px;color:#fff;font-family:'Inter',sans-serif;font-size:16px;outline:none;
+  transition:border-color .15s
+}
+.loc-input:focus{border-color:var(--teal)}
+.loc-input::placeholder{color:rgba(255,255,255,.22)}
+
+.form-fields{display:grid;gap:13px;margin-bottom:22px}
+.field label{
+  display:block;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:rgba(255,255,255,.4);margin-bottom:6px
+}
+.field input{
+  width:100%;padding:14px 16px;
+  background:var(--bg3);border:2px solid var(--border);
+  border-radius:8px;color:#fff;font-family:'Inter',sans-serif;font-size:15px;outline:none;
+  transition:border-color .15s
+}
+.field input:focus{border-color:var(--teal)}
+.field input::placeholder{color:rgba(255,255,255,.2)}
+.field-error{font-size:12px;color:#ff6b6b;margin-top:5px;min-height:16px}
+
+.step-nav{display:flex;gap:10px;justify-content:center;align-items:center}
+.btn-back{
+  background:transparent;border:1.5px solid var(--border);color:var(--muted);
+  font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;
+  padding:11px 20px;border-radius:7px;cursor:pointer;transition:border-color .15s,color .15s
+}
+.btn-back:hover{border-color:rgba(255,255,255,.3);color:#fff}
+.btn-nxt{padding:13px 30px;font-size:16px}
+.btn-nxt:disabled{opacity:.28;cursor:not-allowed;pointer-events:none}
+.btn-submit-full{width:100%;padding:16px;font-size:17px;border-radius:9px;margin-top:2px}
+.btn-submit-full:disabled{opacity:.5;cursor:wait}
+
+.toast{
+  position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-12px);
+  background:#00BFB3;color:#003d39;font-size:14px;font-weight:700;letter-spacing:.3px;
+  padding:12px 22px;border-radius:8px;box-shadow:0 4px 20px rgba(0,191,179,.4);
+  white-space:nowrap;z-index:1000;opacity:0;pointer-events:none;
+  transition:opacity .3s,transform .3s
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.toast-err{background:#ff6b6b;color:#3d0000;box-shadow:0 4px 20px rgba(255,107,107,.4)}
+
+/* Step 4 success */
+.success-card{
+  text-align:center;padding:24px 4px;
+}
+.success-card h3{
+  font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1.05;letter-spacing:.5px;margin-bottom:10px
+}
+.success-card p{font-size:14px;color:var(--muted);line-height:1.65;margin-bottom:18px;max-width:340px;margin-left:auto;margin-right:auto}
+.refcode-box{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,191,179,.12);border:1px solid rgba(0,191,179,.3);
+  color:var(--teal);font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:22px;
+  padding:10px 18px;border-radius:8px;margin-bottom:6px
+}
+.refcode-hint{font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.4px;margin-bottom:22px}
+
+@media(max-width:860px){
+  .quiz-section{padding:82px 20px 50px;align-items:flex-start}
+  .quiz-layout{
+    grid-template-columns:1fr;
+    gap:32px;
+    max-width:540px
+  }
+  .quiz-hl{text-align:center}
+  .quiz-hl p{max-width:100%;font-size:14px}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast">We'll be in touch within 24 hours.</div>
+
+<nav>
+  <a class="nav-logo" href="/">
+    <img src="/images/starbot-logo.png" alt="Starbot" loading="eager">
+  </a>
+  <div class="nav-right">
+    <a class="btn nav-cta" href="/">BACK TO HOME</a>
+  </div>
+</nav>
+
+<section class="quiz-section" id="quiz">
+  <div class="quiz-layout">
+
+    <div class="quiz-hl">
+      <div class="quiz-hl-tag"><span></span>Partner Programme</div>
+      <h2>Check <em>your</em> location<br>in 60 seconds.</h2>
+      <p>We're looking for high-footfall locations in London: offices, universities, shopping centres, transport hubs, hotels and hospitals. Zero cost to you. You earn commission on every cup sold. Three quick questions and we'll tell you whether your space qualifies.</p>
+    </div>
+
+    <div class="quiz-wrap">
+      <div class="quiz-prog-track"><div class="quiz-prog-fill" id="prog"></div></div>
+      <div class="quiz-step-lbl" id="steplbl">Step 1 of 3</div>
+
+      <div class="step active" id="s1">
+        <div class="step-q">What type of location<br>do you have?</div>
+        <div class="step-hint">Select the option that best describes your space</div>
+        <div class="opts">
+          <button class="opt" type="button" onclick="pick(1,'office',this)"><span class="opt-ico">🏢</span><span class="opt-lbl">Office</span></button>
+          <button class="opt" type="button" onclick="pick(1,'university',this)"><span class="opt-ico">🎓</span><span class="opt-lbl">University</span></button>
+          <button class="opt" type="button" onclick="pick(1,'shopping',this)"><span class="opt-ico">🛍️</span><span class="opt-lbl">Shopping Centre</span></button>
+          <button class="opt" type="button" onclick="pick(1,'transport',this)"><span class="opt-ico">🚂</span><span class="opt-lbl">Transport Hub</span></button>
+          <button class="opt" type="button" onclick="pick(1,'hotel',this)"><span class="opt-ico">🏨</span><span class="opt-lbl">Hotel</span></button>
+          <button class="opt" type="button" onclick="pick(1,'hospital',this)"><span class="opt-ico">🏥</span><span class="opt-lbl">Hospital</span></button>
+          <button class="opt" type="button" onclick="pick(1,'other',this)"><span class="opt-ico">📍</span><span class="opt-lbl">Other</span></button>
+        </div>
+      </div>
+
+      <div class="step" id="s2">
+        <div class="quiz-summary" id="sum2"></div>
+        <div class="step-q">What is your postcode?</div>
+        <div class="step-hint">Enter the postcode of your location</div>
+        <div class="loc-input-wrap">
+          <input class="loc-input" type="text" id="f-location" placeholder="e.g. EC1A 1BB" autocomplete="postal-code" oninput="onLocInput()">
+        </div>
+        <div class="step-nav">
+          <button class="btn-back" type="button" onclick="back(2)">← BACK</button>
+          <button class="btn btn-nxt" type="button" id="n2" onclick="next(2)" disabled>NEXT →</button>
+        </div>
+      </div>
+
+      <div class="step" id="s3">
+        <div class="quiz-summary" id="sum3"></div>
+        <div class="step-q">Almost there!</div>
+        <div class="step-hint">Leave your details and we'll confirm if you qualify within 24 hours</div>
+        <form id="cform" novalidate>
+          <div class="form-fields">
+            <div class="field">
+              <label>Full Name <span style="color:var(--teal)">*</span></label>
+              <input type="text" id="f-name" placeholder="John Smith" autocomplete="name" oninput="onNameInput()" required>
+              <div class="field-error" id="err-name"></div>
+            </div>
+            <div class="field">
+              <label>Phone Number <span style="color:var(--teal)">*</span></label>
+              <input type="tel" id="f-phone" placeholder="+44 7XXX XXXXXX" autocomplete="tel" oninput="onPhoneInput()" required>
+              <div class="field-error" id="err-phone"></div>
+            </div>
+          </div>
+          <button class="btn btn-submit-full" id="btn-submit" type="submit">CHECK IF MY LOCATION QUALIFIES →</button>
+          <p style="text-align:center;font-size:12px;color:rgba(255,255,255,.22);margin-top:12px">No spam. We'll only contact you about your application.</p>
+        </form>
+        <div style="text-align:center;margin-top:16px">
+          <button class="btn-back" type="button" onclick="back(3)">← BACK</button>
+        </div>
+      </div>
+
+      <div class="step" id="s4">
+        <div class="success-card">
+          <h3>You're on the list.</h3>
+          <p>We'll review your location and get back to you within 24 hours. Save your reference code in case we connect on WhatsApp.</p>
+          <div class="refcode-box" id="refcode-display">------</div>
+          <div class="refcode-hint">Your reference code</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var ans = {};
+
+  function show(id) {
+    document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
+    if (window.innerWidth < 860) {
+      setTimeout(function(){
+        var el = document.getElementById('quiz');
+        window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - 58, behavior:'smooth'});
+      }, 60);
+    }
+  }
+
+  function setProg(step) {
+    var total = 3;
+    document.getElementById('prog').style.width = Math.round((Math.min(step,total) / total) * 100) + '%';
+    document.getElementById('steplbl').textContent = step <= total ? 'Step ' + step + ' of ' + total : 'Complete';
+  }
+
+  var locLabels = {
+    office:'Office', university:'University', shopping:'Shopping Centre',
+    transport:'Transport Hub', hotel:'Hotel', hospital:'Hospital', other:'Other'
+  };
+
+  function updateSummary(step) {
+    var el = document.getElementById('sum' + step);
+    if (!el) return;
+    var type = locLabels[ans[1]] || ans[1];
+    var text = '📍 ' + type;
+    if (step === 3 && ans.location) text += ' · ' + ans.location;
+    el.innerHTML = '<span class="quiz-tag">' + text + '</span>';
+  }
+
+  function pick(step, val, el) {
+    ans[step] = val;
+    el.closest('.opts').querySelectorAll('.opt').forEach(function(b){ b.classList.remove('sel'); });
+    el.classList.add('sel');
+    if (step === 1) {
+      setTimeout(function(){ next(1); }, 220);
+    } else {
+      var nb = document.getElementById('n' + step);
+      if (nb) nb.disabled = false;
+    }
+  }
+
+  function onLocInput() {
+    document.getElementById('n2').disabled = document.getElementById('f-location').value.trim().length === 0;
+  }
+
+  function next(step) {
+    if (step === 1) {
+      updateSummary(2);
+      show('s2'); setProg(2);
+    } else if (step === 2) {
+      ans.location = document.getElementById('f-location').value.trim();
+      updateSummary(3);
+      show('s3'); setProg(3);
+    }
+  }
+
+  function back(step) {
+    if (step === 2) { show('s1'); setProg(1); }
+    else if (step === 3) { show('s2'); setProg(2); }
+  }
+
+  function onNameInput() {
+    var el = document.getElementById('f-name');
+    var pos = el.selectionStart;
+    var old = el.value;
+    var cleaned = old.replace(/[^A-Za-z\s\-]/g, '');
+    if (old !== cleaned) {
+      var diff = old.length - cleaned.length;
+      el.value = cleaned;
+      el.setSelectionRange(Math.max(0, pos - diff), Math.max(0, pos - diff));
+    }
+    document.getElementById('err-name').textContent = '';
+  }
+
+  function onPhoneInput() {
+    var el = document.getElementById('f-phone');
+    el.value = el.value.replace(/[^0-9+]/g, '');
+    document.getElementById('err-phone').textContent = '';
+  }
+
+  // 6-char alphanumeric, omits visually ambiguous chars (0/O, 1/I/L).
+  // Matches the lead_ref_code shape generated by the existing landing
+  // form; the v2 dashboard already stores 133 codes in this format.
+  function generateRefCode() {
+    var alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+    var out = '';
+    var crypto = window.crypto || window.msCrypto;
+    if (crypto && crypto.getRandomValues) {
+      var buf = new Uint8Array(6);
+      crypto.getRandomValues(buf);
+      for (var i = 0; i < 6; i++) out += alphabet[buf[i] % alphabet.length];
+    } else {
+      for (var j = 0; j < 6; j++) out += alphabet[Math.floor(Math.random() * alphabet.length)];
+    }
+    return out;
+  }
+
+  function splitName(full) {
+    var parts = full.trim().split(/\s+/);
+    if (parts.length === 1) return { first: parts[0], last: '' };
+    return { first: parts[0], last: parts.slice(1).join(' ') };
+  }
+
+  function readUtmFromUrl() {
+    var p = new URLSearchParams(window.location.search);
+    return {
+      utm_source: p.get('utm_source') || undefined,
+      utm_medium: p.get('utm_medium') || undefined,
+      utm_campaign: p.get('utm_campaign') || undefined,
+      utm_content: p.get('utm_content') || undefined,
+    };
+  }
+
+  function showToast(msg, isError) {
+    var toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.toggle('toast-err', !!isError);
+    toast.classList.add('show');
+    setTimeout(function(){ toast.classList.remove('show'); }, 3200);
+  }
+
+  async function submitForm(e) {
+    e.preventDefault();
+    var nameVal = document.getElementById('f-name').value.trim();
+    var phoneVal = document.getElementById('f-phone').value.trim();
+    var nameOk = nameVal.length >= 2 && /^[A-Za-z\s\-]+$/.test(nameVal);
+    var phoneOk = phoneVal.replace(/\D/g, '').length >= 10;
+    document.getElementById('err-name').textContent = nameOk ? '' : 'Please enter a valid name';
+    document.getElementById('err-phone').textContent = phoneOk ? '' : 'Please enter a valid phone number';
+    if (!nameOk || !phoneOk) return;
+
+    var btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.textContent = 'SUBMITTING...';
+
+    var parts = splitName(nameVal);
+    var refCode = generateRefCode();
+    var utm = readUtmFromUrl();
+
+    var payload = {
+      first_name: parts.first,
+      last_name: parts.last || undefined,
+      phone: phoneVal,
+      location_type: ans[1] || undefined,
+      venue_postcode: ans.location || undefined,
+      source: 'landing_quiz',
+      source_url: window.location.href,
+      lead_source: 'Landing - Quiz',
+      lead_ref_code: refCode,
+    };
+    Object.keys(utm).forEach(function(k){
+      if (utm[k]) payload[k] = utm[k];
+    });
+
+    try {
+      var res = await fetch('/api/submit-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        var err = await res.json().catch(function(){ return {}; });
+        throw new Error(err.error || ('HTTP ' + res.status));
+      }
+      document.getElementById('refcode-display').textContent = refCode;
+      show('s4'); setProg(4);
+      showToast('Submitted. Reference code: ' + refCode);
+    } catch (err) {
+      console.error('quiz submit failed:', err);
+      btn.disabled = false;
+      btn.textContent = 'CHECK IF MY LOCATION QUALIFIES →';
+      showToast('Submission failed. Please try again or WhatsApp us.', true);
+    }
+  }
+
+  document.getElementById('cform').addEventListener('submit', submitForm);
+
+  window.pick = pick;
+  window.onLocInput = onLocInput;
+  window.onNameInput = onNameInput;
+  window.onPhoneInput = onPhoneInput;
+  window.next = next;
+  window.back = back;
+})();
+</script>
+</body>
+</html>
