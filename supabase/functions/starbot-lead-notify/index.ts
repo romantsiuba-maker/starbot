@@ -72,6 +72,107 @@ function isBusinessEmail(email: string): boolean {
   return !freeProviders.includes(domain);
 }
 
+// Inline geocoder. Ported from lib/postcodes.js (tiers 1 + 2 only —
+// /quiz always supplies a postcode, free-text tier 3 not needed).
+// Returns the four venue_* columns to spread into the INSERT, or {}.
+// Failures (network, 404, parse) return failed/pending status but the
+// INSERT still proceeds with venue_lat/lng = null so the lead lands.
+const POSTCODES_IO = "https://api.postcodes.io";
+const GEOCODE_TIMEOUT_MS = 4000;
+
+function normalisePostcode(raw: string): string | null {
+  const stripped = raw.replace(/\s+/g, "").toUpperCase();
+  if (!stripped) return null;
+  if (!/^[A-Z0-9]{5,8}$/.test(stripped)) return null;
+  return stripped;
+}
+
+function normaliseOutcode(raw: string): string | null {
+  const stripped = raw.replace(/\s+/g, "").toUpperCase();
+  if (!stripped) return null;
+  if (!/^[A-Z]{1,2}[0-9][A-Z0-9]?$/.test(stripped)) return null;
+  return stripped;
+}
+
+type GeocodeResult =
+  | { status: "success"; postcode: string; lat: number; lng: number; geocoded_at: string }
+  | { status: "failed"; postcode: string }
+  | { status: "pending"; error: string }
+  | { status: "no_postcode" };
+
+async function fetchPostcodesIo(url: string, failedPostcode: string): Promise<GeocodeResult> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), GEOCODE_TIMEOUT_MS);
+  try {
+    const r = await fetch(url, { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (r.status === 404) return { status: "failed", postcode: failedPostcode };
+    if (!r.ok) return { status: "pending", error: `HTTP ${r.status}` };
+    const body = await r.json().catch(() => null);
+    const result = body && body.result;
+    if (!result || typeof result.latitude !== "number" || typeof result.longitude !== "number") {
+      return { status: "failed", postcode: failedPostcode };
+    }
+    return {
+      status: "success",
+      postcode: result.postcode || result.outcode || failedPostcode,
+      lat: result.latitude,
+      lng: result.longitude,
+      geocoded_at: new Date().toISOString(),
+    };
+  } catch (err) {
+    clearTimeout(timer);
+    return { status: "pending", error: err instanceof Error ? err.message : String(err) };
+  }
+}
+
+async function geocodePostcode(raw: string | undefined): Promise<GeocodeResult> {
+  if (!raw) return { status: "no_postcode" };
+  const trimmed = raw.trim();
+  if (!trimmed) return { status: "no_postcode" };
+
+  // Tier 1: full UK postcode
+  const postcode = normalisePostcode(trimmed);
+  if (postcode) {
+    const r = await fetchPostcodesIo(
+      `${POSTCODES_IO}/postcodes/${encodeURIComponent(postcode)}`,
+      postcode,
+    );
+    if (r.status === "success" || r.status === "pending") return r;
+  }
+
+  // Tier 2: outward code (e.g. "EC2A") -> district centroid
+  const outcode = normaliseOutcode(trimmed);
+  if (outcode) {
+    const r = await fetchPostcodesIo(
+      `${POSTCODES_IO}/outcodes/${encodeURIComponent(outcode)}`,
+      outcode,
+    );
+    if (r.status === "success" || r.status === "pending") return r;
+  }
+
+  if (postcode || outcode) return { status: "failed", postcode: postcode || outcode! };
+  return { status: "no_postcode" };
+}
+
+function geocodeColumns(result: GeocodeResult): Record<string, unknown> {
+  switch (result.status) {
+    case "success":
+      return {
+        venue_lat: result.lat,
+        venue_lng: result.lng,
+        venue_geocoded_at: result.geocoded_at,
+        venue_geocode_status: "success",
+      };
+    case "failed":
+      return { venue_geocode_status: "failed" };
+    case "pending":
+      return { venue_geocode_status: "pending" };
+    case "no_postcode":
+      return {};
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
@@ -91,6 +192,7 @@ Deno.serve(async (req: Request) => {
       company, role, email, phone, message,
       source, utm_source, utm_medium, utm_campaign, utm_content,
       location_type, coffee_timeline, london_zone,
+      venue_postcode, lead_ref_code,
       website
     } = body;
 
@@ -172,6 +274,17 @@ Deno.serve(async (req: Request) => {
 
     const isBusiness = cleanedEmail ? isBusinessEmail(cleanedEmail) : false;
 
+    // Geocode synchronously so the pin lands at insert time. Failure modes
+    // (timeout, 404, parse) populate venue_geocode_status='failed' or 'pending'
+    // without blocking the insert. ~4s worst case per the GEOCODE_TIMEOUT_MS.
+    const cleanedPostcode = venue_postcode?.trim() || null;
+    const cleanedRefCode = lead_ref_code?.trim() || null;
+    let geoCols: Record<string, unknown> = {};
+    if (cleanedPostcode) {
+      const geo = await geocodePostcode(cleanedPostcode);
+      geoCols = geocodeColumns(geo);
+    }
+
     // Insert lead - this is the source of truth
     const { error: dbError } = await supabase.from("starbot_leads").insert({
       name: name || firstName,
@@ -190,6 +303,9 @@ Deno.serve(async (req: Request) => {
       location_type: location_type || null,
       coffee_timeline: coffee_timeline || null,
       london_zone: london_zone || null,
+      venue_postcode: cleanedPostcode,
+      lead_ref_code: cleanedRefCode,
+      ...geoCols,
     });
 
     if (dbError) {
